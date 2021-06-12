@@ -1,14 +1,13 @@
-import React from 'react';
-import { Route, Switch } from 'react-router';
-import { NavBar } from './components/Navbar/NavBar';
-import { SignUp } from './containers/SignUp/SignUp';
+import { Route, Switch } from "react-router";
+import { MainPage } from "./containers/MainPage/MainPage";
+import { SignUp } from "./containers/SignUp/SignUp";
 
 function App() {
   return (
     <div className="App">
       <Switch>
-        <Route path="/signup" exact component={() => <SignUp/>}></Route>
-        <Route path="/" exact component={() => <NavBar/>}></Route>
+        <Route path="/signup" exact component={() => <SignUp />}></Route>
+        <Route path="/" exact component={() => <MainPage />}></Route>
       </Switch>
     </div>
   );

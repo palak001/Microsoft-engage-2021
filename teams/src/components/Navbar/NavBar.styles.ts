@@ -7,7 +7,7 @@ import {
 
 export const NavBarStackProps: IStackProps = {
   tokens: {
-    padding: "10px",
+    // padding: "25px",
   },
   verticalAlign: "center",
   horizontalAlign: "space-between",
@@ -16,9 +16,8 @@ export const NavBarStackProps: IStackProps = {
       background: "#464775",
       height: "50px",
       color: "white",
-      fontFamily:
-        '"Segoe UI",system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif',
-      fontSize: "14px",
+      fontSize: "16px",
+      fontStyle: "bold",
     },
   },
 };
@@ -27,7 +26,7 @@ export const IconProps: IIconProps = {
   styles: {
     root: {
       fontSize: "20px",
-      width: "20px",
+      width: "25px",
     },
   },
 };
@@ -37,7 +36,8 @@ export const SearchProps: ISearchBoxProps = {
 
   styles: {
     root: {
-      width: "900px",
+      width: "100%",
+      backgroundColor: "#D2D3DB",
     },
   },
 };

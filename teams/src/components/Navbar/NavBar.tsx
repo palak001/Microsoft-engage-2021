@@ -19,19 +19,32 @@ export const NavBar: React.FunctionComponent = () => {
   initializeIcons();
   return (
     <Stack horizontal {...NavBarStackProps}>
-      <Stack horizontal tokens={{ childrenGap: "10px" }}>
-        <Stack>
+      <Stack
+        horizontal
+        verticalAlign="center"
+        style={{ width: "23%" }}
+        // tokens={{ childrenGap: "10px" }}
+      >
+        <Stack style={{ width: "15%", padding: "12px" }}>
           <Icon iconName={"WaffleOffice365"} {...IconProps} />
         </Stack>
-        <Stack>Microsoft Teams </Stack>
+        <Stack style={{ width: "85%" }}>Microsoft Teams </Stack>
       </Stack>
-      <Stack>
+
+      <Stack style={{ width: "59%" }}>
         <SearchBox
           {...SearchProps}
           onSearch={(newValue) => console.log("value is " + newValue)}
         />
       </Stack>
-      <Stack horizontal tokens={{ childrenGap: "10px" }}>
+
+      <Stack
+        horizontal
+        verticalAlign="center"
+        horizontalAlign="end"
+        tokens={{ childrenGap: "10px" }}
+        style={{ width: "18%" }}
+      >
         <Icon iconName={"more"} {...IconProps} />
         <Persona
           {...PersonaProps}
