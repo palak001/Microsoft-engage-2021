@@ -1,5 +1,8 @@
 import { combineReducers } from 'redux';
 
+// Import other reducers
+
+// combine all the reducers
 export const rootReducer = combineReducers({
 
 });
