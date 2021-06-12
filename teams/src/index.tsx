@@ -6,6 +6,18 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
 import store from './redux-store/store';
+import { mergeStyles } from '@fluentui/merge-styles';
+
+// Inject some global style
+mergeStyles({
+  selectors: {
+    ':global(body), :global(html), :global(#root)': {
+      margin: 0,
+      padding: 0,
+      height: '100vh'
+    }
+  }
+})
 
 ReactDOM.render(
   <Provider store={store()}>
