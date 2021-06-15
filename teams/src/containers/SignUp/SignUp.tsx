@@ -1,20 +1,41 @@
-import { Stack } from '@fluentui/react';
-import { PrimaryButton } from '@fluentui/react/lib/Button';
-import React from 'react';
-import { signUpStackChildrenProps, signUpStackProps } from './SignUp.styles';
-
+import { Stack } from "@fluentui/react";
+import { PrimaryButton } from "@fluentui/react/lib/Button";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+import { signUpStackChildrenProps, signUpStackProps } from "./SignUp.styles";
+import firebase from "firebase";
+import { SignInWithSocialMedia } from "../../Auth";
+import { Providers } from "../../config/firebase";
 
 export const SignUp: React.FunctionComponent = () => {
-    return(
-        <Stack {...signUpStackProps}>
-            <Stack {...signUpStackChildrenProps}>
-                <PrimaryButton ariaDescription="Detailed description used for screen reader." >
-                    Sign up using Google
-                </PrimaryButton>
-                <br></br>
-                <h5>Already have an account? Sign in here</h5>
+  // local states
+  const [authenticating, setAuthenticating] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const history = useHistory();
 
-            </Stack>  
-        </Stack>
-    )
-} 
+  const signInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
+    if (error !== "") setError("");
+    setAuthenticating(true);
+
+    SignInWithSocialMedia(provider)
+      .then((result) => {
+        history.push("/");
+      })
+      .catch((error) => {
+        setAuthenticating(false);
+        setError(error.message);
+      });
+  };
+
+  return (
+    <Stack {...signUpStackProps}>
+      <Stack {...signUpStackChildrenProps}>
+        <PrimaryButton onClick={() => signInWithSocialMedia(Providers.google)}>
+          Sign up using Google
+        </PrimaryButton>
+        <br></br>
+        <h5>Already have an account? Sign in here</h5>
+      </Stack>
+    </Stack>
+  );
+};
