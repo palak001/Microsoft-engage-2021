@@ -3,7 +3,8 @@ import FirebaseUser from "../../interfaces/user.interface";
 
 export const fetchUserContacts = async (): Promise<any> => {
   let userDetails: Array<FirebaseUser> = [];
-  db.collection("users")
+  await db
+    .collection("users")
     .get()
     .then((snapshot) => {
       snapshot.forEach((doc: any) => {

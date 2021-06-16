@@ -1,6 +1,18 @@
+import { Stack } from "@fluentui/react";
 import React from "react";
-// import { db } from "../../config/firebase";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux-store";
 
 export const Contacts: React.FunctionComponent = () => {
-  return <p>hello</p>;
+  const contacts = useSelector(
+    (state: RootState) => state.userContactsReducer.userContacts
+  );
+
+  return (
+    <>
+      {contacts?.map((contact, id) => {
+        return <Stack key={contact.uid}>{contact.email}</Stack>;
+      })}
+    </>
+  );
 };
