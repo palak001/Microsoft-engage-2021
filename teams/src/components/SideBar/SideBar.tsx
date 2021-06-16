@@ -1,5 +1,6 @@
 import { Icon, initializeIcons, Stack } from "@fluentui/react";
 import React from "react";
+import { Contacts } from "../Contacts/Contacts";
 import { IconProps, SideBarStackProps } from "./SideBar.styles";
 
 export const SideBar: React.FunctionComponent = () => {
@@ -43,7 +44,9 @@ export const SideBar: React.FunctionComponent = () => {
             />
           </Stack>
           {/* contacts */}
-          <Stack></Stack>
+          <Stack>
+            <Contacts />
+          </Stack>
         </Stack>
       </Stack>
       {/* right */}

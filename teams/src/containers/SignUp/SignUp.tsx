@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { signUpStackChildrenProps, signUpStackProps } from "./SignUp.styles";
 import firebase from "firebase";
-import { SignInWithSocialMedia } from "../../services/Auth";
+import { SignInWithSocialMedia } from "../../services/auth";
 import { Providers } from "../../config/firebase";
 
 export const SignUp: React.FunctionComponent = () => {

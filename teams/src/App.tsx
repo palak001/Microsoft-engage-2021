@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Redirect, Route, Switch } from "react-router";
 import { BrowserRouter } from "react-router-dom";
-import AuthRoute from "./services/Auth/AuthRouter";
+import AuthRoute from "./services/auth/AuthRouter";
 import { auth, db } from "./config/firebase";
 import { MainPage } from "./containers/MainPage/MainPage";
 import { SignUp } from "./containers/SignUp/SignUp";
+import { fetchUserContacts } from "./services/firebase/FirebaseService";
+import FirebaseUsers from "./interfaces/user.interface";
+import { useDispatch } from "react-redux";
+import { fetchUserContactsAction } from "./redux-store/Firebase/UserContactsReducer";
 
 export interface IApplicationProps {}
 
 const App: React.FunctionComponent<IApplicationProps> = (props) => {
   // local states
   const [loading, setLoading] = useState(true);
-
+  const dispatch = useDispatch();
   // for monitoring and updating user state
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
@@ -25,6 +29,10 @@ const App: React.FunctionComponent<IApplicationProps> = (props) => {
             displayName: user.displayName,
             email: user.email,
           });
+
+        fetchUserContacts().then((result: Array<FirebaseUsers>) => {
+          dispatch(fetchUserContactsAction(result));
+        });
 
         console.log("user: " + auth.currentUser?.email);
         console.log("user detected");
