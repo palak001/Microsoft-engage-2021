@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Redirect, Route, Switch } from "react-router";
 import { BrowserRouter } from "react-router-dom";
-import AuthRoute from "./Auth/AuthRouter";
+import AuthRoute from "./services/Auth/AuthRouter";
 import { auth, db } from "./config/firebase";
 import { MainPage } from "./containers/MainPage/MainPage";
 import { SignUp } from "./containers/SignUp/SignUp";
@@ -21,6 +21,9 @@ const App: React.FunctionComponent<IApplicationProps> = (props) => {
           .doc(user.email + "")
           .set({
             uid: user.uid,
+            photoURL: user.photoURL,
+            displayName: user.displayName,
+            email: user.email,
           });
 
         console.log("user: " + auth.currentUser?.email);
