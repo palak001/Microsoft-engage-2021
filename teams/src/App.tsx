@@ -43,16 +43,13 @@ const App: React.FunctionComponent<IApplicationProps> = (props) => {
       }
       setLoading(false);
     });
-  }, []);
+  }, [dispatch]);
 
   if (loading) return <div>Loading...</div>;
 
   return (
     <BrowserRouter>
       <Switch>
-        {/* <Route path="/signup" exact component={() => <SignUp />}></Route> */}
-        {/* <Route path="/" exact component={() => <MainPage />}></Route> */}
-
         <Route path="/signup" exact={true} component={() => <SignUp />} />
         <Route
           path="/"

@@ -1,21 +1,17 @@
 import { initializeIcons, Stack } from "@fluentui/react";
 import React from "react";
 import { SideBar } from "../SideBar/SideBar";
-import { Chat } from "../Chat/Chat";
+import { ChatList } from "../ChatList/ChatList";
 import { MainBodyStackProps } from "./MainBody.styles";
+import { ChatRoom } from "../ChatRoom/ChatRoom";
 
 export const MainBody: React.FunctionComponent = () => {
   initializeIcons();
   return (
     <Stack {...MainBodyStackProps}>
-      <Stack
-        style={{
-          width: "23%",
-        }}
-        horizontal
-      >
+      <Stack style={{ width: "23%" }} horizontal>
         <SideBar />
-        <Chat />
+        <ChatList />
       </Stack>
       <Stack
         verticalAlign="center"
@@ -26,24 +22,7 @@ export const MainBody: React.FunctionComponent = () => {
           backgroundColor: "#F6F5F4",
         }}
       >
-        <Stack
-          verticalAlign="center"
-          style={{
-            height: "6.75%",
-            width: "100%",
-            paddingLeft: "30px",
-            fontSize: "13px",
-            color: "grey",
-            borderBottom: "0.2px #D2D7DF solid",
-          }}
-        >
-          To: Enter email
-        </Stack>
-        <Stack
-          style={{
-            height: "93.25%",
-          }}
-        ></Stack>
+        <ChatRoom />
       </Stack>
     </Stack>
   );

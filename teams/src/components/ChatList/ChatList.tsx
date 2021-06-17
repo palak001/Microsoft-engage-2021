@@ -3,7 +3,7 @@ import React from "react";
 import { Contacts } from "../Contacts/Contacts";
 import { IconProps } from "../MainBody/MainBody.styles";
 
-export const Chat: React.FunctionComponent = () => {
+export const ChatList: React.FunctionComponent = () => {
   initializeIcons();
   return (
     <Stack
