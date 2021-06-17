@@ -1,7 +1,8 @@
-import { Stack } from "@fluentui/react";
+import { Persona, PersonaSize, Stack } from "@fluentui/react";
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux-store";
+import { ContactStackProp } from "./Contacts.styles";
 
 export const Contacts: React.FunctionComponent = () => {
   const contacts = useSelector(
@@ -11,7 +12,17 @@ export const Contacts: React.FunctionComponent = () => {
   return (
     <>
       {contacts?.map((contact, id) => {
-        return <Stack key={contact.uid}>{contact.email}</Stack>;
+        return (
+          <Stack horizontal key={contact.uid} {...ContactStackProp}>
+            <Persona
+              imageUrl={contact.photoURL}
+              size={PersonaSize.size32}
+              // presence={PersonaPresence.online}
+              imageAlt="Palak, status is online"
+            />
+            {contact.email}
+          </Stack>
+        );
       })}
     </>
   );

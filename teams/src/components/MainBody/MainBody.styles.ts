@@ -1,11 +1,12 @@
 import { IIconProps, IStackProps } from "@fluentui/react";
 
-export const SideBarStackProps: IStackProps = {
+export const MainBodyStackProps: IStackProps = {
   verticalFill: true,
+  horizontal: true,
   horizontalAlign: "space-between",
   styles: {
     root: {
-      //   backgroundColor: "#ECEDE8",
+      backgroundColor: "#ECEDE8",
     },
   },
 };
