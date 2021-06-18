@@ -4,7 +4,7 @@ import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
 
 // const socket = io("http://localhost:8000/");
-const socket = io("http://localhost:8000/", {
+const socket = io("https://microsoft-engage-2021-server.herokuapp.com/", {
   autoConnect: false,
 });
 
