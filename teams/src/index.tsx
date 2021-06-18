@@ -1,33 +1,36 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { Provider } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
 
-import store from './redux-store/store';
-import { mergeStyles } from '@fluentui/merge-styles';
+import store from "./redux-store/store";
+import { mergeStyles } from "@fluentui/merge-styles";
+import ContextProvider from "./SockectContext";
 
 // Inject some global style
 mergeStyles({
   selectors: {
-    ':global(body), :global(html), :global(#root)': {
+    ":global(body), :global(html), :global(#root)": {
       margin: 0,
       padding: 0,
-      height: '100vh'
-    }
-  }
-})
+      height: "100vh",
+    },
+  },
+});
 
 ReactDOM.render(
   <Provider store={store()}>
+    <ContextProvider>
       <React.StrictMode>
         <BrowserRouter>
-      <App />
+          <App />
         </BrowserRouter>
       </React.StrictMode>
+    </ContextProvider>
   </Provider>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function
