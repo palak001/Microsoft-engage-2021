@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Redirect, Route, Switch } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import AuthRoute from "./services/auth/AuthRouter";
@@ -9,16 +9,19 @@ import { fetchUserContacts } from "./services/firebase/FirebaseService";
 import FirebaseUsers from "./interfaces/user.interface";
 import { useDispatch } from "react-redux";
 import { fetchUserContactsAction } from "./redux-store/Firebase/UserContactsReducer";
+import { SocketContext } from "./SockectContext";
 
 export interface IApplicationProps {}
 
 const App: React.FunctionComponent<IApplicationProps> = (props) => {
+  const context = useContext(SocketContext);
   // local states
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   // for monitoring and updating user state
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
+      context.socket.connect();
       if (user) {
         // check if user is already in database
         db.collection("users")

@@ -7,6 +7,17 @@ export const Video: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
   return (
     <Stack horizontal>
+      <Stack>
+        ----- is calling you
+        <button
+          onClick={() => {
+            context.answerCall();
+          }}
+        >
+          AcceptCall
+        </button>
+      </Stack>
+
       <Stack {...StackProps}>
         <video playsInline ref={context.yourVideo} muted autoPlay />
       </Stack>

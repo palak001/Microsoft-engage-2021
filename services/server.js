@@ -3,15 +3,17 @@ const http = require("http");
 const app = express();
 const server = http.createServer(app);
 const socket = require("socket.io");
+const cors = require("cors");
+const PORT = process.env.PORT || 8000;
+
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
-// temp storage
-const user = {};
+app.use(cors());
 
 // socket.emit => only to that particular socket will receive the event
 // io.emit => all the sockets connected to the io will revieve this
@@ -20,22 +22,14 @@ const user = {};
 // io is kind of a whole device with lots of sockets
 // socket is kind of a plug that connects to a socket in the device io
 io.on("connection", (socket) => {
-  if (!user[socket.id]) {
-    user[socket.id] = socket.id;
-  }
-
   socket.emit("yourID", socket.id);
-
-  // add on disconnect
-
   // emit to all the users to update their all users list.
   io.sockets.emit("allUsers", user);
   socket.on("disconnect", () => {
-    delete user[socket.id];
+    socket.broadcast.emit("callEnded");
   });
 
   socket.on("callUser", (data) => {
-    // console.log("call user data: " + data);
     io.to(data.userToCall).emit("callUser", {
       signal: data.signalData,
       from: data.from,
@@ -47,4 +41,8 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(8000, () => console.log("Yay! Server is running on port 8000"));
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
+
+server.listen(PORT, () => console.log("Server is running on port 8000"));
