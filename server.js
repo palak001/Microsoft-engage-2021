@@ -8,14 +8,14 @@ const PORT = process.env.PORT || 8000;
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    "Access-Control-Allow-Origin": "http://localhost:3000",
     methods: "GET, PUT",
   })
 );
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    "Access-Control-Allow-Origin": "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.get("/", (req, res) => {
+app.get("/", cors, (req, res) => {
   res.send("Server is running");
 });
 
