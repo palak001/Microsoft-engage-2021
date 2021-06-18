@@ -3,7 +3,10 @@ import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
 
-const socket = io("http://localhost:8000/");
+// const socket = io("http://localhost:8000/");
+const socket = io("https://microsoft-engage-2021-server.herokuapp.com/", {
+  autoConnect: false,
+});
 
 interface ICallDetails {
   from: string;
@@ -22,7 +25,8 @@ interface ICallDetails {
 // }
 
 interface IContext {
-  callDetails: any;
+  socket: any;
+  callDetails: ICallDetails;
   callAccepted: any;
   yourVideo: any;
   friendVideo: any;
@@ -54,12 +58,16 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
-        yourVideo.current.srcObject = currentStream;
+        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
       });
 
     socket.on("yourID", (socketID) => {
       setYourID(socketID);
+      console.log(socketID);
       if (auth.currentUser) {
+        console.log(socketID);
+        console.log(auth.currentUser);
+        console.log(auth.currentUser?.email);
         db.collection("users")
           .doc(auth.currentUser?.email + "")
           .set(
@@ -84,13 +92,13 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setCallAccepted(true);
     const peer = new Peer({ initiator: false, trickle: false, stream: stream });
     peer.on("signal", (data: ICallDetails) => {
-      socket.emit("acceptCall", { signal: data.signal, to: callDetails?.from });
+      socket.emit("acceptCall", { signal: data.signal, to: callDetails.from });
     });
 
     peer.on("stream", (currentStream) => {
-      friendVideo.current.srcObject = currentStream;
+      if (friendVideo.current) friendVideo.current.srcObject = currentStream;
     });
-    peer.signal(callDetails?.signal);
+    peer.signal(callDetails.signal);
     connectionRef.current = peer;
   };
 
@@ -110,7 +118,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     peer.on("stream", (currentStream) => {
-      friendVideo.current.srcObject = currentStream;
+      if (friendVideo) friendVideo.current.srcObject = currentStream;
     });
 
     socket.on("callAccpted", (signal) => {
@@ -129,6 +137,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   return (
     <SocketContext.Provider
       value={{
+        socket,
         callDetails,
         callAccepted,
         yourVideo,

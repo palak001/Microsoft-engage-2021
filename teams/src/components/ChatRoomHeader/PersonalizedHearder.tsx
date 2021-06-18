@@ -1,10 +1,14 @@
 import { Icon, Persona, PersonaSize, Stack } from "@fluentui/react";
-import React from "react";
+import React, { useContext } from "react";
 import { useSelector } from "react-redux";
+import { db } from "../../config/firebase";
 import FirebaseUser from "../../interfaces/user.interface";
 import { RootState } from "../../redux-store";
+import { SocketContext } from "../../SockectContext";
 
 export const PersonalizedHeader: React.FunctionComponent = () => {
+  const context = useContext(SocketContext);
+
   const selectedUser: FirebaseUser = useSelector(
     (state: RootState) => state.selectedUserReducer.selectedUserDetails
   );
@@ -34,7 +38,19 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
       <Stack
         verticalAlign="center"
         onClick={() => {
-          //   callPeer(selectedUser.uid);
+          console.log("clicked");
+          console.log(selectedUser.email);
+          console.log(selectedUser.displayName);
+          db.collection("users")
+            .doc(selectedUser.email)
+            .get()
+            .then((doc) => {
+              if (doc.exists) {
+                // console.log("info");
+                // console.log(doc.data());
+                if (doc.data()) context.startCall(doc.data()?.socketID);
+              }
+            });
         }}
       >
         <Icon
