@@ -6,14 +6,19 @@ const socket = require("socket.io");
 const cors = require("cors");
 const PORT = process.env.PORT || 8000;
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: "GET, PUT",
+  })
+);
+
 const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
-
-app.use(cors());
 
 // socket.emit => only to that particular socket will receive the event
 // io.emit => all the sockets connected to the io will revieve this
