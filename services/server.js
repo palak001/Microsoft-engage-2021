@@ -23,8 +23,11 @@ io.on("connection", (socket) => {
   if (!user[socket.id]) {
     user[socket.id] = socket.id;
   }
-  console.log("from server: ypour id: " + socket.id);
+
   socket.emit("yourID", socket.id);
+
+  // add on disconnect
+
   // emit to all the users to update their all users list.
   io.sockets.emit("allUsers", user);
   socket.on("disconnect", () => {
@@ -33,14 +36,13 @@ io.on("connection", (socket) => {
 
   socket.on("callUser", (data) => {
     // console.log("call user data: " + data);
-    io.to(data.userToCall).emit("hey", {
+    io.to(data.userToCall).emit("callUser", {
       signal: data.signalData,
       from: data.from,
     });
   });
 
   socket.on("acceptCall", (data) => {
-    console.log("accept user data: " + data);
     io.to(data.to).emit("callAccepted", data.signal);
   });
 });

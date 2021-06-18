@@ -2,17 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 import { auth, db } from "../../config/firebase";
-import FirebaseUser from "../../interfaces/user.interface";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux-store";
-
-const selectedUser: FirebaseUser = useSelector(
-  (state: RootState) => state.selectedUserReducer.selectedUserDetails
-);
 
 export interface IVideocallProps {}
 
-const Videocall: React.FunctionComponent<IVideocallProps> = (props) => {
+export const Videocall: React.FunctionComponent<IVideocallProps> = (props) => {
   // Local States
   const [yourID, setYourID] = useState<string>("");
   const [users, setUsers] = useState<object>({});
@@ -139,7 +132,7 @@ const Videocall: React.FunctionComponent<IVideocallProps> = (props) => {
   if (receivingCall) {
     incomingCall = (
       <div>
-        <h1>{selectedUser.displayName} is calling you</h1>
+        <h1>{caller} is calling you</h1>
         <button
           onClick={() => {
             acceptCall();
@@ -158,11 +151,24 @@ const Videocall: React.FunctionComponent<IVideocallProps> = (props) => {
         {PartnerVideo}
       </div>
 
+      <div>
+        {Object.keys(users).map((key) => {
+          console.log("yourId: " + yourID);
+          console.log("key: " + key);
+          if (key === yourID) {
+            return null;
+          }
+          return (
+            <button key={key} onClick={() => callPeer(key)}>
+              Call {key}
+            </button>
+          );
+        })}
+      </div>
+
       <div>{incomingCall}</div>
     </div>
   );
 };
 
 export default Videocall;
-
-export {};
