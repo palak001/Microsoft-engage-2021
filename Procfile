@@ -1,1 +1,1 @@
-web: node Microsoft-engage-2021/services/server.js
+web: node server.js
