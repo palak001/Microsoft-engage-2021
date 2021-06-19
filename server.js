@@ -7,7 +7,7 @@ const cors = require("cors");
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin:  ["http://localhost:3000", "https://palak001-microsoft-engage-2021.netlify.app/"],
     methods: ["GET", "POST"],
   },
 });
