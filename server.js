@@ -7,7 +7,7 @@ const cors = require("cors");
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "*",
+    origin: "*:*",
     methods: ["GET", "POST"],
   },
 });
@@ -23,8 +23,6 @@ const PORT = process.env.PORT || 8000;
 // socket is kind of a plug that connects to a socket in the device io
 io.on("connection", (socket) => {
   socket.emit("yourID", socket.id);
-  // emit to all the users to update their all users list.
-  io.sockets.emit("allUsers", user);
   socket.on("disconnect", () => {
     socket.broadcast.emit("callEnded");
   });
