@@ -1,4 +1,4 @@
-import { db } from "../../config/firebase";
+import { auth, db } from "../../config/firebase";
 import FirebaseUser from "../../interfaces/user.interface";
 
 export const fetchUserContacts = async (): Promise<any> => {
@@ -10,7 +10,7 @@ export const fetchUserContacts = async (): Promise<any> => {
       snapshot.forEach((doc: any) => {
         const snap = doc.data();
         // console.log(snap);
-
+        // if (snap.email !== auth.currentUser?.email)
         userDetails = userDetails.concat(snap);
       });
     });
