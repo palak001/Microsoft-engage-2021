@@ -23,10 +23,10 @@ interface IContext {
   stream: any;
   callEnded: any;
   yourID: any;
-  setStream: any;
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
+  setStreamFunction: () => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
@@ -117,6 +117,15 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     connectionRef.current.destroy();
   };
 
+  const setStreamFunction = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+      });
+  };
+
   return (
     <SocketContext.Provider
       value={{
@@ -128,10 +137,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         stream,
         callEnded,
         yourID,
-        setStream,
         answerCall,
         startCall,
         leaveCall,
+        setStreamFunction,
       }}
     >
       {children}

@@ -13,14 +13,8 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
     (state: RootState) => state.selectedUserReducer.selectedUserDetails
   );
 
-  const handleVideoCall = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        context.setStream(currentStream);
-        if (context.yourVideo.current)
-          context.yourVideo.current.srcObject = currentStream;
-      });
+  const handleVideoCall = async () => {
+    await context.setStreamFunction();
 
     db.collection("users")
       .doc(selectedUser.email)
