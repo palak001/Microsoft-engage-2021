@@ -5,14 +5,31 @@ const server = http.createServer(app);
 const socket = require("socket.io");
 const cors = require("cors");
 
+let whitelist = [
+  "http://localhost:3000",
+  "https://palak001-microsoft-engage-2021.netlify.app",
+];
+let corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+
 const io = require("socket.io")(server, {
   cors: {
-    origin:  ["http://localhost:3000", "https://palak001-microsoft-engage-2021.netlify.app/"],
+    origin: [
+      "http://localhost:3000",
+      "https://palak001-microsoft-engage-2021.netlify.app",
+    ],
     methods: ["GET", "POST"],
   },
 });
 
-app.use(cors());
+app.use(cors(corsOptions));
 const PORT = process.env.PORT || 8000;
 
 // socket.emit => only to that particular socket will receive the event
