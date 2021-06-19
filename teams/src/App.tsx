@@ -18,6 +18,7 @@ const App: React.FunctionComponent<IApplicationProps> = (props) => {
   // local states
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+
   // for monitoring and updating user state
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
@@ -31,22 +32,20 @@ const App: React.FunctionComponent<IApplicationProps> = (props) => {
             photoURL: user.photoURL,
             displayName: user.displayName,
             email: user.email,
+            socketID: context.yourID,
           });
 
         fetchUserContacts().then((result: Array<FirebaseUsers>) => {
           dispatch(fetchUserContactsAction(result));
         });
-
-        console.log("user: " + auth.currentUser?.email);
-        console.log("user detected");
       } else {
-        console.log("No user detected");
+        // console.log("No user detected");
         // redirect the user to signup page
         <Redirect to="/signup" />;
       }
       setLoading(false);
     });
-  }, [dispatch]);
+  }, [dispatch, context]);
 
   if (loading) return <div>Loading...</div>;
 

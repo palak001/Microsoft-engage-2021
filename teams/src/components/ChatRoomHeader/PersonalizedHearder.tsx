@@ -13,6 +13,26 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
     (state: RootState) => state.selectedUserReducer.selectedUserDetails
   );
 
+  const handleVideoCall = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        context.setStream(currentStream);
+        if (context.yourVideo.current)
+          context.yourVideo.current.srcObject = currentStream;
+      });
+
+    db.collection("users")
+      .doc(selectedUser.email)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          if (doc.data()?.socketID) context.startCall(doc.data()?.socketID);
+          else console.log("Person if offline");
+        }
+      });
+  };
+
   return (
     <Stack
       horizontal
@@ -35,24 +55,7 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
         />
         {selectedUser.displayName}
       </Stack>
-      <Stack
-        verticalAlign="center"
-        onClick={() => {
-          console.log("clicked");
-          console.log(selectedUser.email);
-          console.log(selectedUser.displayName);
-          db.collection("users")
-            .doc(selectedUser.email)
-            .get()
-            .then((doc) => {
-              if (doc.exists) {
-                // console.log("info");
-                // console.log(doc.data());
-                if (doc.data()) context.startCall(doc.data()?.socketID);
-              }
-            });
-        }}
-      >
+      <Stack verticalAlign="center" onClick={handleVideoCall}>
         <Icon
           iconName={"Video"}
           style={{

@@ -3,14 +3,22 @@ import React, { useContext } from "react";
 import { SocketContext } from "../../SockectContext";
 import { StackProps } from "./Video.styles";
 
-export const Video: React.FunctionComponent = () => {
+const Video: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
   return (
     <Stack horizontal>
       <Stack>
-        ----- is calling you
+        {context.callDetails?.from} is calling you
         <button
           onClick={() => {
+            // set user stream
+            navigator.mediaDevices
+              .getUserMedia({ video: true, audio: true })
+              .then((currentStream) => {
+                context.setStream(currentStream);
+                if (context.yourVideo.current)
+                  context.yourVideo.current.srcObject = currentStream;
+              });
             context.answerCall();
           }}
         >
@@ -19,11 +27,16 @@ export const Video: React.FunctionComponent = () => {
       </Stack>
 
       <Stack {...StackProps}>
+        your video
         <video playsInline ref={context.yourVideo} muted autoPlay />
       </Stack>
-      <Stack {...StackProps}>
+      <Stack style={{ backgroundColor: "pink" }} {...StackProps}>
+        your friend video
+        {console.log(context.friendVideo)}
         <video playsInline ref={context.friendVideo} muted autoPlay />
       </Stack>
     </Stack>
   );
 };
+
+export default Video;

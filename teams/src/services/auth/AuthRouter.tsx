@@ -12,7 +12,7 @@ const AuthRoute: React.FunctionComponent<IAuthRouteProps> = (props) => {
   if (!auth.currentUser) {
     return <Redirect to="/signup" />;
   }
-  console.log("auth.currentUser: " + auth.currentUser);
+  // console.log("auth.currentUser: " + auth.currentUser);
   return <div>{children}</div>;
 };
 
