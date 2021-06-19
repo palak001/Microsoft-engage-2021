@@ -14,16 +14,6 @@ interface ICallDetails {
   isReceivedCall: boolean;
 }
 
-// interface IInfoNeeded {
-//   callDetails: ICallDetails;
-//   callAccepted: boolean;
-//   yourVideo: any;
-//   friendVideo: any;
-//   stream: MediaStream;
-//   callEnded: boolean;
-//   yourID: string;
-// }
-
 interface IContext {
   socket: any;
   callDetails: ICallDetails;
@@ -33,6 +23,7 @@ interface IContext {
   stream: any;
   callEnded: any;
   yourID: any;
+  setStream: any;
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
@@ -42,10 +33,10 @@ export const SocketContext = React.createContext({} as IContext);
 
 const ContextProvider: React.FunctionComponent = ({ children }) => {
   const [stream, setStream] = useState<any>();
-  const [yourID, setYourID] = useState<any>();
+  const [yourID, setYourID] = useState<any>("");
   const [callDetails, setCallDetails] = useState<any>();
-  const [callAccepted, setCallAccepted] = useState<any>();
-  const [callEnded, setCallEnded] = useState<any>();
+  const [callAccepted, setCallAccepted] = useState<any>(false);
+  const [callEnded, setCallEnded] = useState<any>(false);
 
   // refs
   const yourVideo = useRef<any>();
@@ -53,21 +44,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const connectionRef = useRef<any>();
 
   useEffect(() => {
-    // get the permission to use camera and microphone
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-      });
-
     socket.on("yourID", (socketID) => {
       setYourID(socketID);
       console.log(socketID);
       if (auth.currentUser) {
-        console.log(socketID);
-        console.log(auth.currentUser);
-        console.log(auth.currentUser?.email);
         db.collection("users")
           .doc(auth.currentUser?.email + "")
           .set(
@@ -79,30 +59,33 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       }
     });
 
-    socket.on("callUser", (data: any) => {
+    socket.on("calling", (data: any) => {
       setCallDetails({
         from: data.from,
         signal: data.signal,
         isReceivedCall: true,
       });
+      console.log(data.from);
     });
-  }, []);
+  }, [yourID, callDetails]);
 
   const answerCall = () => {
     setCallAccepted(true);
     const peer = new Peer({ initiator: false, trickle: false, stream: stream });
     peer.on("signal", (data: ICallDetails) => {
-      socket.emit("acceptCall", { signal: data.signal, to: callDetails.from });
+      socket.emit("acceptCall", { signal: data, to: callDetails.from });
     });
 
     peer.on("stream", (currentStream) => {
-      if (friendVideo.current) friendVideo.current.srcObject = currentStream;
+      if (friendVideo.current) {
+        friendVideo.current.srcObject = currentStream;
+      }
     });
-    peer.signal(callDetails.signal);
+    if (callDetails) peer.signal(callDetails.signal);
     connectionRef.current = peer;
   };
 
-  const startCall = (id: string) => {
+  const startCall = (socketId: string) => {
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -111,7 +94,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
     peer.on("signal", (data: any) => {
       socket.emit("callUser", {
-        userToCall: id,
+        userToCall: socketId,
         signalData: data,
         from: yourID,
       });
@@ -121,7 +104,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       if (friendVideo) friendVideo.current.srcObject = currentStream;
     });
 
-    socket.on("callAccpted", (signal) => {
+    socket.on("callAccepted", (signal) => {
       setCallAccepted(true);
       peer.signal(signal);
     });
@@ -145,6 +128,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         stream,
         callEnded,
         yourID,
+        setStream,
         answerCall,
         startCall,
         leaveCall,
