@@ -8,17 +8,17 @@ const Video: React.FunctionComponent = () => {
   return (
     <Stack horizontal>
       <Stack>
-        {context.callDetails?.from} is calling you
         <button
-          onClick={() => {
+          onClick={async () => {
             // set user stream
-            navigator.mediaDevices
-              .getUserMedia({ video: true, audio: true })
-              .then((currentStream) => {
-                context.setStream(currentStream);
-                if (context.yourVideo.current)
-                  context.yourVideo.current.srcObject = currentStream;
-              });
+            // navigator.mediaDevices
+            //   .getUserMedia({ video: true, audio: true })
+            //   .then((currentStream) => {
+            //     context.setStream(currentStream);
+            //     if (context.yourVideo.current)
+            //       context.yourVideo.current.srcObject = currentStream;
+            //   });
+            await context.setStreamFunction();
             context.answerCall();
           }}
         >

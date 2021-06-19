@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import FirebaseUser from "../../interfaces/user.interface";
 import { RootState } from "../../redux-store";
 import { NormalHeader } from "./NormalHeader";
-import { PersonalizedHeader } from "./PersonalizedHearder";
+import { PersonalizedHeader } from "./PersonalizedHeader";
 
 export const ChatRoomHeader: React.FunctionComponent = () => {
   const selectedUser: FirebaseUser = useSelector(

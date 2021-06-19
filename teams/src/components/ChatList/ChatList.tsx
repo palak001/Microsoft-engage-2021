@@ -1,5 +1,6 @@
 import { Icon, initializeIcons, Stack } from "@fluentui/react";
 import React from "react";
+import { auth } from "../../config/firebase";
 import { Contacts } from "../Contacts/Contacts";
 import { IconProps } from "../MainBody/MainBody.styles";
 
@@ -32,6 +33,7 @@ export const ChatList: React.FunctionComponent = () => {
       </Stack>
       {/* contacts */}
       <Stack>
+        <Stack>Current User: {auth.currentUser?.email}</Stack>
         <Contacts />
       </Stack>
     </Stack>
