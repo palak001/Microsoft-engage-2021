@@ -45,7 +45,7 @@ const App: React.FunctionComponent<IApplicationProps> = (props) => {
       }
       setLoading(false);
     });
-  }, [dispatch, context]);
+  }, []);
 
   if (loading) return <div>Loading...</div>;
 

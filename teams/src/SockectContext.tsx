@@ -22,7 +22,7 @@ interface IContext {
   friendVideo: any;
   stream: any;
   callEnded: any;
-  yourID: any;
+  yourID: string;
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
@@ -33,7 +33,7 @@ export const SocketContext = React.createContext({} as IContext);
 
 const ContextProvider: React.FunctionComponent = ({ children }) => {
   const [stream, setStream] = useState<any>();
-  const [yourID, setYourID] = useState<any>("");
+  const [yourID, setYourID] = useState<string>("");
   const [callDetails, setCallDetails] = useState<any>();
   const [callAccepted, setCallAccepted] = useState<any>(false);
   const [callEnded, setCallEnded] = useState<any>(false);
@@ -44,7 +44,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const connectionRef = useRef<any>();
 
   useEffect(() => {
-    socket.on("yourID", (socketID) => {
+    socket.on("yourID", (socketID: string) => {
       setYourID(socketID);
       console.log(socketID);
       if (auth.currentUser) {
@@ -59,29 +59,30 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       }
     });
 
-    socket.on("calling", (data: any) => {
+    socket.on("callUser", (data: ICallDetails) => {
+      console.log("you are getting a call");
       setCallDetails({
         from: data.from,
         signal: data.signal,
-        isReceivedCall: true,
+        isReceivedCall: data.isReceivedCall,
       });
       console.log(data.from);
     });
-  }, [yourID, callDetails]);
+  }, []);
 
   const answerCall = () => {
     setCallAccepted(true);
     const peer = new Peer({ initiator: false, trickle: false, stream: stream });
-    peer.on("signal", (data: ICallDetails) => {
-      socket.emit("acceptCall", { signal: data, to: callDetails.from });
+    peer.on("signal", (signalData) => {
+      socket.emit("acceptCall", { signal: signalData, to: callDetails.from });
     });
 
     peer.on("stream", (currentStream) => {
-      if (friendVideo.current) {
-        friendVideo.current.srcObject = currentStream;
-      }
+      friendVideo.current.srcObject = currentStream;
     });
-    if (callDetails) peer.signal(callDetails.signal);
+    // peer.signal(JSON.stringify(callDetails?.signal));
+    peer.signal(callDetails.signal);
+
     connectionRef.current = peer;
   };
 
@@ -92,20 +93,24 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       stream: stream,
     });
 
-    peer.on("signal", (data: any) => {
+    // fires when the peer want to send signalling data to other peers
+    peer.on("signal", (signalData: any) => {
       socket.emit("callUser", {
         userToCall: socketId,
-        signalData: data,
+        signalData: signalData,
         from: yourID,
       });
     });
 
     peer.on("stream", (currentStream) => {
-      if (friendVideo) friendVideo.current.srcObject = currentStream;
+      friendVideo.current.srcObject = currentStream;
     });
 
     socket.on("callAccepted", (signal) => {
+      console.log("do you still have your video?");
+      console.log(signal);
       setCallAccepted(true);
+      // peer.signal(JSON.stringify(signal));
       peer.signal(signal);
     });
 
@@ -122,7 +127,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
-        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+        yourVideo.current.srcObject = currentStream;
       });
   };
 
