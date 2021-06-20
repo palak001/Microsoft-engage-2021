@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Redirect, Route, Switch } from "react-router";
+import { Redirect, Route, Switch, useHistory } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import AuthRoute from "./services/auth/AuthRouter";
 import { auth, db } from "./config/firebase";
@@ -13,18 +13,17 @@ import { SocketContext } from "./SockectContext";
 
 export interface IApplicationProps {}
 
-const App: React.FunctionComponent<IApplicationProps> = (props) => {
+const App: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
   // local states
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+  const history = useHistory();
 
-  // for monitoring and updating user state
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
-      context.socket.connect();
       if (user) {
-        // check if user is already in database
+        context.socket.connect();
         db.collection("users")
           .doc(user.email + "")
           .set({
@@ -32,20 +31,21 @@ const App: React.FunctionComponent<IApplicationProps> = (props) => {
             photoURL: user.photoURL,
             displayName: user.displayName,
             email: user.email,
-            socketID: context.yourID,
           });
-
-        fetchUserContacts().then((result: Array<FirebaseUsers>) => {
-          dispatch(fetchUserContactsAction(result));
-        });
-      } else {
-        // console.log("No user detected");
-        // redirect the user to signup page
-        <Redirect to="/signup" />;
-      }
+        history.push("/");
+      } else history.push("/signup");
       setLoading(false);
     });
-  }, []);
+  }, [context.socket, history]);
+
+  // // for monitoring and updating user state
+  useEffect(() => {
+    if (auth.currentUser) {
+      fetchUserContacts().then((result: Array<FirebaseUsers>) => {
+        dispatch(fetchUserContactsAction(result));
+      });
+    }
+  }, [dispatch]);
 
   if (loading) return <div>Loading...</div>;
 

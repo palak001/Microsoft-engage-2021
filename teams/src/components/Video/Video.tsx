@@ -9,7 +9,7 @@ const Video: React.FunctionComponent = () => {
     <Stack horizontal>
       <Stack>
         <button
-          onClick={async () => {
+          onClick={() => {
             // set user stream
             // navigator.mediaDevices
             //   .getUserMedia({ video: true, audio: true })
@@ -18,8 +18,8 @@ const Video: React.FunctionComponent = () => {
             //     if (context.yourVideo.current)
             //       context.yourVideo.current.srcObject = currentStream;
             //   });
-            await context.setStreamFunction();
-            context.answerCall();
+            context.setCalleeStreamFunction();
+            // context.answerCall();
           }}
         >
           AcceptCall

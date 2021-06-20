@@ -2,6 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
+import FirebaseUser from "./interfaces/user.interface";
+import { useSelector } from "react-redux";
+import { RootState } from "./redux-store";
 
 // const socket = io("http://localhost:8000/");
 const socket = io("https://microsoft-engage-2021-server.herokuapp.com", {
@@ -26,12 +29,17 @@ interface IContext {
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
-  setStreamFunction: () => void;
+  setCallerStreamFunction: () => void;
+  setCalleeStreamFunction: () => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
 
 const ContextProvider: React.FunctionComponent = ({ children }) => {
+  const selectedUser: FirebaseUser = useSelector(
+    (state: RootState) => state.selectedUserReducer.selectedUserDetails
+  );
+
   const [stream, setStream] = useState<any>();
   const [yourID, setYourID] = useState<string>("");
   const [callDetails, setCallDetails] = useState<any>();
@@ -45,6 +53,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   useEffect(() => {
     socket.on("yourID", (socketID: string) => {
+      console.log("Got your socket id");
       setYourID(socketID);
       console.log(socketID);
       if (auth.currentUser) {
@@ -68,9 +77,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
       console.log(data.from);
     });
-  }, []);
+  });
 
   const answerCall = () => {
+    console.log("You have answered a call");
     setCallAccepted(true);
     const peer = new Peer({ initiator: false, trickle: false, stream: stream });
     peer.on("signal", (signalData) => {
@@ -87,6 +97,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const startCall = (socketId: string) => {
+    console.log("you have started a call");
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -122,12 +133,35 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     connectionRef.current.destroy();
   };
 
-  const setStreamFunction = () => {
+  const setCalleeStreamFunction = () => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
         yourVideo.current.srcObject = currentStream;
+      })
+      .then(() => {
+        answerCall();
+      });
+  };
+
+  const setCallerStreamFunction = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        yourVideo.current.srcObject = currentStream;
+      })
+      .then(() => {
+        db.collection("users")
+          .doc(selectedUser.email)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              if (doc.data()?.socketID) startCall(doc.data()?.socketID);
+              else console.log("Person if offline");
+            }
+          });
       });
   };
 
@@ -145,7 +179,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         answerCall,
         startCall,
         leaveCall,
-        setStreamFunction,
+        setCallerStreamFunction,
+        setCalleeStreamFunction,
       }}
     >
       {children}

@@ -1,11 +1,20 @@
 import { Icon, initializeIcons, Stack } from "@fluentui/react";
 import React from "react";
+import { useHistory } from "react-router";
 import { auth } from "../../config/firebase";
 import { Contacts } from "../Contacts/Contacts";
 import { IconProps } from "../MainBody/MainBody.styles";
 
 export const ChatList: React.FunctionComponent = () => {
+  const history = useHistory();
   initializeIcons();
+
+  const handleSignOut = () => {
+    auth.signOut().then(() => {
+      history.push("/signup");
+    });
+  };
+
   return (
     <Stack
       style={{
@@ -34,6 +43,9 @@ export const ChatList: React.FunctionComponent = () => {
       {/* contacts */}
       <Stack>
         <Stack>Current User: {auth.currentUser?.email}</Stack>
+        <Stack>
+          <button onClick={handleSignOut}>Sign out</button>
+        </Stack>
         <Contacts />
       </Stack>
     </Stack>
