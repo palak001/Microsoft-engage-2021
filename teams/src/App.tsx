@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Redirect, Route, Switch, useHistory } from "react-router";
+import { Route, Switch, useHistory } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import AuthRoute from "./services/auth/AuthRouter";
 import { auth, db } from "./config/firebase";
