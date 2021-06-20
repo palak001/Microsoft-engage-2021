@@ -14,7 +14,16 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
   );
 
   const handleVideoCall = () => {
-    context.setCallerStreamFunction();
+    // context.setCallerStreamFunction();
+    db.collection("users")
+      .doc(selectedUser.email)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          if (doc.data()?.socketID) context.startCall(doc.data()?.socketID);
+          else console.log("Person if offline");
+        }
+      });
   };
 
   return (

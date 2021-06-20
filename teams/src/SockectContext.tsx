@@ -52,6 +52,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const connectionRef = useRef<any>();
 
   useEffect(() => {
+    console.log("Welcome3");
+
     socket.on("yourID", (socketID: string) => {
       console.log("Got your socket id");
       setYourID(socketID);
@@ -77,17 +79,49 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
       console.log(data.from);
     });
+  }, []);
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      if (yourVideo.current && !yourVideo.current.srcObject) {
+        navigator.mediaDevices
+          .getUserMedia({ video: true, audio: true })
+          .then((currentStream) => {
+            setStream(currentStream);
+            if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+          });
+      }
+    }
   });
 
   const answerCall = () => {
     console.log("You have answered a call");
     setCallAccepted(true);
-    const peer = new Peer({ initiator: false, trickle: false, stream: stream });
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: stream,
+      config: {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+          { urls: "stun:stun2.l.google.com:19302" },
+          { urls: "stun:stun3.l.google.com:19302" },
+          { urls: "stun:stun4.l.google.com:19302" },
+        ],
+      },
+    });
+    // console.log("peer oject");
+    // console.log(peer);
     peer.on("signal", (signalData) => {
+      console.log("you are emmiting this info");
+      console.log(signalData);
       socket.emit("acceptCall", { signal: signalData, to: callDetails.from });
     });
 
     peer.on("stream", (currentStream) => {
+      console.log("caller video");
+      console.log(currentStream);
       friendVideo.current.srcObject = currentStream;
     });
     // peer.signal(JSON.stringify(callDetails?.signal));
@@ -102,7 +136,19 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       initiator: true,
       trickle: false,
       stream: stream,
+      config: {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+          { urls: "stun:stun2.l.google.com:19302" },
+          { urls: "stun:stun3.l.google.com:19302" },
+          { urls: "stun:stun4.l.google.com:19302" },
+        ],
+      },
     });
+
+    console.log("peer at start call");
+    console.log(peer);
 
     // fires when the peer want to send signalling data to other peers
     peer.on("signal", (signalData: any) => {
@@ -114,6 +160,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     peer.on("stream", (currentStream) => {
+      console.log("callee video");
+      console.log(currentStream);
+      console.log(currentStream);
       friendVideo.current.srcObject = currentStream;
     });
 
@@ -133,36 +182,62 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     connectionRef.current.destroy();
   };
 
-  const setCalleeStreamFunction = () => {
-    navigator.mediaDevices
+  const setCalleeStreamFunction = async () => {
+    await navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
-        yourVideo.current.srcObject = currentStream;
-      })
-      .then(() => {
-        answerCall();
+        setStream((state: any) => {
+          console.log("current Stream");
+          console.log(state);
+          yourVideo.current.srcObject = state;
+          answerCall();
+          return state;
+        });
       });
   };
 
-  const setCallerStreamFunction = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        yourVideo.current.srcObject = currentStream;
-      })
-      .then(() => {
-        db.collection("users")
-          .doc(selectedUser.email)
-          .get()
-          .then((doc) => {
-            if (doc.exists) {
-              if (doc.data()?.socketID) startCall(doc.data()?.socketID);
-              else console.log("Person if offline");
-            }
-          });
-      });
+  const setCallerStreamFunction = async () => {
+    const currentStream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+    setStream(currentStream);
+    setStream((state: any) => {
+      console.log("current Stream");
+      console.log(state);
+      yourVideo.current.srcObject = state;
+      db.collection("users")
+        .doc(selectedUser.email)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            if (doc.data()?.socketID) startCall(doc.data()?.socketID);
+            else console.log("Person if offline");
+          }
+        });
+      return state;
+    });
+
+    // console.log(stream);
+
+    // navigator.mediaDevices
+    //   .getUserMedia({ video: true, audio: true })
+    //   .then((currentStream) => {
+    //     setStream(currentStream);
+    //     yourVideo.current.srcObject = currentStream;
+    //   })
+    //   .then(() => {
+    //     db.collection("users")
+    //       .doc(selectedUser.email)
+    //       .get()
+    //       .then((doc) => {
+    //         if (doc.exists) {
+    //           if (doc.data()?.socketID) startCall(doc.data()?.socketID);
+    //           else console.log("Person if offline");
+    //         }
+    //       });
+    //   });
   };
 
   return (
