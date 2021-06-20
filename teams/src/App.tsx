@@ -40,12 +40,14 @@ const App: React.FunctionComponent = () => {
 
   // // for monitoring and updating user state
   useEffect(() => {
+    // console.log("when are your called");
     if (auth.currentUser) {
       fetchUserContacts().then((result: Array<FirebaseUsers>) => {
         dispatch(fetchUserContactsAction(result));
       });
+      setLoading(false);
     }
-  }, [dispatch]);
+  }, [dispatch, loading]);
 
   if (loading) return <div>Loading...</div>;
 
