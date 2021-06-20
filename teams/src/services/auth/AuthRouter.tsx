@@ -9,7 +9,9 @@ interface IAuthRouteProps {
 const AuthRoute: React.FunctionComponent<IAuthRouteProps> = (props) => {
   const { children } = props;
 
+  // console.log(auth.currentUser?.email);
   if (!auth.currentUser) {
+    // console.log("no entry");
     return <Redirect to="/signup" />;
   }
   // console.log("auth.currentUser: " + auth.currentUser);

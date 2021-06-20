@@ -13,18 +13,8 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
     (state: RootState) => state.selectedUserReducer.selectedUserDetails
   );
 
-  const handleVideoCall = async () => {
-    await context.setStreamFunction();
-
-    db.collection("users")
-      .doc(selectedUser.email)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          if (doc.data()?.socketID) context.startCall(doc.data()?.socketID);
-          else console.log("Person if offline");
-        }
-      });
+  const handleVideoCall = () => {
+    context.setCallerStreamFunction();
   };
 
   return (
