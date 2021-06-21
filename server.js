@@ -55,6 +55,20 @@ io.on("connection", (socket) => {
   socket.on("acceptCall", (data) => {
     io.to(data.to).emit("callAccepted", data.signal);
   });
+
+  socket.on("disconnectThisID", (id) => {
+    console.log(id);
+    if (id) {
+      io.to(id).emit("youHaveBeenDisconnected");
+      io.sockets.sockets.forEach((socket) => {
+        // If given socket id is exist in list of all sockets, kill it
+        if (socket.id === id) {
+          console.log("found you!");
+          socket.disconnect(true);
+        }
+      });
+    }
+  });
 });
 
 app.get("/", (req, res) => {

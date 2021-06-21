@@ -10,11 +10,20 @@ import FirebaseUsers from "./interfaces/user.interface";
 import { useDispatch } from "react-redux";
 import { fetchUserContactsAction } from "./redux-store/Firebase/UserContactsReducer";
 import { SocketContext } from "./SockectContext";
+import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
+import { IStackProps, Stack } from "@fluentui/react/lib/Stack";
 
 export interface IApplicationProps {}
 
 const App: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
+  const rowProps: IStackProps = {
+    verticalFill: true,
+    horizontal: true,
+    verticalAlign: "center",
+    horizontalAlign: "center",
+  };
+
   // local states
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
@@ -49,7 +58,12 @@ const App: React.FunctionComponent = () => {
     }
   }, [dispatch, loading]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <Stack {...rowProps}>
+        <Spinner size={SpinnerSize.large} />
+      </Stack>
+    );
 
   return (
     <BrowserRouter>

@@ -5,8 +5,11 @@ import { auth, db } from "./config/firebase";
 import FirebaseUser from "./interfaces/user.interface";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux-store";
+import { useHistory } from "react-router";
 
-// const socket = io("http://localhost:8000/");
+// const socket = io("http://localhost:8000/", {
+//   autoConnect: false,
+// });
 const socket = io("https://microsoft-engage-2021-server.herokuapp.com", {
   autoConnect: false,
 });
@@ -51,6 +54,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const friendVideo = useRef<any>();
   const connectionRef = useRef<any>();
 
+  const history = useHistory();
+
   useEffect(() => {
     console.log("Welcome3");
 
@@ -58,7 +63,25 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       console.log("Got your socket id");
       setYourID(socketID);
       console.log(socketID);
+
       if (auth.currentUser) {
+        // To work on!
+
+        // db.collection("users")
+        //   .doc(auth.currentUser?.email!)
+        //   .get()
+        //   .then((doc) => {
+        //     if (doc.exists) {
+        //       if (
+        //         doc.data()?.socketID !== null &&
+        //         doc.data()?.socketID !== "" &&
+        //       ) {
+        //         socket.emit("disconnectThisID", doc.data()?.socketID);
+        //         console.log("Disconnecting event emitted!");
+        //       }
+        //     }
+        //   })
+        //   .then(() => {
         db.collection("users")
           .doc(auth.currentUser?.email + "")
           .set(
@@ -67,6 +90,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
             },
             { merge: true }
           );
+        // });
       }
     });
 
@@ -79,7 +103,14 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
       console.log(data.from);
     });
-  }, []);
+
+    socket.on("youHaveBeenDisconnected", () => {
+      console.log("You have logged in through other tab");
+      auth.signOut().then(() => {
+        history.push("/signUp");
+      });
+    });
+  }, [history]);
 
   useEffect(() => {
     if (auth.currentUser) {
