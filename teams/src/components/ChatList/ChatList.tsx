@@ -1,12 +1,18 @@
-import { Icon, initializeIcons, Stack } from "@fluentui/react";
-import React from "react";
+import { Icon, initializeIcons, IStackTokens, Stack } from "@fluentui/react";
+import React, { useContext } from "react";
 import { useHistory } from "react-router";
 import { auth } from "../../config/firebase";
+import { SocketContext } from "../../SockectContext";
 import { Contacts } from "../Contacts/Contacts";
 import { IconProps } from "../MainBody/MainBody.styles";
 
+import { DefaultButton } from "@fluentui/react/lib/Button";
+
+const stackTokens: IStackTokens = { childrenGap: 40 };
+
 export const ChatList: React.FunctionComponent = () => {
   const history = useHistory();
+  const context = useContext(SocketContext);
   initializeIcons();
 
   const handleSignOut = () => {
@@ -42,9 +48,26 @@ export const ChatList: React.FunctionComponent = () => {
       </Stack>
       {/* contacts */}
       <Stack>
-        <Stack>Current User: {auth.currentUser?.email}</Stack>
         <Stack>
-          <button onClick={handleSignOut}>Sign out</button>
+          <Stack>
+            <h4>Current User:</h4> {auth.currentUser?.email}
+          </Stack>
+          <Stack>
+            <h4>SocketID:</h4> {context.yourID}
+          </Stack>
+        </Stack>
+
+        <Stack>
+          <Stack horizontal tokens={stackTokens}>
+            <DefaultButton
+              style={{ backgroundColor: "#ECEDE8" }}
+              text="Sign out"
+              onClick={() => {
+                handleSignOut();
+              }}
+              allowDisabledFocus
+            />
+          </Stack>
         </Stack>
         <Contacts />
       </Stack>

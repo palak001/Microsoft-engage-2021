@@ -32,7 +32,7 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
       horizontalAlign="space-between"
       verticalAlign="center"
       style={{
-        height: "6.75%",
+        height: "100%",
         width: "100%",
         paddingLeft: "30px",
         fontSize: "20px",

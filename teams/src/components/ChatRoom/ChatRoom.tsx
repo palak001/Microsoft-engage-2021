@@ -17,14 +17,21 @@ export const ChatRoom: React.FunctionComponent = () => {
         backgroundColor: "#F6F5F4",
       }}
     >
-      <ChatRoomHeader />
-      <Video />
-      <Stack>{context.callDetails?.from} is calling you</Stack>
       <Stack
+        style={{
+          height: "5%",
+        }}
+      >
+        <ChatRoomHeader />
+      </Stack>
+      <Stack horizontalAlign="center" style={{ height: "95%" }}>
+        <Video />
+      </Stack>
+      {/* <Stack
         style={{
           height: "93.25%",
         }}
-      ></Stack>
+      ></Stack> */}
     </Stack>
   );
 };
