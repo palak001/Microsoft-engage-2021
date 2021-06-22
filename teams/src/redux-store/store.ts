@@ -1,5 +1,5 @@
 import { configureStore, DeepPartial } from "@reduxjs/toolkit";
-import { rootReducer, RootState } from "./index";
+import { rootReducer } from "./index";
 
 // configure store wraps redux createStore api
 

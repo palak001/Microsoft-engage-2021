@@ -1,12 +1,8 @@
 import { Stack } from "@fluentui/react";
-import React, { useContext } from "react";
 import { ChatRoomHeader } from "../ChatRoomHeader/ChatRoomHeader";
 import Video from "../Video/Video";
 
-import { SocketContext } from "../../SockectContext";
-
 export const ChatRoom: React.FunctionComponent = () => {
-  const context = useContext(SocketContext);
   return (
     <Stack
       verticalAlign="center"

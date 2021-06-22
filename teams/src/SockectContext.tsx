@@ -5,7 +5,6 @@ import { auth, db } from "./config/firebase";
 import FirebaseUser from "./interfaces/user.interface";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux-store";
-import { useHistory } from "react-router";
 
 // const socket = io("http://localhost:8000/", {
 //   autoConnect: false,
@@ -39,6 +38,7 @@ interface IContext {
 export const SocketContext = React.createContext({} as IContext);
 
 const ContextProvider: React.FunctionComponent = ({ children }) => {
+  console.log("Context socket rendered");
   const selectedUser: FirebaseUser = useSelector(
     (state: RootState) => state.selectedUserReducer.selectedUserDetails
   );
@@ -54,8 +54,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const friendVideo = useRef<any>();
   const connectionRef = useRef<any>();
 
-  const history = useHistory();
-
   useEffect(() => {
     console.log("Welcome3");
 
@@ -65,23 +63,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       console.log(socketID);
 
       if (auth.currentUser) {
-        // To work on!
-
-        // db.collection("users")
-        //   .doc(auth.currentUser?.email!)
-        //   .get()
-        //   .then((doc) => {
-        //     if (doc.exists) {
-        //       if (
-        //         doc.data()?.socketID !== null &&
-        //         doc.data()?.socketID !== "" &&
-        //       ) {
-        //         socket.emit("disconnectThisID", doc.data()?.socketID);
-        //         console.log("Disconnecting event emitted!");
-        //       }
-        //     }
-        //   })
-        //   .then(() => {
         db.collection("users")
           .doc(auth.currentUser?.email + "")
           .set(
@@ -94,40 +75,40 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       }
     });
 
-    socket.on("callUser", (data: ICallDetails) => {
-      console.log("you are getting a call");
-      setCallDetails({
-        from: data.from,
-        signal: data.signal,
-        isReceivedCall: data.isReceivedCall,
-      });
-      console.log(data.from);
-    });
-
-    socket.on("youHaveBeenDisconnected", () => {
-      console.log("You have logged in through other tab");
-      auth.signOut().then(() => {
-        history.push("/signUp");
-      });
-    });
-  }, [history]);
-
-  useEffect(() => {
-    if (auth.currentUser) {
-      if (yourVideo.current && !yourVideo.current.srcObject) {
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
-          .then((currentStream) => {
-            setStream(currentStream);
-            if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-          });
+    socket.on("callingYou", (data: ICallDetails) => {
+      console.log("callAccepted");
+      console.log(callAccepted);
+      if (!callAccepted) {
+        console.log("you are getting a call");
+        setCallDetails({
+          from: data.from,
+          signal: data.signal,
+          isReceivedCall: data.isReceivedCall,
+        });
+        console.log(data.from);
       }
-    }
-  });
+    });
+  }, [callAccepted]);
+
+  // useEffect(() => {
+  //   if (auth.currentUser) {
+  //     console.log("your Video");
+  //     console.log(yourVideo.current.srcObject);
+  //     console.log(!yourVideo.current.srcObject);
+  //     if (yourVideo.current && !yourVideo.current.srcObject) {
+  //       console.log("video?");
+  //       navigator.mediaDevices
+  //         .getUserMedia({ video: true, audio: true })
+  //         .then((currentStream) => {
+  //           setStream(currentStream);
+  //           if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+  //         });
+  //     }
+  //   }
+  // });
 
   const answerCall = () => {
     console.log("You have answered a call");
-    setCallAccepted(true);
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -200,7 +181,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     socket.on("callAccepted", (signal) => {
       console.log("do you still have your video?");
       console.log(signal);
-      setCallAccepted(true);
+      // setCallAccepted(true);
       // peer.signal(JSON.stringify(signal));
       peer.signal(signal);
     });
@@ -214,18 +195,21 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const setCalleeStreamFunction = async () => {
-    await navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        setStream((state: any) => {
-          console.log("current Stream");
-          console.log(state);
-          yourVideo.current.srcObject = state;
-          answerCall();
-          return state;
+    if (!callAccepted) {
+      setCallAccepted(true);
+      await navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((currentStream) => {
+          setStream(currentStream);
+          setStream((state: any) => {
+            console.log("current Stream");
+            console.log(state);
+            yourVideo.current.srcObject = state;
+            answerCall();
+            return state;
+          });
         });
-      });
+    }
   };
 
   const setCallerStreamFunction = async () => {

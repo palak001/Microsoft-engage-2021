@@ -1,4 +1,4 @@
-import { auth, db } from "../../config/firebase";
+import { db } from "../../config/firebase";
 import FirebaseUser from "../../interfaces/user.interface";
 
 export const fetchUserContacts = async (): Promise<any> => {

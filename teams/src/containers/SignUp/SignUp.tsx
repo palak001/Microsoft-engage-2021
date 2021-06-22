@@ -9,20 +9,20 @@ import { Providers } from "../../config/firebase";
 
 export const SignUp: React.FunctionComponent = () => {
   // local states
-  const [authenticating, setAuthenticating] = useState<boolean>(false);
+  // const [authenticating, setAuthenticating] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const history = useHistory();
 
   const signInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
     if (error !== "") setError("");
-    setAuthenticating(true);
+    // setAuthenticating(true);
 
     SignInWithSocialMedia(provider)
       .then((result) => {
         history.push("/");
       })
       .catch((error) => {
-        setAuthenticating(false);
+        // setAuthenticating(false);
         setError(error.message);
       });
   };

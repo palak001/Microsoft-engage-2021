@@ -1,7 +1,6 @@
 import { Icon, Persona, PersonaSize, Stack } from "@fluentui/react";
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
-import { db } from "../../config/firebase";
 import FirebaseUser from "../../interfaces/user.interface";
 import { RootState } from "../../redux-store";
 import { SocketContext } from "../../SockectContext";
@@ -14,16 +13,7 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
   );
 
   const handleVideoCall = () => {
-    // context.setCallerStreamFunction();
-    db.collection("users")
-      .doc(selectedUser.email)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          if (doc.data()?.socketID) context.startCall(doc.data()?.socketID);
-          else console.log("Person if offline");
-        }
-      });
+    context.setCallerStreamFunction();
   };
 
   return (
@@ -48,7 +38,12 @@ export const PersonalizedHeader: React.FunctionComponent = () => {
         />
         {selectedUser.displayName}
       </Stack>
-      <Stack verticalAlign="center" onClick={handleVideoCall}>
+      <Stack
+        verticalAlign="center"
+        onClick={() => {
+          handleVideoCall();
+        }}
+      >
         <Icon
           iconName={"Video"}
           style={{
