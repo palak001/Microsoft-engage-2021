@@ -1,15 +1,10 @@
 import { Persona, PersonaSize, Stack } from "@fluentui/react";
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { auth } from "../../config/firebase";
 import FirebaseUser from "../../interfaces/user.interface";
 import { RootState } from "../../redux-store";
 import { getSelectedUserDetailsAction } from "../../redux-store/Chat/selectedUserReducer";
-import { fetchUserContactsAction } from "../../redux-store/Firebase/UserContactsReducer";
-import { getSelectedUserDetails } from "../../services/chat/selectedUserServices";
-import { fetchUserContacts } from "../../services/firebase/FirebaseService";
 import { ContactStackProp } from "./Contacts.styles";
-import FirebaseUsers from "../../interfaces/user.interface";
 
 export const Contacts: React.FunctionComponent = () => {
   const contacts = useSelector(
@@ -25,14 +20,16 @@ export const Contacts: React.FunctionComponent = () => {
     email: "",
   };
 
+  const handleOnClick = (obj: FirebaseUser) => {
+    // getSelectedUserDetails(obj).then((result: FirebaseUser) => {
+    dispatch(getSelectedUserDetailsAction(obj));
+    // });
+  };
+
   return (
     <>
       <Stack
-        onClick={() => {
-          getSelectedUserDetails(dummyObj).then((result: FirebaseUser) => {
-            dispatch(getSelectedUserDetailsAction(result));
-          });
-        }}
+        onClick={() => handleOnClick(dummyObj)}
         horizontal
         {...ContactStackProp}
       >
@@ -43,9 +40,7 @@ export const Contacts: React.FunctionComponent = () => {
         return (
           <Stack
             onClick={() => {
-              getSelectedUserDetails(contact).then((result: FirebaseUser) => {
-                dispatch(getSelectedUserDetailsAction(result));
-              });
+              handleOnClick(contact);
             }}
             horizontal
             key={contact.uid}

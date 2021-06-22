@@ -30,6 +30,7 @@ const App: React.FunctionComponent = () => {
   const history = useHistory();
 
   useEffect(() => {
+    console.log("App.tsx useEffect");
     auth.onAuthStateChanged((user) => {
       if (user) {
         context.socket.connect();
