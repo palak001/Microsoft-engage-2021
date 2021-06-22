@@ -121,7 +121,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       friendVideo.current.srcObject = currentStream;
     });
     // peer.signal(JSON.stringify(callDetails?.signal));
-    peer.signal(callDetails.signal);
+    peer.signal(JSON.stringify(callDetails.signal));
 
     connectionRef.current = peer;
   };
@@ -171,7 +171,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       console.log(signal);
       // setCallAccepted(true);
       // peer.signal(JSON.stringify(signal));
-      peer.signal(signal);
+      peer.signal(JSON.stringify(signal));
     });
 
     connectionRef.current = peer;
