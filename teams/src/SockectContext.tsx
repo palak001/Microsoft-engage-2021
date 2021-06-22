@@ -74,7 +74,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         // });
       }
     });
-
+    initializeVideo();
     socket.on("callingYou", (data: ICallDetails) => {
       console.log("you are getting a call");
       setCallDetails({
@@ -180,6 +180,20 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const leaveCall = () => {
     setCallEnded(true);
     connectionRef.current.destroy();
+  };
+
+  const initializeVideo = async () => {
+    await navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        setStream((state: any) => {
+          console.log("current Stream");
+          console.log(state);
+          if (yourVideo.current) yourVideo.current.srcObject = state;
+          return state;
+        });
+      });
   };
 
   const setCalleeStreamFunction = async () => {
