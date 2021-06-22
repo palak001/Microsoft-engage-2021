@@ -76,36 +76,15 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     socket.on("callingYou", (data: ICallDetails) => {
-      console.log("callAccepted");
-      console.log(callAccepted);
-      if (!callAccepted) {
-        console.log("you are getting a call");
-        setCallDetails({
-          from: data.from,
-          signal: data.signal,
-          isReceivedCall: data.isReceivedCall,
-        });
-        console.log(data.from);
-      }
+      console.log("you are getting a call");
+      setCallDetails({
+        from: data.from,
+        signal: data.signal,
+        isReceivedCall: data.isReceivedCall,
+      });
+      console.log(data.from);
     });
-  }, [callAccepted]);
-
-  // useEffect(() => {
-  //   if (auth.currentUser) {
-  //     console.log("your Video");
-  //     console.log(yourVideo.current.srcObject);
-  //     console.log(!yourVideo.current.srcObject);
-  //     if (yourVideo.current && !yourVideo.current.srcObject) {
-  //       console.log("video?");
-  //       navigator.mediaDevices
-  //         .getUserMedia({ video: true, audio: true })
-  //         .then((currentStream) => {
-  //           setStream(currentStream);
-  //           if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-  //         });
-  //     }
-  //   }
-  // });
+  }, []);
 
   const answerCall = () => {
     console.log("You have answered a call");
@@ -125,6 +104,11 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
     // console.log("peer oject");
     // console.log(peer);
+    peer.on("error", (err) => {
+      console.log("anserCall error");
+      console.log(err);
+    });
+
     peer.on("signal", (signalData) => {
       console.log("you are emmiting this info");
       console.log(signalData);
@@ -174,8 +158,12 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     peer.on("stream", (currentStream) => {
       console.log("callee video");
       console.log(currentStream);
-      console.log(currentStream);
       friendVideo.current.srcObject = currentStream;
+    });
+
+    peer.on("error", (err) => {
+      console.log("call start error");
+      console.log(err);
     });
 
     socket.on("callAccepted", (signal) => {
