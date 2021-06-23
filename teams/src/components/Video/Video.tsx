@@ -22,6 +22,7 @@ const Video: React.FunctionComponent = () => {
             <h4>Your Video</h4>
           </Stack>
           <Stack>
+            {/* {yourVideoTag.current} */}
             <video
               width="90%"
               height="90%"
@@ -30,6 +31,8 @@ const Video: React.FunctionComponent = () => {
               muted
               autoPlay
             />
+            {/* {console.log("yourvideo")}
+            {console.log(context.yourVideo)} */}
           </Stack>
         </Stack>
         <Stack {...StackProps}>
@@ -45,6 +48,9 @@ const Video: React.FunctionComponent = () => {
               ref={context.friendVideo}
               autoPlay
             />
+            {/* {console.log("fientd video")}
+            {console.log(context.friendVideo)} */}
+            {/* {friendVideoTag.current} */}
           </Stack>
         </Stack>
       </Stack>

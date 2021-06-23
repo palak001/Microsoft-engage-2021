@@ -2,10 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
-// import FirebaseUser from "./interfaces/user.interface";
-// import { useSelector } from "react-redux";
-// import { RootState } from "./redux-store";
-
 // const socket = io("http://localhost:8000/", {
 //   autoConnect: false,
 // });
@@ -85,50 +81,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   if (callAccepted) initializeVideo();
-  // }, [callAccepted]);
-
-  // useEffect(() => {
-  //   if (callStarted) initializeVideo();
-  // }, [callStarted]);
-
   // Helper Functions
-  const answerCall = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        setCallAccepted(true);
-        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-
-        const peer = new Peer({
-          initiator: false,
-          trickle: false,
-          stream: stream,
-        });
-
-        connectionRef.current = peer;
-
-        peer.on("signal", (signalData) => {
-          socket.current.emit("acceptCall", {
-            signal: signalData,
-            to: callDetails.from,
-          });
-        });
-
-        peer.on("stream", (currentStream) => {
-          friendVideo.current.srcObject = currentStream;
-        });
-
-        peer.on("error", (err) => {
-          console.log("anserCall error");
-          console.log(err);
-        });
-
-        peer.signal(JSON.stringify(callDetails.signal));
-      });
-  };
 
   const startCall = (socketId: string) => {
     navigator.mediaDevices
@@ -179,7 +132,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
               },
             ],
           },
-          stream: stream,
+          stream: currentStream,
         });
 
         connectionRef.current = peer;
@@ -210,20 +163,46 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
   };
 
+  const answerCall = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        setCallAccepted(true);
+        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+
+        const peer = new Peer({
+          initiator: false,
+          trickle: false,
+          stream: currentStream,
+        });
+
+        connectionRef.current = peer;
+
+        peer.on("signal", (signalData) => {
+          socket.current.emit("acceptCall", {
+            signal: signalData,
+            to: callDetails.from,
+          });
+        });
+
+        peer.on("stream", (currentStream) => {
+          friendVideo.current.srcObject = currentStream;
+        });
+
+        peer.on("error", (err) => {
+          console.log("anserCall error");
+          console.log(err);
+        });
+
+        peer.signal(JSON.stringify(callDetails.signal));
+      });
+  };
+
   const leaveCall = () => {
     setCallEnded(true);
     connectionRef.current.destroy();
   };
-
-  // const initializeVideo = async () => {
-  //   console.log("initialize video");
-  //   await navigator.mediaDevices
-  //     .getUserMedia({ video: true, audio: true })
-  //     .then((currentStream) => {
-  //       setStream(currentStream);
-  //       if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-  //     });
-  // };
 
   return (
     <SocketContext.Provider
