@@ -81,6 +81,20 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
   }, []);
 
+  useEffect(() => {
+    if (callAccepted && callStarted) {
+      if (yourVideo.current && !yourVideo.current.srcObject) {
+        console.log("here we are again");
+        navigator.mediaDevices
+          .getUserMedia({ video: true, audio: true })
+          .then((currentStream) => {
+            setStream(currentStream);
+            if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+          });
+      }
+    }
+  }, [callStarted, callAccepted]);
+
   // Helper Functions
 
   const startCall = (socketId: string) => {
@@ -157,7 +171,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         socket.current.on("callAccepted", (signal: any) => {
-          if (yourVideo.current) yourVideo.current.srcObject = currentStream;
           setCallAccepted(true);
           peer.signal(JSON.stringify(signal));
         });
