@@ -33,7 +33,7 @@ const App: React.FunctionComponent = () => {
     console.log("App.tsx useEffect");
     auth.onAuthStateChanged((user) => {
       if (user) {
-        context.socket.connect();
+        context.socket.current.connect();
         db.collection("users")
           .doc(user.email + "")
           .set({
@@ -50,7 +50,6 @@ const App: React.FunctionComponent = () => {
 
   // // for monitoring and updating user state
   useEffect(() => {
-    // console.log("when are your called");
     if (auth.currentUser) {
       fetchUserContacts().then((result: Array<FirebaseUsers>) => {
         dispatch(fetchUserContactsAction(result));
