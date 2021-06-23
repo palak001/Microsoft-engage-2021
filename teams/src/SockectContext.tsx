@@ -157,6 +157,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         socket.current.on("callAccepted", (signal: any) => {
+          if (yourVideo.current) yourVideo.current.srcObject = currentStream;
           setCallAccepted(true);
           peer.signal(JSON.stringify(signal));
         });
