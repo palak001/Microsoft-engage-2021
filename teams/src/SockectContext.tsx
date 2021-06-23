@@ -2,12 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
-// const socket = io("http://localhost:8000/", {
-//   autoConnect: false,
-// });
-// const socket = io("https://microsoft-engage-2021-server.herokuapp.com", {
-//   autoConnect: false,
-// });
 
 interface ICallDetails {
   from: string;
@@ -28,8 +22,6 @@ interface IContext {
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
-  // setCallerStreamFunction: () => void;
-  // setCalleeStreamFunction: () => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
@@ -68,7 +60,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         // });
       }
     });
-    //initializeVideo();
     socket.current.on("callingYou", (data: ICallDetails) => {
       console.log("you are getting a call");
       // setReceiving
@@ -88,7 +79,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         navigator.mediaDevices
           .getUserMedia({ video: true, audio: true })
           .then((currentStream) => {
-            // setStream(currentStream);
             if (yourVideo.current) yourVideo.current.srcObject = currentStream;
           });
       }
@@ -129,21 +119,21 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
               { urls: "stun:stun.voipstunt.com" },
               { urls: "stun:stun.voxgratia.org" },
               { urls: "stun:stun.xten.com" },
-              {
-                urls: "turn:numb.viagenie.ca",
-                credential: "muazkh",
-                username: "webrtc@live.com",
-              },
-              {
-                urls: "turn:192.158.29.39:3478?transport=udp",
-                credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
-                username: "28224511:1379330808",
-              },
-              {
-                urls: "turn:192.158.29.39:3478?transport=tcp",
-                credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
-                username: "28224511:1379330808",
-              },
+              // {
+              //   urls: "turn:numb.viagenie.ca",
+              //   credential: "muazkh",
+              //   username: "webrtc@live.com",
+              // },
+              // {
+              //   urls: "turn:192.158.29.39:3478?transport=udp",
+              //   credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+              //   username: "28224511:1379330808",
+              // },
+              // {
+              //   urls: "turn:192.158.29.39:3478?transport=tcp",
+              //   credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+              //   username: "28224511:1379330808",
+              // },
             ],
           },
           stream: currentStream,
