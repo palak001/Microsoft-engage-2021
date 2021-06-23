@@ -66,8 +66,8 @@ const Video: React.FunctionComponent = () => {
               <DefaultButton
                 text="AcceptCall"
                 onClick={() => {
-                  // context.answerCall();
-                  context.setCalleeStreamFunction();
+                  context.answerCall();
+                  // context.setCalleeStreamFunction();
                 }}
                 allowDisabledFocus
               />

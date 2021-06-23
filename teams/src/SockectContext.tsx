@@ -2,16 +2,16 @@ import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
-import FirebaseUser from "./interfaces/user.interface";
-import { useSelector } from "react-redux";
-import { RootState } from "./redux-store";
+// import FirebaseUser from "./interfaces/user.interface";
+// import { useSelector } from "react-redux";
+// import { RootState } from "./redux-store";
 
 // const socket = io("http://localhost:8000/", {
 //   autoConnect: false,
 // });
-const socket = io("https://microsoft-engage-2021-server.herokuapp.com", {
-  autoConnect: false,
-});
+// const socket = io("https://microsoft-engage-2021-server.herokuapp.com", {
+//   autoConnect: false,
+// });
 
 interface ICallDetails {
   from: string;
@@ -23,6 +23,7 @@ interface IContext {
   socket: any;
   callDetails: ICallDetails;
   callAccepted: any;
+  callStarted: any;
   yourVideo: any;
   friendVideo: any;
   stream: any;
@@ -31,36 +32,33 @@ interface IContext {
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
-  setCallerStreamFunction: () => void;
-  setCalleeStreamFunction: () => void;
+  // setCallerStreamFunction: () => void;
+  // setCalleeStreamFunction: () => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
 
 const ContextProvider: React.FunctionComponent = ({ children }) => {
-  console.log("Context socket rendered");
-  const selectedUser: FirebaseUser = useSelector(
-    (state: RootState) => state.selectedUserReducer.selectedUserDetails
-  );
-
+  // Local States
   const [stream, setStream] = useState<any>();
   const [yourID, setYourID] = useState<string>("");
   const [callDetails, setCallDetails] = useState<any>();
   const [callAccepted, setCallAccepted] = useState<any>(false);
+  const [callStarted, setCallStarted] = useState<any>(false);
   const [callEnded, setCallEnded] = useState<any>(false);
-
   // refs
   const yourVideo = useRef<any>();
   const friendVideo = useRef<any>();
   const connectionRef = useRef<any>();
+  const socket = useRef<any>();
 
+  // useEffects
   useEffect(() => {
-    console.log("Welcome3");
-
-    socket.on("yourID", (socketID: string) => {
-      console.log("Got your socket id");
+    socket.current = io("https://microsoft-engage-2021-server.herokuapp.com", {
+      autoConnect: false,
+    });
+    socket.current.on("yourID", (socketID: string) => {
       setYourID(socketID);
-      console.log(socketID);
 
       if (auth.currentUser) {
         db.collection("users")
@@ -74,9 +72,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         // });
       }
     });
-    initializeVideo();
-    socket.on("callingYou", (data: ICallDetails) => {
+    //initializeVideo();
+    socket.current.on("callingYou", (data: ICallDetails) => {
       console.log("you are getting a call");
+      // setReceiving
       setCallDetails({
         from: data.from,
         signal: data.signal,
@@ -86,95 +85,129 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
   }, []);
 
+  // useEffect(() => {
+  //   if (callAccepted) initializeVideo();
+  // }, [callAccepted]);
+
+  // useEffect(() => {
+  //   if (callStarted) initializeVideo();
+  // }, [callStarted]);
+
+  // Helper Functions
   const answerCall = () => {
-    console.log("You have answered a call");
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream: stream,
-      config: {
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:stun1.l.google.com:19302" },
-          { urls: "stun:stun2.l.google.com:19302" },
-          { urls: "stun:stun3.l.google.com:19302" },
-          { urls: "stun:stun4.l.google.com:19302" },
-        ],
-      },
-    });
-    // console.log("peer oject");
-    // console.log(peer);
-    peer.on("error", (err) => {
-      console.log("anserCall error");
-      console.log(err);
-    });
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        setCallAccepted(true);
+        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
 
-    peer.on("signal", (signalData) => {
-      console.log("you are emmiting this info");
-      console.log(signalData);
-      socket.emit("acceptCall", { signal: signalData, to: callDetails.from });
-    });
+        const peer = new Peer({
+          initiator: false,
+          trickle: false,
+          stream: stream,
+        });
 
-    peer.on("stream", (currentStream) => {
-      console.log("caller video");
-      console.log(currentStream);
-      friendVideo.current.srcObject = currentStream;
-    });
-    // peer.signal(JSON.stringify(callDetails?.signal));
-    peer.signal(JSON.stringify(callDetails.signal));
+        connectionRef.current = peer;
 
-    connectionRef.current = peer;
+        peer.on("signal", (signalData) => {
+          socket.current.emit("acceptCall", {
+            signal: signalData,
+            to: callDetails.from,
+          });
+        });
+
+        peer.on("stream", (currentStream) => {
+          friendVideo.current.srcObject = currentStream;
+        });
+
+        peer.on("error", (err) => {
+          console.log("anserCall error");
+          console.log(err);
+        });
+
+        peer.signal(JSON.stringify(callDetails.signal));
+      });
   };
 
   const startCall = (socketId: string) => {
-    console.log("you have started a call");
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream: stream,
-      config: {
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:stun1.l.google.com:19302" },
-          { urls: "stun:stun2.l.google.com:19302" },
-          { urls: "stun:stun3.l.google.com:19302" },
-          { urls: "stun:stun4.l.google.com:19302" },
-        ],
-      },
-    });
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        setCallStarted(true);
+        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
 
-    console.log("peer at start call");
-    console.log(peer);
+        const peer = new Peer({
+          initiator: true,
+          trickle: false,
+          config: {
+            iceServers: [
+              { urls: "stun:stun01.sipphone.com" },
+              { urls: "stun:stun.ekiga.net" },
+              { urls: "stun:stun.fwdnet.net" },
+              { urls: "stun:stun.ideasip.com" },
+              { urls: "stun:stun.iptel.org" },
+              { urls: "stun:stun.rixtelecom.se" },
+              { urls: "stun:stun.schlund.de" },
+              { urls: "stun:stun.l.google.com:19302" },
+              { urls: "stun:stun1.l.google.com:19302" },
+              { urls: "stun:stun2.l.google.com:19302" },
+              { urls: "stun:stun3.l.google.com:19302" },
+              { urls: "stun:stun4.l.google.com:19302" },
+              { urls: "stun:stunserver.org" },
+              { urls: "stun:stun.softjoys.com" },
+              { urls: "stun:stun.voiparound.com" },
+              { urls: "stun:stun.voipbuster.com" },
+              { urls: "stun:stun.voipstunt.com" },
+              { urls: "stun:stun.voxgratia.org" },
+              { urls: "stun:stun.xten.com" },
+              {
+                urls: "turn:numb.viagenie.ca",
+                credential: "muazkh",
+                username: "webrtc@live.com",
+              },
+              {
+                urls: "turn:192.158.29.39:3478?transport=udp",
+                credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+                username: "28224511:1379330808",
+              },
+              {
+                urls: "turn:192.158.29.39:3478?transport=tcp",
+                credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+                username: "28224511:1379330808",
+              },
+            ],
+          },
+          stream: stream,
+        });
 
-    // fires when the peer want to send signalling data to other peers
-    peer.on("signal", (signalData: any) => {
-      socket.emit("callUser", {
-        userToCall: socketId,
-        signalData: signalData,
-        from: yourID,
+        connectionRef.current = peer;
+
+        // fires when the peer want to send signalling data to other peers
+        peer.on("signal", (signalData: any) => {
+          socket.current.emit("callUser", {
+            userToCall: socketId,
+            signalData: signalData,
+            from: yourID,
+          });
+        });
+
+        peer.on("stream", (currentStream) => {
+          if (friendVideo.current)
+            friendVideo.current.srcObject = currentStream;
+        });
+
+        peer.on("error", (err) => {
+          console.log("call start error");
+          console.log(err);
+        });
+
+        socket.current.on("callAccepted", (signal: any) => {
+          setCallAccepted(true);
+          peer.signal(JSON.stringify(signal));
+        });
       });
-    });
-
-    peer.on("stream", (currentStream) => {
-      console.log("callee video");
-      console.log(currentStream);
-      friendVideo.current.srcObject = currentStream;
-    });
-
-    peer.on("error", (err) => {
-      console.log("call start error");
-      console.log(err);
-    });
-
-    socket.on("callAccepted", (signal) => {
-      console.log("do you still have your video?");
-      console.log(signal);
-      // setCallAccepted(true);
-      // peer.signal(JSON.stringify(signal));
-      peer.signal(JSON.stringify(signal));
-    });
-
-    connectionRef.current = peer;
   };
 
   const leaveCall = () => {
@@ -182,80 +215,15 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     connectionRef.current.destroy();
   };
 
-  const initializeVideo = async () => {
-    await navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        setStream((state: any) => {
-          console.log("current Stream");
-          console.log(state);
-          if (yourVideo.current) yourVideo.current.srcObject = state;
-          return state;
-        });
-      });
-  };
-
-  const setCalleeStreamFunction = async () => {
-    if (!callAccepted) {
-      setCallAccepted(true);
-      await navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((currentStream) => {
-          setStream(currentStream);
-          setStream((state: any) => {
-            console.log("current Stream");
-            console.log(state);
-            yourVideo.current.srcObject = state;
-            answerCall();
-            return state;
-          });
-        });
-    }
-  };
-
-  const setCallerStreamFunction = async () => {
-    const currentStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    setStream(currentStream);
-    setStream((state: any) => {
-      console.log("current Stream");
-      console.log(state);
-      yourVideo.current.srcObject = state;
-      db.collection("users")
-        .doc(selectedUser.email)
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
-            if (doc.data()?.socketID) startCall(doc.data()?.socketID);
-            else console.log("Person if offline");
-          }
-        });
-      return state;
-    });
-
-    // console.log(stream);
-
-    // navigator.mediaDevices
-    //   .getUserMedia({ video: true, audio: true })
-    //   .then((currentStream) => {
-    //     setStream(currentStream);
-    //     yourVideo.current.srcObject = currentStream;
-    //   })
-    //   .then(() => {
-    //     db.collection("users")
-    //       .doc(selectedUser.email)
-    //       .get()
-    //       .then((doc) => {
-    //         if (doc.exists) {
-    //           if (doc.data()?.socketID) startCall(doc.data()?.socketID);
-    //           else console.log("Person if offline");
-    //         }
-    //       });
-    //   });
-  };
+  // const initializeVideo = async () => {
+  //   console.log("initialize video");
+  //   await navigator.mediaDevices
+  //     .getUserMedia({ video: true, audio: true })
+  //     .then((currentStream) => {
+  //       setStream(currentStream);
+  //       if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+  //     });
+  // };
 
   return (
     <SocketContext.Provider
@@ -263,6 +231,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         socket,
         callDetails,
         callAccepted,
+        callStarted,
         yourVideo,
         friendVideo,
         stream,
@@ -271,8 +240,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         answerCall,
         startCall,
         leaveCall,
-        setCallerStreamFunction,
-        setCalleeStreamFunction,
+        // setCallerStreamFunction,
+        // setCalleeStreamFunction,
       }}
     >
       {children}
