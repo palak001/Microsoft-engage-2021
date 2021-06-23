@@ -88,7 +88,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         navigator.mediaDevices
           .getUserMedia({ video: true, audio: true })
           .then((currentStream) => {
-            setStream(currentStream);
+            // setStream(currentStream);
             if (yourVideo.current) yourVideo.current.srcObject = currentStream;
           });
       }
