@@ -1,6 +1,5 @@
 import { Stack } from "@fluentui/react";
 import { ChatRoomHeader } from "../ChatRoomHeader/ChatRoomHeader";
-import Video from "../Video/Video";
 
 export const ChatRoom: React.FunctionComponent = () => {
   return (
@@ -20,9 +19,7 @@ export const ChatRoom: React.FunctionComponent = () => {
       >
         <ChatRoomHeader />
       </Stack>
-      <Stack horizontalAlign="center" style={{ height: "95%" }}>
-        <Video />
-      </Stack>
+      <Stack horizontalAlign="center" style={{ height: "95%" }}></Stack>
       {/* <Stack
         style={{
           height: "93.25%",

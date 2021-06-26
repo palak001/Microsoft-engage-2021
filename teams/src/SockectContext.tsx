@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
+import { useHistory } from "react-router";
 
 interface ICallDetails {
   from: string;
@@ -27,7 +28,10 @@ interface IContext {
 export const SocketContext = React.createContext({} as IContext);
 
 const ContextProvider: React.FunctionComponent = ({ children }) => {
+  const history = useHistory();
+
   // Local States
+
   const [stream, setStream] = useState<any>();
   const [yourID, setYourID] = useState<string>("");
   const [callDetails, setCallDetails] = useState<any>();
@@ -42,12 +46,31 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // useEffects
   useEffect(() => {
-    socket.current = io("https://microsoft-engage-2021-server.herokuapp.com", {
+    // socket.current = io("https://microsoft-engage-2021-server.herokuapp.com", {
+    //   autoConnect: false,
+    // });
+    socket.current = io("http://localhost:8000", {
       autoConnect: false,
     });
+
+    socket.current.on("connect", () => {
+      console.log("sending authentication data");
+      socket.current.emit("authentication", {
+        username: auth.currentUser?.email,
+        token: auth.currentUser?.uid,
+      });
+      socket.current.on("unauthorized", (reason: any) => {
+        console.log("Unauthorized:", reason);
+        console.log("disconnecting");
+        history.push("/activesession");
+      });
+      socket.current.on("authenticated", function () {
+        console.log("authenticated");
+      });
+    });
+
     socket.current.on("yourID", (socketID: string) => {
       setYourID(socketID);
-
       if (auth.currentUser) {
         db.collection("users")
           .doc(auth.currentUser?.email + "")
@@ -57,7 +80,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
             },
             { merge: true }
           );
-        // });
       }
     });
     socket.current.on("callingYou", (data: ICallDetails) => {
@@ -70,7 +92,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
       console.log(data.from);
     });
-  }, []);
+  }, [history]);
 
   useEffect(() => {
     if (callAccepted && callStarted) {
@@ -119,21 +141,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
               { urls: "stun:stun.voipstunt.com" },
               { urls: "stun:stun.voxgratia.org" },
               { urls: "stun:stun.xten.com" },
-              // {
-              //   urls: "turn:numb.viagenie.ca",
-              //   credential: "muazkh",
-              //   username: "webrtc@live.com",
-              // },
-              // {
-              //   urls: "turn:192.158.29.39:3478?transport=udp",
-              //   credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
-              //   username: "28224511:1379330808",
-              // },
-              // {
-              //   urls: "turn:192.158.29.39:3478?transport=tcp",
-              //   credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
-              //   username: "28224511:1379330808",
-              // },
             ],
           },
           stream: currentStream,

@@ -12,6 +12,7 @@ import { fetchUserContactsAction } from "./redux-store/Firebase/UserContactsRedu
 import { SocketContext } from "./SockectContext";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 import { IStackProps, Stack } from "@fluentui/react/lib/Stack";
+import { ActiveSession } from "./containers/SignUp/ActiveSession";
 
 export interface IApplicationProps {}
 
@@ -34,6 +35,7 @@ const App: React.FunctionComponent = () => {
     auth.onAuthStateChanged((user) => {
       if (user) {
         context.socket.current.connect();
+
         db.collection("users")
           .doc(user.email + "")
           .set({
@@ -69,6 +71,11 @@ const App: React.FunctionComponent = () => {
     <BrowserRouter>
       <Switch>
         <Route path="/signup" exact={true} component={() => <SignUp />} />
+        <Route
+          path="/activesession"
+          exact={true}
+          component={ActiveSession}
+        ></Route>
         <Route
           path="/"
           exact={true}

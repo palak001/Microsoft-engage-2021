@@ -15,14 +15,11 @@ export const SignUp: React.FunctionComponent = () => {
 
   const signInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
     if (error !== "") setError("");
-    // setAuthenticating(true);
-
     SignInWithSocialMedia(provider)
       .then((result) => {
         history.push("/");
       })
       .catch((error) => {
-        // setAuthenticating(false);
         setError(error.message);
       });
   };
