@@ -1,33 +1,36 @@
 import { IStackProps } from "@fluentui/react";
 
 export const signUpStackChildrenProps: IStackProps = {
-    tokens: {
-        padding: '10px'
+  tokens: {
+    padding: "10px",
+  },
+  // verticalAlign: "center",
+  verticalAlign: "space-evenly",
+  styles: {
+    root: {
+      position: "absolute",
+      left: "39%",
+      right: "39%",
+      top: "12%",
+      bottom: "56%",
+      backgroundColor: "#FFFFFF",
+      border: "0.5px solid #E5E5E5",
+      boxSizing: "border-box",
+      boxShadow:
+        "0px 1.6px 3.6px rgba(0, 0, 0, 0.132), 0px 0.3px 0.9px rgba(0, 0, 0, 0.108)",
+      borderRadius: "4px",
     },
-    verticalAlign: 'center',
-    horizontalAlign: 'center',
-    styles: {
-        root: {
-            background: 'white',
-            boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)', 
-            height: '300px',
-            width: '300px',
-        }
-    }
-}
+  },
+};
 
 export const signUpStackProps: IStackProps = {
-    tokens: {
+  tokens: {},
+  verticalAlign: "center",
+  horizontalAlign: "center",
+  styles: {
+    root: {
+      height: "100vh",
+      fontFamily: "Segoe UI Web (West European)",
     },
-    verticalAlign: 'center',
-    horizontalAlign: 'center',
-    styles: {
-        root: {
-            background: '#E5EAFA',
-            height: '100vh',
-            // border: 'solid black 1px',
-            
-        }
-    }
-}
-
+  },
+};

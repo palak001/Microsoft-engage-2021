@@ -5,6 +5,7 @@ import FirebaseUser from "../../interfaces/user.interface";
 import { RootState } from "../../redux-store";
 import { getSelectedUserDetailsAction } from "../../redux-store/Chat/selectedUserReducer";
 import { ContactStackProp } from "./Contacts.styles";
+import { Text } from "@fluentui/react/lib/Text";
 
 export const Contacts: React.FunctionComponent = () => {
   const contacts = useSelector(
@@ -34,7 +35,7 @@ export const Contacts: React.FunctionComponent = () => {
         {...ContactStackProp}
       >
         <Persona size={PersonaSize.size32} imageAlt="Palak, status is online" />
-        New Chat
+        <Text>New Chat</Text>
       </Stack>
       {contacts?.map((contact, id) => {
         return (
@@ -52,7 +53,7 @@ export const Contacts: React.FunctionComponent = () => {
               // presence={PersonaPresence.online}
               imageAlt="Palak, status is online"
             />
-            {contact.email}
+            <Text>{contact.email}</Text>
           </Stack>
         );
       })}

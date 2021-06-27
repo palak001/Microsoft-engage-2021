@@ -16,6 +16,7 @@
     "@types/react-dom": "^17.0.7",
     "firebase": "^8.6.7",
     "firebaseui": "^4.8.0",
+    "office-ui-fabric-react": "^7.172.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.4",
@@ -55,6 +56,8 @@
     ]
   },
   "devDependencies": {
+    "@iconify-icons/logos": "^1.1.10",
+    "@iconify/react": "^1.1.4",
     "@types/react-router-dom": "^5.1.7",
     "@types/simple-peer": "^9.11.0"
   }

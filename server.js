@@ -2,9 +2,13 @@ const express = require("express");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
-const socket = require("socket.io");
 const cors = require("cors");
+const adapter = require("socket.io-redis");
+const redis = require("./redis");
 
+require("dotenv").config();
+
+/* Handling CORS error */
 let whitelist = [
   "http://localhost:3000",
   "https://palak001-microsoft-engage-2021.netlify.app",
@@ -19,6 +23,14 @@ let corsOptions = {
   },
 };
 
+/* Redis Adapter */
+const redisAdapter = adapter({
+  host: process.env.REDIS_HOST || "localhost",
+  port: process.env.REDIS_PORT || "6379",
+  password: process.env.REDIS_PASS || "password",
+});
+
+/* Setting socket server */
 const io = require("socket.io")(server, {
   cors: {
     origin: [
@@ -29,50 +41,88 @@ const io = require("socket.io")(server, {
   },
 });
 
+/* linking io with redis adapter */
+io.adapter(redisAdapter);
+
 app.use(cors(corsOptions));
 const PORT = process.env.PORT || 8000;
 
-// socket.emit => only to that particular socket will receive the event
-// io.emit => all the sockets connected to the io will revieve this
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
 
-// notify when user connect to the server
-// io is kind of a whole device with lots of sockets
-// socket is kind of a plug that connects to a socket in the device io
+// important
 io.on("connection", (socket) => {
-  socket.emit("yourID", socket.id);
-  socket.on("disconnect", () => {
-    socket.broadcast.emit("callEnded");
+  redis.keys("*", function (err, keys) {
+    if (err) return console.log(err);
+    for (var i = 0, len = keys.length; i < len; i++) {
+      console.log("key: ", keys[i]);
+    }
   });
+  console.log(socket.id);
+  socket.on("authentication", async (data) => {
+    // console.log("Here's the data I recieved: ", data);
 
-  socket.on("callUser", (data) => {
-    io.to(data.userToCall).emit("callingYou", {
-      signal: data.signalData,
-      from: data.from,
-      isReceivedCall: true,
-    });
-  });
+    let canConnect = await redis.setAsync(
+      `users:${data.uid}`,
+      socket.id,
+      "NX",
+      "EX",
+      30
+    );
+    if (!canConnect) {
+      console.log("Already Logged In");
+      console.log(socket.id + " disconnected");
+      io.to(socket.id).emit("InvalidSession");
+      if (socket.user) {
+        await redis.delAsync(`users:${socket.user.uid}`);
+      }
+      socket.disconnect();
+    } else {
+      socket.user = data;
+      console.log(socket.user);
+      io.to(socket.id).emit("authenticated");
+      console.log("Welcome");
 
-  socket.on("acceptCall", (data) => {
-    io.to(data.to).emit("callAccepted", data.signal);
-  });
-
-  socket.on("disconnectThisID", (id) => {
-    console.log(id);
-    if (id) {
-      io.to(id).emit("youHaveBeenDisconnected");
-      io.sockets.sockets.forEach((socket) => {
-        // If given socket id is exist in list of all sockets, kill it
-        if (socket.id === id) {
-          console.log("found you!");
-          socket.disconnect(true);
+      // redis renewel
+      socket.conn.on("packet", async (packet) => {
+        console.log("Thinking of renewing the key");
+        console.log("socket.auth: ", socket.auth);
+        console.log("packet type: ", packet.type);
+        if (packet.type === "pong") {
+          console.log("received a pong");
+          await redis.setAsync(
+            `users:${socket.user.uid}`,
+            socket.id,
+            "XX",
+            "EX",
+            30
+          );
         }
+      });
+
+      // Video Call related logic
+      socket.emit("yourID", socket.id);
+      socket.on("disconnect", async () => {
+        socket.broadcast.emit("callEnded");
+        if (socket.user) {
+          await redis.delAsync(`users:${socket.user.uid}`);
+        }
+      });
+
+      socket.on("callUser", (data) => {
+        io.to(data.userToCall).emit("callingYou", {
+          signal: data.signalData,
+          from: data.from,
+          isReceivedCall: true,
+        });
+      });
+
+      socket.on("acceptCall", (data) => {
+        io.to(data.to).emit("callAccepted", data.signal);
       });
     }
   });
-});
-
-app.get("/", (req, res) => {
-  res.send("Server is running");
 });
 
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

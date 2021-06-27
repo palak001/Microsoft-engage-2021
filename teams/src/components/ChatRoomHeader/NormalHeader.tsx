@@ -1,5 +1,6 @@
 import { Stack } from "@fluentui/react";
 import React from "react";
+import { Text } from "@fluentui/react/lib/Text";
 
 export const NormalHeader: React.FunctionComponent = () => {
   return (
@@ -8,14 +9,14 @@ export const NormalHeader: React.FunctionComponent = () => {
       style={{
         height: "100%",
         width: "100%",
-        paddingLeft: "30px",
-        fontSize: "13px",
+        padding: "18px",
+        fontSize: "15px",
         color: "grey",
         backgroundColor: "white",
         borderBottom: "0.2px #D2D7DF solid",
       }}
     >
-      To: Enter email
+      <Text>To: Enter email</Text>
     </Stack>
   );
 };

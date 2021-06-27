@@ -16,20 +16,22 @@ mergeStyles({
       margin: 0,
       padding: 0,
       height: "100vh",
+      fontFamily: "Segoe UI Web (West European)",
     },
   },
 });
 
 ReactDOM.render(
-  <Provider store={store()}>
-    <ContextProvider>
+  <BrowserRouter>
+    <Provider store={store()}>
       <React.StrictMode>
-        <BrowserRouter>
+        <ContextProvider>
           <App />
-        </BrowserRouter>
+        </ContextProvider>
       </React.StrictMode>
-    </ContextProvider>
-  </Provider>,
+      {/* </ContextProvider> */}
+    </Provider>
+  </BrowserRouter>,
   document.getElementById("root")
 );
 
