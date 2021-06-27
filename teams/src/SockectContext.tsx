@@ -59,6 +59,15 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         username: auth.currentUser?.email,
         token: auth.currentUser?.uid,
       });
+      // socket.current.on("unauthorized", (reason: any) => {
+      //   console.log("Unauthorized:", reason);
+      //   console.log("disconnecting");
+      //   history.push("/activesession");
+      // });
+      // socket.current.on("authenticated", function () {
+      //   console.log("authenticated");
+      // });
+
       socket.current.on("unauthorized", (reason: any) => {
         console.log("Unauthorized:", reason);
         console.log("disconnecting");
@@ -67,30 +76,30 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       socket.current.on("authenticated", function () {
         console.log("authenticated");
       });
-    });
 
-    socket.current.on("yourID", (socketID: string) => {
-      setYourID(socketID);
-      if (auth.currentUser) {
-        db.collection("users")
-          .doc(auth.currentUser?.email + "")
-          .set(
-            {
-              socketID: socketID,
-            },
-            { merge: true }
-          );
-      }
-    });
-    socket.current.on("callingYou", (data: ICallDetails) => {
-      console.log("you are getting a call");
-      // setReceiving
-      setCallDetails({
-        from: data.from,
-        signal: data.signal,
-        isReceivedCall: data.isReceivedCall,
+      socket.current.on("yourID", (socketID: string) => {
+        setYourID(socketID);
+        if (auth.currentUser) {
+          db.collection("users")
+            .doc(auth.currentUser?.email + "")
+            .set(
+              {
+                socketID: socketID,
+              },
+              { merge: true }
+            );
+        }
       });
-      console.log(data.from);
+      socket.current.on("callingYou", (data: ICallDetails) => {
+        console.log("you are getting a call");
+        // setReceiving
+        setCallDetails({
+          from: data.from,
+          signal: data.signal,
+          isReceivedCall: data.isReceivedCall,
+        });
+        console.log(data.from);
+      });
     });
   }, [history]);
 

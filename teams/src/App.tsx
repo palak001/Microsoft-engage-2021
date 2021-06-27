@@ -68,25 +68,25 @@ const App: React.FunctionComponent = () => {
     );
 
   return (
-    <BrowserRouter>
-      <Switch>
-        <Route path="/signup" exact={true} component={() => <SignUp />} />
-        <Route
-          path="/activesession"
-          exact={true}
-          component={ActiveSession}
-        ></Route>
-        <Route
-          path="/"
-          exact={true}
-          component={() => (
-            <AuthRoute>
-              <MainPage />
-            </AuthRoute>
-          )}
-        />
-      </Switch>
-    </BrowserRouter>
+    // <BrowserRouter>
+    <Switch>
+      <Route path="/signup" exact={true} component={() => <SignUp />} />
+      <Route
+        path="/activesession"
+        exact={true}
+        component={ActiveSession}
+      ></Route>
+      <Route
+        path="/"
+        exact={true}
+        component={() => (
+          <AuthRoute>
+            <MainPage />
+          </AuthRoute>
+        )}
+      />
+    </Switch>
+    // </BrowserRouter>
   );
 };
 

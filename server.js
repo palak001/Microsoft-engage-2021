@@ -100,7 +100,8 @@ const authenticate = async (socket, data, callback) => {
             return callback(new Error("ALREADY_LOGGED_IN"));
           }
           socket.user = doc.data();
-          console.log("socket.user", socket.user);
+          console.log("socket.user: ", socket.user);
+          // console.log("socket.user", socket.user);
           return callback(null, true);
         } else {
           return callback(new Error("Unauthorized"));

@@ -21,16 +21,16 @@ mergeStyles({
 });
 
 ReactDOM.render(
-  <Provider store={store()}>
-    <React.StrictMode>
-      <BrowserRouter>
+  <BrowserRouter>
+    <Provider store={store()}>
+      <React.StrictMode>
         <ContextProvider>
           <App />
         </ContextProvider>
-      </BrowserRouter>
-    </React.StrictMode>
-    {/* </ContextProvider> */}
-  </Provider>,
+      </React.StrictMode>
+      {/* </ContextProvider> */}
+    </Provider>
+  </BrowserRouter>,
   document.getElementById("root")
 );
 
