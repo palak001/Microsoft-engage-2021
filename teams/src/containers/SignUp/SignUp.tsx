@@ -1,4 +1,4 @@
-import { Stack } from "@fluentui/react";
+import { Icon, initializeIcons, Stack } from "@fluentui/react";
 import { PrimaryButton } from "@fluentui/react/lib/Button";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -6,12 +6,12 @@ import { signUpStackChildrenProps, signUpStackProps } from "./SignUp.styles";
 import firebase from "firebase";
 import { SignInWithSocialMedia } from "../../services/auth";
 import { Providers } from "../../config/firebase";
+import { Text } from "@fluentui/react/lib/Text";
 
 export const SignUp: React.FunctionComponent = () => {
-  // local states
-  // const [authenticating, setAuthenticating] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const history = useHistory();
+  initializeIcons();
 
   const signInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
     if (error !== "") setError("");
@@ -27,11 +27,23 @@ export const SignUp: React.FunctionComponent = () => {
   return (
     <Stack {...signUpStackProps}>
       <Stack {...signUpStackChildrenProps}>
-        <PrimaryButton onClick={() => signInWithSocialMedia(Providers.google)}>
-          Sign up using Google
-        </PrimaryButton>
-        <br></br>
-        <h5>Already have an account? Sign in here</h5>
+        <Stack horizontalAlign="center">
+          <Icon
+            iconName={"TeamsLogo16"}
+            style={{ fontSize: "40px", color: "#6264A7" }}
+            // {...IconProps}
+          />
+          <Text variant={"xxLarge"}>Sign in to Microsoft Teams</Text>
+        </Stack>
+        <Stack horizontalAlign="center">
+          <PrimaryButton
+            style={{ backgroundColor: "#6264A7" }}
+            onClick={() => signInWithSocialMedia(Providers.google)}
+          >
+            <Text style={{ color: "white" }}>Sign in using Google</Text>
+          </PrimaryButton>
+          {/* <Text>Already have an account? Sign in here</Text> */}
+        </Stack>
       </Stack>
     </Stack>
   );

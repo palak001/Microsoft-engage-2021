@@ -13,10 +13,16 @@ export const MainBody: React.FunctionComponent = () => {
   return (
     <Stack {...MainBodyStackProps}>
       <Stack style={{ width: "23%" }} horizontal>
-        <SideBar />
-        <ChatList />
+        <Stack style={{ width: "15%" }}>
+          <SideBar />
+        </Stack>
+        <Stack style={{ width: "85%" }}>
+          <ChatList />
+        </Stack>
       </Stack>
-      {context.callStarted || context.callAccepted ? <Video /> : <ChatRoom />}
+      <Stack style={{ width: "77%" }}>
+        {context.callStarted || context.callAccepted ? <Video /> : <ChatRoom />}
+      </Stack>
     </Stack>
   );
 };

@@ -5,6 +5,7 @@ import { auth } from "../../config/firebase";
 import { SocketContext } from "../../SockectContext";
 import { Contacts } from "../Contacts/Contacts";
 import { IconProps } from "../MainBody/MainBody.styles";
+import { Text } from "@fluentui/react/lib/Text";
 
 import { DefaultButton } from "@fluentui/react/lib/Button";
 
@@ -23,10 +24,9 @@ export const ChatList: React.FunctionComponent = () => {
 
   return (
     <Stack
+      verticalFill
       style={{
-        width: "85%",
-        boxShadow:
-          "0 3.2px 7.2px rgba(0, 0, 0, 0.132), 0px 0.6px 1.8px rgba(0, 0, 0, 0.108)",
+        borderRight: "1px solid #646464",
       }}
     >
       {/* heading */}
@@ -35,29 +35,31 @@ export const ChatList: React.FunctionComponent = () => {
         horizontal
         verticalAlign="center"
         style={{
-          paddingLeft: "12px",
+          padding: "12px",
+          height: "6.4%",
           borderBottom: "0.2px #D2D7DF solid",
         }}
       >
-        <h3>Chat</h3>
-        <Icon
-          iconName={"Favicon"}
-          style={{ fontSize: "15px" }}
-          {...IconProps}
-        />
+        <Text variant={"xLarge"}>Chat</Text>
+        <Icon iconName={"Add"} style={{ fontSize: "15px" }} {...IconProps} />
       </Stack>
       {/* contacts */}
-      <Stack>
-        <Stack>
+      <Stack
+        style={{
+          // padding: "12px",
+          height: "93.6%",
+        }}
+      >
+        {/* <Stack>
           <Stack>
             <h4>Current User:</h4> {auth.currentUser?.email}
           </Stack>
           <Stack>
             <h4>SocketID:</h4> {context.yourID}
           </Stack>
-        </Stack>
+        </Stack> */}
 
-        <Stack>
+        {/* <Stack>
           <Stack horizontal tokens={stackTokens}>
             <DefaultButton
               style={{ backgroundColor: "#ECEDE8" }}
@@ -68,7 +70,7 @@ export const ChatList: React.FunctionComponent = () => {
               allowDisabledFocus
             />
           </Stack>
-        </Stack>
+        </Stack> */}
         <Contacts />
       </Stack>
     </Stack>

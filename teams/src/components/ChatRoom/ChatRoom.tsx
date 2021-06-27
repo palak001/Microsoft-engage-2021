@@ -1,30 +1,24 @@
-import { Stack } from "@fluentui/react";
 import { ChatRoomHeader } from "../ChatRoomHeader/ChatRoomHeader";
+import { TextField } from "@fluentui/react/lib/TextField";
+import { IStackProps, Stack } from "@fluentui/react";
+import React from "react";
+
+const columnProps: Partial<IStackProps> = {
+  styles: { root: { width: "85%", height: "7%" } },
+};
 
 export const ChatRoom: React.FunctionComponent = () => {
   return (
-    <Stack
-      verticalAlign="center"
-      style={{
-        width: "77%",
-        boxShadow:
-          "0 3.2px 7.2px rgba(0, 0, 0, 0.132), 0px 0.6px 1.8px rgba(0, 0, 0, 0.108)",
-        backgroundColor: "#F6F5F4",
-      }}
-    >
-      <Stack
-        style={{
-          height: "5%",
-        }}
-      >
+    <Stack verticalFill verticalAlign="center" style={{ width: "100%" }}>
+      <Stack style={{ height: "6.4%" }}>
         <ChatRoomHeader />
       </Stack>
-      <Stack horizontalAlign="center" style={{ height: "95%" }}></Stack>
-      {/* <Stack
-        style={{
-          height: "93.25%",
-        }}
-      ></Stack> */}
+      <Stack horizontalAlign="center" style={{ height: "93.6%" }}>
+        <Stack style={{ height: "93%" }}></Stack>
+        <Stack {...columnProps}>
+          <TextField placeholder="Type your message " underlined />
+        </Stack>
+      </Stack>
     </Stack>
   );
 };

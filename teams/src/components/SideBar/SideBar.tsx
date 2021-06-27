@@ -1,27 +1,63 @@
-import { Icon, initializeIcons, Stack } from "@fluentui/react";
-import { IconProps } from "../MainBody/MainBody.styles";
+import { Text } from "@fluentui/react/lib/Text";
+import {
+  Icon,
+  IIconProps,
+  initializeIcons,
+  IStackProps,
+  mergeStyles,
+  Stack,
+} from "@fluentui/react";
+
+const SideBarStackProps: IStackProps = {
+  horizontalAlign: "center",
+  verticalAlign: "center",
+  styles: {
+    root: {
+      // border: "1px solid pink",
+      height: "70px",
+      width: "100%",
+      padding: "10px",
+      selectors: {
+        ":hover": { backgroundColor: "#EAECEA", fontSize: "100px" },
+      },
+    },
+  },
+};
+
+const IconProps: IIconProps = {
+  styles: {
+    root: {
+      fontSize: "20px",
+      color: "grey",
+    },
+  },
+};
 
 export const SideBar: React.FunctionComponent = () => {
   initializeIcons();
   return (
     <Stack
       horizontalAlign="center"
+      verticalFill
       style={{
-        fontSize: "10px",
         color: "grey",
-        padding: "10px",
-        width: "15%",
-        // boxShadow:
-
-        //   "0 3.2px 7.2px rgba(0, 0, 0,  0.132), 0px 0.6px 1.8px rgba(0, 0, 0, 0.108)",
+        borderRight: "solid 0.2px #646464",
+        cursor: "pointer",
+        width: "100%",
       }}
+      // {...SideBarStackProps}
     >
-      <Icon iconName={"Phone"} {...IconProps} />
-      Phone
-      <Icon iconName={"Chat"} {...IconProps} />
-      Chat
-      <Icon iconName={"Group"} {...IconProps} />
-      Teams
+      <Stack verticalAlign="start">
+        <Stack horizontalAlign="center" {...SideBarStackProps}>
+          <Icon iconName={"SkypeMessage"} {...IconProps} />
+          <Text>Chat</Text>
+        </Stack>
+        <Stack horizontalAlign="center" {...SideBarStackProps}>
+          <Icon iconName={"TeamsLogo16"} {...IconProps} />
+          <Text>Teams</Text>
+        </Stack>
+      </Stack>
+      <Stack></Stack>
     </Stack>
   );
 };

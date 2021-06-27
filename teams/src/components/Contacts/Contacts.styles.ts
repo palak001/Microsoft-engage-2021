@@ -9,7 +9,7 @@ export const ContactStackProp: IStackProps = {
       height: "50px",
       cursor: "pointer",
       selectors: {
-        ":hover": { backgroundColor: "white" },
+        ":hover": { backgroundColor: "#EAECEA" },
       },
     },
   },

@@ -1,5 +1,4 @@
 import {
-  IIconProps,
   IPersonaSharedProps,
   ISearchBoxProps,
   IStackProps,
@@ -7,41 +6,32 @@ import {
 
 export const NavBarStackProps: IStackProps = {
   tokens: {
-    // padding: "25px",
+    padding: "30px",
   },
   verticalAlign: "center",
   horizontalAlign: "space-between",
   styles: {
     root: {
-      background: "#464775",
+      backgroundColor: "black",
       height: "50px",
       color: "white",
-      fontSize: "16px",
+      fontSize: "25px",
       fontStyle: "bold",
-    },
-  },
-};
-
-export const IconProps: IIconProps = {
-  styles: {
-    root: {
-      fontSize: "20px",
-      width: "25px",
     },
   },
 };
 
 export const SearchProps: ISearchBoxProps = {
   placeholder: "Search",
-
   styles: {
     root: {
       width: "100%",
-      backgroundColor: "#D2D3DB",
+      backgroundColor: "#EAECEA",
+      color: "#646464",
     },
   },
 };
 
 export const PersonaProps: IPersonaSharedProps = {
-  imageInitials: "P",
+  imageInitials: "S",
 };
