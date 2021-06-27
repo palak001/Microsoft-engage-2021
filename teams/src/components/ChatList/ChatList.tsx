@@ -50,16 +50,16 @@ export const ChatList: React.FunctionComponent = () => {
           height: "93.6%",
         }}
       >
-        {/* <Stack>
+        <Stack>
           <Stack>
             <h4>Current User:</h4> {auth.currentUser?.email}
           </Stack>
           <Stack>
             <h4>SocketID:</h4> {context.yourID}
           </Stack>
-        </Stack> */}
+        </Stack>
 
-        {/* <Stack>
+        <Stack>
           <Stack horizontal tokens={stackTokens}>
             <DefaultButton
               style={{ backgroundColor: "#ECEDE8" }}
@@ -70,7 +70,7 @@ export const ChatList: React.FunctionComponent = () => {
               allowDisabledFocus
             />
           </Stack>
-        </Stack> */}
+        </Stack>
         <Contacts />
       </Stack>
     </Stack>

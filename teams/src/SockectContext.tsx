@@ -57,7 +57,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       console.log("sending authentication data");
       socket.current.emit("authentication", {
         username: auth.currentUser?.email,
-        token: auth.currentUser?.uid,
+        uid: auth.currentUser?.uid,
       });
       // socket.current.on("unauthorized", (reason: any) => {
       //   console.log("Unauthorized:", reason);
@@ -68,8 +68,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       //   console.log("authenticated");
       // });
 
-      socket.current.on("unauthorized", (reason: any) => {
-        console.log("Unauthorized:", reason);
+      socket.current.on("InvalidSession", () => {
+        console.log("Unauthorized:");
         console.log("disconnecting");
         history.push("/activesession");
       });
@@ -78,6 +78,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
 
       socket.current.on("yourID", (socketID: string) => {
+        console.log("Your ID: ", socketID);
         setYourID(socketID);
         if (auth.currentUser) {
           db.collection("users")
