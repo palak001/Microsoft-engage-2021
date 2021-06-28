@@ -1,14 +1,8 @@
 import React from "react";
 import { initializeIcons } from "@fluentui/font-icons-mdl2";
 import { Text } from "@fluentui/react/lib/Text";
-import {
-  Persona,
-  PersonaPresence,
-  PersonaSize,
-  SearchBox,
-  Stack,
-} from "@fluentui/react";
-import { NavBarStackProps, PersonaProps, SearchProps } from "./NavBar.styles";
+import { Persona, PersonaPresence, PersonaSize, Stack } from "@fluentui/react";
+import { NavBarStackProps, PersonaProps } from "./NavBar.styles";
 
 export const NavBar: React.FunctionComponent = () => {
   initializeIcons();
@@ -21,13 +15,6 @@ export const NavBar: React.FunctionComponent = () => {
             Microsoft Teams{" "}
           </Text>
         </Stack>
-      </Stack>
-
-      <Stack style={{ width: "59%" }}>
-        <SearchBox
-          {...SearchProps}
-          onSearch={(newValue) => console.log("value is " + newValue)}
-        />
       </Stack>
 
       <Stack

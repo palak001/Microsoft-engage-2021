@@ -5,15 +5,15 @@ import {
 } from "@fluentui/react";
 
 export const NavBarStackProps: IStackProps = {
-  tokens: {
-    padding: "30px",
-  },
+  // tokens: {
+  //   padding: "30px",
+  // },
   verticalAlign: "center",
   horizontalAlign: "space-between",
   styles: {
     root: {
       backgroundColor: "black",
-      height: "50px",
+      height: "100%",
       color: "white",
       fontSize: "25px",
       fontStyle: "bold",

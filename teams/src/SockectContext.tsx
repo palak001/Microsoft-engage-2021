@@ -20,6 +20,7 @@ interface IContext {
   stream: any;
   callEnded: any;
   yourID: string;
+  callRejected: any;
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
@@ -38,6 +39,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const [callAccepted, setCallAccepted] = useState<any>(false);
   const [callStarted, setCallStarted] = useState<any>(false);
   const [callEnded, setCallEnded] = useState<any>(false);
+  const [callRejected, setCallRejected] = useState<any>(false);
+  const [otherPersonID, setOtherPersonID] = useState<any>();
   // refs
   const yourVideo = useRef<any>();
   const friendVideo = useRef<any>();
@@ -59,14 +62,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         username: auth.currentUser?.email,
         uid: auth.currentUser?.uid,
       });
-      // socket.current.on("unauthorized", (reason: any) => {
-      //   console.log("Unauthorized:", reason);
-      //   console.log("disconnecting");
-      //   history.push("/activesession");
-      // });
-      // socket.current.on("authenticated", function () {
-      //   console.log("authenticated");
-      // });
 
       socket.current.on("InvalidSession", () => {
         console.log("Unauthorized:");
@@ -99,6 +94,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
           signal: data.signal,
           isReceivedCall: data.isReceivedCall,
         });
+        setOtherPersonID(data.from);
         console.log(data.from);
       });
     });
@@ -125,6 +121,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       .then((currentStream) => {
         setStream(currentStream);
         setCallStarted(true);
+        setOtherPersonID(socketId);
         if (yourVideo.current) yourVideo.current.srcObject = currentStream;
 
         const peer = new Peer({
@@ -181,6 +178,16 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
           setCallAccepted(true);
           peer.signal(JSON.stringify(signal));
         });
+
+        socket.current.on("callEnded", () => {
+          console.log("callEnded");
+          window.location.reload();
+        });
+
+        socket.current.on("callRejected", () => {
+          console.log("callRejected");
+          window.location.reload();
+        });
       });
   };
 
@@ -217,11 +224,28 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         peer.signal(JSON.stringify(callDetails.signal));
+
+        socket.current.on("callEnded", () => {
+          console.log("callEnded");
+          window.location.reload();
+        });
+
+        socket.current.on("callRejected", () => {
+          console.log("callRejected");
+          window.location.reload();
+        });
       });
   };
 
   const leaveCall = () => {
     setCallEnded(true);
+    socket.current.emit("callEnded", { to: otherPersonID });
+    connectionRef.current.destroy();
+  };
+
+  const rejectCall = () => {
+    setCallRejected(true);
+    socket.current.emit("callRejected", { to: otherPersonID });
     connectionRef.current.destroy();
   };
 
@@ -237,6 +261,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         stream,
         callEnded,
         yourID,
+        callRejected,
         answerCall,
         startCall,
         leaveCall,

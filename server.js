@@ -29,6 +29,11 @@ const redisAdapter = adapter({
   port: process.env.REDIS_PORT || "6379",
   password: process.env.REDIS_PASS || "password",
 });
+// const redisAdapter = adapter({
+//   host: "localhost",
+//   port: "6379",
+//   password: "password",
+// });
 
 /* Setting socket server */
 const io = require("socket.io")(server, {
@@ -120,6 +125,14 @@ io.on("connection", (socket) => {
 
       socket.on("acceptCall", (data) => {
         io.to(data.to).emit("callAccepted", data.signal);
+      });
+
+      socket.on("callEnded", (data) => {
+        io.to(data.to).emit("callEnded");
+      });
+
+      socket.on("callRejected", (data) => {
+        io.to(data.to).emit("callRejected");
       });
     }
   });

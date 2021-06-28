@@ -18,6 +18,8 @@ export const ChatList: React.FunctionComponent = () => {
 
   const handleSignOut = () => {
     auth.signOut().then(() => {
+      context.socket.current.emit("disconnect");
+
       history.push("/signup");
     });
   };
