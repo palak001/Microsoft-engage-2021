@@ -46,12 +46,12 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // useEffects
   useEffect(() => {
-    // socket.current = io("https://microsoft-engage-2021-server.herokuapp.com", {
-    //   autoConnect: false,
-    // });
-    socket.current = io("http://localhost:8000", {
+    socket.current = io("https://microsoft-engage-2021-server.herokuapp.com", {
       autoConnect: false,
     });
+    // socket.current = io("http://localhost:8000", {
+    //   autoConnect: false,
+    // });
 
     socket.current.on("connect", () => {
       console.log("sending authentication data");
