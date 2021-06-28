@@ -8,7 +8,7 @@ export const yourVideoStackProps: IStackProps = {
       width: "20%",
       height: "20%",
       position: "absolute",
-      border: "1px solid green",
+      // border: "1px solid green",
     },
   },
 };
@@ -18,7 +18,7 @@ export const friendVideoStackProps: IStackProps = {
     root: {
       width: "100%",
       height: "100%",
-      border: "1px solid pink",
+      // border: "1px solid pink",
       // position: "relative",
     },
   },

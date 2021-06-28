@@ -6,6 +6,9 @@ import { useHistory } from "react-router";
 
 interface ICallDetails {
   from: string;
+  photoURL: string;
+  name: string;
+  uid: string;
   signal: any;
   isReceivedCall: boolean;
 }
@@ -91,6 +94,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         // setReceiving
         setCallDetails({
           from: data.from,
+          name: data.name,
+          photoURL: data.photoURL,
+          uid: data.uid,
           signal: data.signal,
           isReceivedCall: data.isReceivedCall,
         });
@@ -161,6 +167,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
             userToCall: socketId,
             signalData: signalData,
             from: yourID,
+            photoURL: auth.currentUser?.photoURL,
+            name: auth.currentUser?.displayName,
+            uid: auth.currentUser?.uid,
           });
         });
 

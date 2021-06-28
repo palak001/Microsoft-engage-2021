@@ -1,6 +1,7 @@
 import { Stack } from "@fluentui/react";
 import React, { useContext } from "react";
 import { SocketContext } from "../../SockectContext";
+import Controllers from "../Controllers/Controllers";
 import { friendVideoStackProps, yourVideoStackProps } from "./Video.styles";
 
 const Video: React.FunctionComponent = () => {
@@ -14,6 +15,7 @@ const Video: React.FunctionComponent = () => {
           height="100%"
           playsInline
           ref={context.yourVideo}
+          style={{ objectFit: "cover" }}
           muted
           autoPlay
         />
@@ -24,8 +26,12 @@ const Video: React.FunctionComponent = () => {
           height="100%"
           playsInline
           ref={context.friendVideo}
+          style={{ objectFit: "cover" }}
           autoPlay
         />
+      </Stack>
+      <Stack>
+        <Controllers />
       </Stack>
     </Stack>
   );
