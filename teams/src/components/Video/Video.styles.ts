@@ -1,15 +1,25 @@
 import { IStackProps } from "@fluentui/react";
 
-export const StackProps: IStackProps = {
-  horizontalAlign: "space-around",
-  // verticalAlign: "center",
+export const yourVideoStackProps: IStackProps = {
   styles: {
     root: {
-      // border: "1px solid grey",
-      // backgroundColor: "white",
+      top: "80%",
+      left: "80%",
+      width: "20%",
+      height: "20%",
+      position: "absolute",
+      border: "1px solid green",
+    },
+  },
+};
+
+export const friendVideoStackProps: IStackProps = {
+  styles: {
+    root: {
       width: "100%",
       height: "100%",
-      padding: "10px",
+      border: "1px solid pink",
+      // position: "relative",
     },
   },
 };
