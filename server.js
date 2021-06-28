@@ -119,6 +119,9 @@ io.on("connection", (socket) => {
         io.to(data.userToCall).emit("callingYou", {
           signal: data.signalData,
           from: data.from,
+          name: data.name,
+          photoURL: data.photoURL,
+          uid: data.uid,
           isReceivedCall: true,
         });
       });
