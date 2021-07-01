@@ -24,16 +24,16 @@ let corsOptions = {
 };
 
 /* Redis Adapter */
-// const redisAdapter = adapter({
-//   host: process.env.REDIS_HOST || "localhost",
-//   port: process.env.REDIS_PORT || "6379",
-//   password: process.env.REDIS_PASS || "password",
-// });
 const redisAdapter = adapter({
-  host: "localhost",
-  port: "6379",
-  password: "password",
+  host: process.env.REDIS_HOST || "localhost",
+  port: process.env.REDIS_PORT || "6379",
+  password: process.env.REDIS_PASS || "password",
 });
+// const redisAdapter = adapter({
+//   host: "localhost",
+//   port: "6379",
+//   password: "password",
+// });
 
 /* Setting socket server */
 const io = require("socket.io")(server, {
