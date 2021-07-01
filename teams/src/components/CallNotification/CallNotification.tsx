@@ -50,7 +50,7 @@ export const CallNotification: React.FunctionComponent = () => {
         />
         <DefaultButton
           text="Decline"
-          onClick={context.leaveCall}
+          onClick={context.rejectCall}
           allowDisabledFocus
           style={{ backgroundColor: "#D1462F", color: "white" }}
         />
