@@ -60,12 +60,12 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // useEffects
   useEffect(() => {
-    socket.current = io("https://microsoft-engage-2021-server.herokuapp.com", {
-      autoConnect: false,
-    });
-    // socket.current = io("http://localhost:8000", {
+    // socket.current = io("https://microsoft-engage-2021-server.herokuapp.com", {
     //   autoConnect: false,
     // });
+    socket.current = io("http://localhost:8000", {
+      autoConnect: false,
+    });
 
     socket.current.on("connect", () => {
       console.log("sending authentication data");
@@ -133,6 +133,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
+        console.log("again");
         setStream(currentStream);
         setCallStarted(true);
         setOtherPersonID(socketId);
@@ -198,33 +199,27 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         socket.current.on("callEnded", () => {
-          if (stream) {
-            console.log("stream", stream);
-            stream.getTracks().forEach(function (track: any) {
+          if (currentStream) {
+            currentStream.getTracks().forEach(function (track: any) {
               track.stop();
             });
-            console.log("stream", stream);
           }
           setCallEnded(true);
           console.log("callEnded");
           setCallAccepted(false);
           setCallStarted(false);
-          // window.location.reload();
         });
 
         socket.current.on("callRejected", () => {
-          if (stream) {
-            console.log("stream", stream);
-            stream.getTracks().forEach(function (track: any) {
+          if (currentStream) {
+            currentStream.getTracks().forEach(function (track: any) {
               track.stop();
             });
-            console.log("stream", stream);
           }
-          setCallRejected(true);
+          setCallEnded(true);
           console.log("callRejected");
           setCallAccepted(false);
           setCallStarted(false);
-          // window.location.reload();
         });
       });
   };
@@ -265,11 +260,12 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         peer.signal(JSON.stringify(callDetails.signal));
 
         socket.current.on("callEnded", () => {
-          if (stream) {
-            stream.getTracks().forEach(function (track: any) {
+          if (currentStream) {
+            currentStream.getTracks().forEach(function (track: any) {
               track.stop();
             });
           }
+          console.log("currentStream1: ", currentStream);
           setCallEnded(true);
           console.log("callEnded");
           setCallAccepted(false);
@@ -277,13 +273,12 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         socket.current.on("callRejected", () => {
-          if (stream) {
-            console.log("stream", stream);
-            stream.getTracks().forEach(function (track: any) {
+          if (currentStream) {
+            currentStream.getTracks().forEach(function (track: any) {
               track.stop();
             });
           }
-          setCallRejected(true);
+          setCallEnded(true);
           console.log("callRejected");
           setCallAccepted(false);
           setCallStarted(false);
@@ -292,26 +287,26 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const leaveCall = () => {
-    if (stream) {
-      console.log("stream", stream);
-      stream.getTracks().forEach(function (track: any) {
-        track.stop();
-      });
+    // To switch your webcam light!
+    for (const track of yourVideo.current.srcObject.getTracks()) {
+      track.stop();
     }
+    yourVideo.current.srcObject = null;
+
     setCallEnded(true);
-    socket.current.emit("callEnded", { to: otherPersonID });
     if (connectionRef.current) connectionRef.current.destroy();
+    console.log("streams: ", stream);
     setCallAccepted(false);
     setCallStarted(false);
+    socket.current.emit("callEnded", { to: otherPersonID });
   };
 
   const rejectCall = () => {
-    if (stream) {
-      console.log("stream", stream);
-      stream.getTracks().forEach(function (track: any) {
-        track.stop();
-      });
+    for (const track of yourVideo.current.srcObject.getTracks()) {
+      track.stop();
     }
+    yourVideo.current.srcObject = null;
+
     setCallRejected(true);
     socket.current.emit("callRejected", { to: otherPersonID });
     if (connectionRef.current) connectionRef.current.destroy();
