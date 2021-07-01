@@ -16,9 +16,9 @@ export const IconProps: IIconProps = {
   styles: {
     root: {
       fontSize: "20px",
-      width: "24px",
       padding: "14px 13px 3px 0px",
-      color: "grey",
+      color: "white",
+      cursor: "pointer",
     },
   },
 };

@@ -1,28 +1,11 @@
-import { Icon, initializeIcons, IStackTokens, Stack } from "@fluentui/react";
-import React, { useContext } from "react";
-import { useHistory } from "react-router";
-import { auth } from "../../config/firebase";
-import { SocketContext } from "../../SockectContext";
+import { Icon, initializeIcons, Stack } from "@fluentui/react";
+import React from "react";
 import { Contacts } from "../Contacts/Contacts";
 import { IconProps } from "../MainBody/MainBody.styles";
 import { Text } from "@fluentui/react/lib/Text";
 
-import { DefaultButton } from "@fluentui/react/lib/Button";
-
-const stackTokens: IStackTokens = { childrenGap: 40 };
-
 export const ChatList: React.FunctionComponent = () => {
-  const history = useHistory();
-  const context = useContext(SocketContext);
   initializeIcons();
-
-  const handleSignOut = () => {
-    auth.signOut().then(() => {
-      context.socket.current.emit("disconnect");
-
-      history.push("/signup");
-    });
-  };
 
   return (
     <Stack
@@ -43,7 +26,11 @@ export const ChatList: React.FunctionComponent = () => {
         }}
       >
         <Text variant={"xLarge"}>Chat</Text>
-        <Icon iconName={"Add"} style={{ fontSize: "15px" }} {...IconProps} />
+        <Icon
+          iconName={"ChevronDown"}
+          {...IconProps}
+          style={{ fontSize: "14px", color: "black" }}
+        />
       </Stack>
       {/* contacts */}
       <Stack
@@ -53,26 +40,11 @@ export const ChatList: React.FunctionComponent = () => {
         }}
       >
         <Stack>
-          <Stack>
-            <h4>Current User:</h4> {auth.currentUser?.email}
-          </Stack>
-          <Stack>
+          {/* <Stack>
             <h4>SocketID:</h4> {context.yourID}
-          </Stack>
+          </Stack> */}
         </Stack>
 
-        <Stack>
-          <Stack horizontal tokens={stackTokens}>
-            <DefaultButton
-              style={{ backgroundColor: "#ECEDE8" }}
-              text="Sign out"
-              onClick={() => {
-                handleSignOut();
-              }}
-              allowDisabledFocus
-            />
-          </Stack>
-        </Stack>
         <Contacts />
       </Stack>
     </Stack>

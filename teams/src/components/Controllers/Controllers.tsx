@@ -14,12 +14,17 @@ const Controllers: React.FunctionComponent = () => {
         top: "95%",
         left: "40%",
         right: "40%",
+        backgroundColor: "teal",
       }}
     >
       <Stack>
         <Icon
           iconName={"Microphone"}
           style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
+          onClick={() => {
+            context.toggleAudioSettings();
+            console.log("getVideoTracks: ", context.stream);
+          }}
         />
         {/* <Icon
           iconName={"MicOff2"}
@@ -30,6 +35,10 @@ const Controllers: React.FunctionComponent = () => {
         <Icon
           iconName={"Camera"}
           style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
+          onClick={() => {
+            context.toggleVideoSettings();
+            console.log("getVideoTracks: ", context.stream);
+          }}
         />
       </Stack>
       <Stack>
