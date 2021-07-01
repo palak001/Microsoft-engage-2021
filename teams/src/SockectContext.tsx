@@ -30,6 +30,7 @@ interface IContext {
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
+  rejectCall: () => void;
   toggleAudioSettings: () => void;
   toggleVideoSettings: () => void;
 }
@@ -203,6 +204,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
             currentStream.getTracks().forEach(function (track: any) {
               track.stop();
             });
+            setStream(null);
           }
           setCallEnded(true);
           console.log("callEnded");
@@ -215,6 +217,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
             currentStream.getTracks().forEach(function (track: any) {
               track.stop();
             });
+            setStream(null);
           }
           setCallEnded(true);
           console.log("callRejected");
@@ -288,30 +291,39 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   const leaveCall = () => {
     // To switch your webcam light!
-    for (const track of yourVideo.current.srcObject.getTracks()) {
-      track.stop();
+    if (yourVideo.current && yourVideo.current.srcObject) {
+      for (const track of yourVideo.current.srcObject.getTracks()) {
+        track.stop();
+      }
+      yourVideo.current.srcObject = null;
+      setStream(null);
     }
-    yourVideo.current.srcObject = null;
 
     setCallEnded(true);
     if (connectionRef.current) connectionRef.current.destroy();
     console.log("streams: ", stream);
     setCallAccepted(false);
     setCallStarted(false);
+    setGettingCall(false);
     socket.current.emit("callEnded", { to: otherPersonID });
   };
 
   const rejectCall = () => {
-    for (const track of yourVideo.current.srcObject.getTracks()) {
-      track.stop();
+    // To switch your webcam light!
+    if (yourVideo.current && yourVideo.current.srcObject) {
+      for (const track of yourVideo.current.srcObject.getTracks()) {
+        track.stop();
+      }
+      yourVideo.current.srcObject = null;
+      setStream(null);
     }
-    yourVideo.current.srcObject = null;
 
     setCallRejected(true);
-    socket.current.emit("callRejected", { to: otherPersonID });
     if (connectionRef.current) connectionRef.current.destroy();
     setCallAccepted(false);
     setCallStarted(false);
+    setGettingCall(false);
+    socket.current.emit("callRejected", { to: otherPersonID });
   };
 
   const toggleAudioSettings = () => {
@@ -347,6 +359,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         answerCall,
         startCall,
         leaveCall,
+        rejectCall,
         toggleAudioSettings,
         toggleVideoSettings,
         // setCallerStreamFunction,
