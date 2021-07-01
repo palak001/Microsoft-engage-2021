@@ -6,17 +6,24 @@ import { ChatRoom } from "../ChatRoom/ChatRoom";
 import { SocketContext } from "../../SockectContext";
 import Video from "../Video/Video";
 import { CallNotification } from "../CallNotification/CallNotification";
+import { ChatRoomHeader } from "../ChatRoomHeader/ChatRoomHeader";
 
 export const MainBody: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
   initializeIcons();
   return (
     <Stack {...MainBodyStackProps}>
-      {context.callStarted || context.callAccepted ? (
-        <Stack style={{ height: "100%", width: "100%" }}>
-          <Video />
-        </Stack>
-      ) : (
+      {/* {context.callStarted || context.callAccepted ? ( */}
+      <Stack verticalFill>
+        <ChatList />
+      </Stack>
+      <Stack style={{ height: "6.4%" }}>
+        <ChatRoomHeader />
+      </Stack>
+      <Stack style={{ height: "100%", width: "100%" }}>
+        <Video />
+      </Stack>
+      {/* ) : (
         <>
           <Stack style={{ width: "15%" }}>
             <Stack verticalFill>
@@ -27,7 +34,7 @@ export const MainBody: React.FunctionComponent = () => {
             <ChatRoom />
           </Stack>
         </>
-      )}
+      )} */}
 
       {context.gettingCall && !context.callAccepted && context.callDetails ? (
         <Stack style={{ height: "10%", width: "10%" }}>
