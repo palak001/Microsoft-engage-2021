@@ -18,15 +18,20 @@ interface IContext {
   callDetails: ICallDetails;
   callAccepted: any;
   callStarted: any;
+  gettingCall: any;
   yourVideo: any;
   friendVideo: any;
   stream: any;
   callEnded: any;
   yourID: string;
   callRejected: any;
+  muteAudio: any;
+  muteVideo: any;
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
+  toggleAudioSettings: () => void;
+  toggleVideoSettings: () => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
@@ -43,7 +48,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const [callStarted, setCallStarted] = useState<any>(false);
   const [callEnded, setCallEnded] = useState<any>(false);
   const [callRejected, setCallRejected] = useState<any>(false);
+  const [gettingCall, setGettingCall] = useState<any>(false);
   const [otherPersonID, setOtherPersonID] = useState<any>();
+  const [muteAudio, setMuteAudio] = useState<boolean>(false);
+  const [muteVideo, setMuteVideo] = useState<boolean>(false);
   // refs
   const yourVideo = useRef<any>();
   const friendVideo = useRef<any>();
@@ -91,7 +99,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
       socket.current.on("callingYou", (data: ICallDetails) => {
         console.log("you are getting a call");
-        // setReceiving
+        setGettingCall(true);
         setCallDetails({
           from: data.from,
           name: data.name,
@@ -174,6 +182,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         peer.on("stream", (currentStream) => {
+          console.log("peerstream:", currentStream);
           if (friendVideo.current)
             friendVideo.current.srcObject = currentStream;
         });
@@ -189,13 +198,33 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         socket.current.on("callEnded", () => {
+          if (stream) {
+            console.log("stream", stream);
+            stream.getTracks().forEach(function (track: any) {
+              track.stop();
+            });
+            console.log("stream", stream);
+          }
+          setCallEnded(true);
           console.log("callEnded");
-          window.location.reload();
+          setCallAccepted(false);
+          setCallStarted(false);
+          // window.location.reload();
         });
 
         socket.current.on("callRejected", () => {
+          if (stream) {
+            console.log("stream", stream);
+            stream.getTracks().forEach(function (track: any) {
+              track.stop();
+            });
+            console.log("stream", stream);
+          }
+          setCallRejected(true);
           console.log("callRejected");
-          window.location.reload();
+          setCallAccepted(false);
+          setCallStarted(false);
+          // window.location.reload();
         });
       });
   };
@@ -206,6 +235,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       .then((currentStream) => {
         setStream(currentStream);
         setCallAccepted(true);
+        setGettingCall(false);
         if (yourVideo.current) yourVideo.current.srcObject = currentStream;
 
         const peer = new Peer({
@@ -217,45 +247,90 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         connectionRef.current = peer;
 
         peer.on("signal", (signalData) => {
-          socket.current.emit("acceptCall", {
+          socket.current.emit("acceptedCall", {
             signal: signalData,
             to: callDetails.from,
           });
         });
 
         peer.on("stream", (currentStream) => {
-          friendVideo.current.srcObject = currentStream;
+          if (friendVideo.current)
+            friendVideo.current.srcObject = currentStream;
         });
 
         peer.on("error", (err) => {
-          console.log("anserCall error");
           console.log(err);
         });
 
         peer.signal(JSON.stringify(callDetails.signal));
 
         socket.current.on("callEnded", () => {
+          if (stream) {
+            stream.getTracks().forEach(function (track: any) {
+              track.stop();
+            });
+          }
+          setCallEnded(true);
           console.log("callEnded");
-          window.location.reload();
+          setCallAccepted(false);
+          setCallStarted(false);
         });
 
         socket.current.on("callRejected", () => {
+          if (stream) {
+            console.log("stream", stream);
+            stream.getTracks().forEach(function (track: any) {
+              track.stop();
+            });
+          }
+          setCallRejected(true);
           console.log("callRejected");
-          window.location.reload();
+          setCallAccepted(false);
+          setCallStarted(false);
         });
       });
   };
 
   const leaveCall = () => {
+    if (stream) {
+      console.log("stream", stream);
+      stream.getTracks().forEach(function (track: any) {
+        track.stop();
+      });
+    }
     setCallEnded(true);
     socket.current.emit("callEnded", { to: otherPersonID });
-    connectionRef.current.destroy();
+    if (connectionRef.current) connectionRef.current.destroy();
+    setCallAccepted(false);
+    setCallStarted(false);
   };
 
   const rejectCall = () => {
+    if (stream) {
+      console.log("stream", stream);
+      stream.getTracks().forEach(function (track: any) {
+        track.stop();
+      });
+    }
     setCallRejected(true);
     socket.current.emit("callRejected", { to: otherPersonID });
-    connectionRef.current.destroy();
+    if (connectionRef.current) connectionRef.current.destroy();
+    setCallAccepted(false);
+    setCallStarted(false);
+  };
+
+  const toggleAudioSettings = () => {
+    if (stream) {
+      setMuteAudio(!muteAudio);
+      stream.getAudioTracks()[0].enabled = !stream.getAudioTracks()[0].enabled;
+    }
+  };
+
+  const toggleVideoSettings = () => {
+    if (stream) {
+      setMuteVideo(!muteVideo);
+      stream.getVideoTracks()[0].enabled = !stream.getVideoTracks()[0].enabled;
+    }
   };
 
   return (
@@ -265,15 +340,20 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         callDetails,
         callAccepted,
         callStarted,
+        gettingCall,
         yourVideo,
         friendVideo,
         stream,
         callEnded,
         yourID,
         callRejected,
+        muteAudio,
+        muteVideo,
         answerCall,
         startCall,
         leaveCall,
+        toggleAudioSettings,
+        toggleVideoSettings,
         // setCallerStreamFunction,
         // setCalleeStreamFunction,
       }}

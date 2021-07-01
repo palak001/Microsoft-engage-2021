@@ -115,6 +115,13 @@ io.on("connection", (socket) => {
         }
       });
 
+      socket.on("signOut", async () => {
+        socket.broadcast.emit("callEnded");
+        if (socket.user) {
+          await redis.delAsync(`users:${socket.user.uid}`);
+        }
+      });
+
       socket.on("callUser", (data) => {
         io.to(data.userToCall).emit("callingYou", {
           signal: data.signalData,
@@ -126,7 +133,7 @@ io.on("connection", (socket) => {
         });
       });
 
-      socket.on("acceptCall", (data) => {
+      socket.on("acceptedCall", (data) => {
         io.to(data.to).emit("callAccepted", data.signal);
       });
 

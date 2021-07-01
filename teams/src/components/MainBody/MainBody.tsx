@@ -29,9 +29,7 @@ export const MainBody: React.FunctionComponent = () => {
         </>
       )}
 
-      {context.callDetails?.from &&
-      !context.callAccepted &&
-      !context.callRejected ? (
+      {context.gettingCall && !context.callAccepted && context.callDetails ? (
         <Stack style={{ height: "10%", width: "10%" }}>
           <CallNotification />
         </Stack>

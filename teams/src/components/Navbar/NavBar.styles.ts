@@ -1,13 +1,9 @@
-import {
-  IPersonaSharedProps,
-  ISearchBoxProps,
-  IStackProps,
-} from "@fluentui/react";
+import { IPersonaSharedProps, IStackProps } from "@fluentui/react";
 
 export const NavBarStackProps: IStackProps = {
-  // tokens: {
-  //   padding: "30px",
-  // },
+  tokens: {
+    padding: "30px",
+  },
   verticalAlign: "center",
   horizontalAlign: "space-between",
   styles: {
@@ -21,17 +17,9 @@ export const NavBarStackProps: IStackProps = {
   },
 };
 
-export const SearchProps: ISearchBoxProps = {
-  placeholder: "Search",
-  styles: {
-    root: {
-      width: "100%",
-      backgroundColor: "#EAECEA",
-      color: "#646464",
-    },
-  },
-};
-
 export const PersonaProps: IPersonaSharedProps = {
-  imageInitials: "S",
+  imageInitials: "P",
+  style: {
+    fontSize: "40px",
+  },
 };
