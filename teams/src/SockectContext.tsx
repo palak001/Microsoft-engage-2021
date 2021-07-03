@@ -77,7 +77,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
       socket.current.on("InvalidSession", () => {
         console.log("Unauthorized:");
-        console.log("disconnecting");
         history.push("/activesession");
       });
       socket.current.on("authenticated", function () {
@@ -118,15 +117,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (callAccepted && callStarted) {
       if (yourVideo.current && !yourVideo.current.srcObject) {
-        console.log("here we are again");
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
-          .then((currentStream) => {
-            if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-          });
+        yourVideo.current.srcObject = stream;
       }
     }
-  }, [callStarted, callAccepted]);
+  }, [callStarted, callAccepted, stream]);
 
   // Helper Functions
 
@@ -134,12 +128,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
-        console.log("again");
+        setOtherPersonID(socketId);
         setStream(currentStream);
         setCallStarted(true);
-        setOtherPersonID(socketId);
         if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-
         const peer = new Peer({
           initiator: true,
           trickle: false,
@@ -200,12 +192,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         socket.current.on("callEnded", () => {
-          if (currentStream) {
-            currentStream.getTracks().forEach(function (track: any) {
-              track.stop();
-            });
-            setStream(null);
-          }
+          stopMediaTracks(currentStream);
           setCallEnded(true);
           console.log("callEnded");
           setCallAccepted(false);
@@ -213,16 +200,12 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         socket.current.on("callRejected", () => {
-          if (currentStream) {
-            currentStream.getTracks().forEach(function (track: any) {
-              track.stop();
-            });
-            setStream(null);
-          }
+          stopMediaTracks(currentStream);
           setCallEnded(true);
           console.log("callRejected");
           setCallAccepted(false);
           setCallStarted(false);
+          // setCallDetails(null);
         });
       });
   };
@@ -234,8 +217,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         setStream(currentStream);
         setCallAccepted(true);
         setGettingCall(false);
-        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
 
+        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
         const peer = new Peer({
           initiator: false,
           trickle: false,
@@ -263,12 +246,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         peer.signal(JSON.stringify(callDetails.signal));
 
         socket.current.on("callEnded", () => {
-          if (currentStream) {
-            currentStream.getTracks().forEach(function (track: any) {
-              track.stop();
-            });
-          }
-          console.log("currentStream1: ", currentStream);
+          stopMediaTracks(currentStream);
           setCallEnded(true);
           console.log("callEnded");
           setCallAccepted(false);
@@ -276,11 +254,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         socket.current.on("callRejected", () => {
-          if (currentStream) {
-            currentStream.getTracks().forEach(function (track: any) {
-              track.stop();
-            });
-          }
+          stopMediaTracks(currentStream);
           setCallEnded(true);
           console.log("callRejected");
           setCallAccepted(false);
@@ -291,13 +265,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   const leaveCall = () => {
     // To switch your webcam light!
-    if (yourVideo.current && yourVideo.current.srcObject) {
-      for (const track of yourVideo.current.srcObject.getTracks()) {
-        track.stop();
-      }
-      yourVideo.current.srcObject = null;
-      setStream(null);
-    }
+    stopMediaTracks(stream);
 
     setCallEnded(true);
     if (connectionRef.current) connectionRef.current.destroy();
@@ -310,14 +278,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   const rejectCall = () => {
     // To switch your webcam light!
-    if (yourVideo.current && yourVideo.current.srcObject) {
-      for (const track of yourVideo.current.srcObject.getTracks()) {
-        track.stop();
-      }
-      yourVideo.current.srcObject = null;
-      setStream(null);
-    }
-
+    stopMediaTracks(stream);
     setCallRejected(true);
     if (connectionRef.current) connectionRef.current.destroy();
     setCallAccepted(false);
@@ -337,6 +298,17 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     if (stream) {
       setMuteVideo(!muteVideo);
       stream.getVideoTracks()[0].enabled = !stream.getVideoTracks()[0].enabled;
+    }
+  };
+
+  const stopMediaTracks = (currentStream: any) => {
+    if (currentStream) {
+      currentStream.getTracks().forEach(function (track: any) {
+        console.log("stopping tracks:", track);
+        track.stop();
+      });
+      yourVideo.current.srcObject = null;
+      setStream(null);
     }
   };
 
