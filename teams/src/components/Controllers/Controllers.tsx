@@ -1,10 +1,12 @@
 import { Icon, initializeIcons, Stack } from "@fluentui/react";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { SocketContext } from "../../SockectContext";
 
 const Controllers: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
   initializeIcons();
+  const [toggleMic, setToggleMic] = useState<boolean>(true);
+  const [toggleCam, setToggleCam] = useState<boolean>(true);
   return (
     <Stack
       horizontal
@@ -18,28 +20,46 @@ const Controllers: React.FunctionComponent = () => {
       }}
     >
       <Stack>
-        <Icon
-          iconName={"Microphone"}
-          style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
-          onClick={() => {
-            context.toggleAudioSettings();
-            console.log("getVideoTracks: ", context.stream);
-          }}
-        />
-        {/* <Icon
-          iconName={"MicOff2"}
-          style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
-        /> */}
+        {toggleMic ? (
+          <Icon
+            iconName={"Microphone"}
+            style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
+            onClick={() => {
+              context.toggleAudioSettings();
+              setToggleMic(!toggleMic);
+            }}
+          />
+        ) : (
+          <Icon
+            iconName={"MicOff2"}
+            style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
+            onClick={() => {
+              context.toggleAudioSettings();
+              setToggleMic(!toggleMic);
+            }}
+          />
+        )}
       </Stack>
       <Stack>
-        <Icon
-          iconName={"Camera"}
-          style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
-          onClick={() => {
-            context.toggleVideoSettings();
-            console.log("getVideoTracks: ", context.stream);
-          }}
-        />
+        {toggleCam ? (
+          <Icon
+            iconName={"Video"}
+            style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
+            onClick={() => {
+              context.toggleVideoSettings();
+              setToggleCam(!toggleCam);
+            }}
+          />
+        ) : (
+          <Icon
+            iconName={"VideoOff"}
+            style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
+            onClick={() => {
+              context.toggleVideoSettings();
+              setToggleCam(!toggleCam);
+            }}
+          />
+        )}
       </Stack>
       <Stack>
         <Icon

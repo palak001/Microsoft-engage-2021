@@ -22,11 +22,10 @@ interface IContext {
   yourVideo: any;
   friendVideo: any;
   stream: any;
+  friendStream: any;
   callEnded: any;
   yourID: string;
   callRejected: any;
-  muteAudio: any;
-  muteVideo: any;
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
@@ -43,6 +42,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   // Local States
 
   const [stream, setStream] = useState<any>();
+  const [friendStream, setFriendStream] = useState<any>();
   const [yourID, setYourID] = useState<string>("");
   const [callDetails, setCallDetails] = useState<any>();
   const [callAccepted, setCallAccepted] = useState<any>(false);
@@ -51,8 +51,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const [callRejected, setCallRejected] = useState<any>(false);
   const [gettingCall, setGettingCall] = useState<any>(false);
   const [otherPersonID, setOtherPersonID] = useState<any>();
-  const [muteAudio, setMuteAudio] = useState<boolean>(false);
-  const [muteVideo, setMuteVideo] = useState<boolean>(false);
   // refs
   const yourVideo = useRef<any>();
   const friendVideo = useRef<any>();
@@ -119,8 +117,11 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       if (yourVideo.current && !yourVideo.current.srcObject) {
         yourVideo.current.srcObject = stream;
       }
+      if (friendVideo.current && !friendVideo.current.srcObject) {
+        friendVideo.current.srcObject = friendStream;
+      }
     }
-  }, [callStarted, callAccepted, stream]);
+  }, [callStarted, callAccepted, stream, friendStream]);
 
   // Helper Functions
 
@@ -176,9 +177,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         peer.on("stream", (currentStream) => {
-          console.log("peerstream:", currentStream);
           if (friendVideo.current)
             friendVideo.current.srcObject = currentStream;
+          setFriendStream(currentStream);
         });
 
         peer.on("error", (err) => {
@@ -237,6 +238,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         peer.on("stream", (currentStream) => {
           if (friendVideo.current)
             friendVideo.current.srcObject = currentStream;
+          setFriendStream(currentStream);
         });
 
         peer.on("error", (err) => {
@@ -289,15 +291,21 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   const toggleAudioSettings = () => {
     if (stream) {
-      setMuteAudio(!muteAudio);
-      stream.getAudioTracks()[0].enabled = !stream.getAudioTracks()[0].enabled;
+      stream.getTracks().forEach(function (track: any) {
+        if (track.kind === "audio") {
+          track.enabled = !track.enabled;
+        }
+      });
     }
   };
 
   const toggleVideoSettings = () => {
     if (stream) {
-      setMuteVideo(!muteVideo);
-      stream.getVideoTracks()[0].enabled = !stream.getVideoTracks()[0].enabled;
+      stream.getTracks().forEach(function (track: any) {
+        if (track.kind === "video") {
+          track.enabled = !track.enabled;
+        }
+      });
     }
   };
 
@@ -307,7 +315,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         console.log("stopping tracks:", track);
         track.stop();
       });
-      yourVideo.current.srcObject = null;
+      if (yourVideo.current) yourVideo.current.srcObject = null;
       setStream(null);
     }
   };
@@ -323,11 +331,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         yourVideo,
         friendVideo,
         stream,
+        friendStream,
         callEnded,
         yourID,
         callRejected,
-        muteAudio,
-        muteVideo,
         answerCall,
         startCall,
         leaveCall,
