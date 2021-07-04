@@ -25,8 +25,8 @@ const Controllers: React.FunctionComponent = () => {
             iconName={"Microphone"}
             style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
             onClick={() => {
-              context.toggleAudioSettings();
               setToggleMic(!toggleMic);
+              context.toggleAudioSettings();
             }}
           />
         ) : (
@@ -34,8 +34,8 @@ const Controllers: React.FunctionComponent = () => {
             iconName={"MicOff2"}
             style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
             onClick={() => {
-              context.toggleAudioSettings();
               setToggleMic(!toggleMic);
+              context.toggleAudioSettings();
             }}
           />
         )}
@@ -46,8 +46,8 @@ const Controllers: React.FunctionComponent = () => {
             iconName={"Video"}
             style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
             onClick={() => {
-              context.toggleVideoSettings();
               setToggleCam(!toggleCam);
+              context.toggleVideoSettings();
             }}
           />
         ) : (
@@ -55,8 +55,8 @@ const Controllers: React.FunctionComponent = () => {
             iconName={"VideoOff"}
             style={{ color: "white", fontSize: "25px", cursor: "pointer" }}
             onClick={() => {
-              context.toggleVideoSettings();
               setToggleCam(!toggleCam);
+              context.toggleVideoSettings();
             }}
           />
         )}

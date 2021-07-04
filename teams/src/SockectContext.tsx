@@ -113,7 +113,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   }, [history]);
 
   useEffect(() => {
-    if (callAccepted && callStarted) {
+    if (callAccepted || callStarted) {
       if (yourVideo.current && !yourVideo.current.srcObject) {
         yourVideo.current.srcObject = stream;
       }
@@ -218,8 +218,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         setStream(currentStream);
         setCallAccepted(true);
         setGettingCall(false);
-
         if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+        // console.log("yourVideo:", yourVideo);
         const peer = new Peer({
           initiator: false,
           trickle: false,
@@ -236,9 +236,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
 
         peer.on("stream", (currentStream) => {
+          setFriendStream(currentStream);
           if (friendVideo.current)
             friendVideo.current.srcObject = currentStream;
-          setFriendStream(currentStream);
         });
 
         peer.on("error", (err) => {
