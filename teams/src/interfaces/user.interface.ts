@@ -3,4 +3,5 @@ export default interface FirebaseUser {
   email: string;
   photoURL: string;
   uid: string;
+  socketID: string;
 }

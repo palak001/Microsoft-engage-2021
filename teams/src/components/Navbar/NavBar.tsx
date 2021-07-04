@@ -1,5 +1,5 @@
 import React from "react";
-import { initializeIcons } from "@fluentui/font-icons-mdl2";
+import { initializeIcons } from "@fluentui/react";
 import { Text } from "@fluentui/react/lib/Text";
 import {
   Persona,
@@ -21,7 +21,6 @@ export const NavBar: React.FunctionComponent = () => {
             {...PersonaProps}
             size={PersonaSize.size48}
             initialsColor={PersonaInitialsColor.teal}
-            // imageInitials={}
             imageUrl={auth.currentUser?.photoURL!}
             imageAlt="Palak, status is online"
           />

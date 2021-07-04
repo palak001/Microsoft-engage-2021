@@ -19,12 +19,11 @@ export const Contacts: React.FunctionComponent = () => {
     displayName: "",
     uid: "",
     email: "",
+    socketID: "",
   };
 
   const handleOnClick = (obj: FirebaseUser) => {
-    // getSelectedUserDetails(obj).then((result: FirebaseUser) => {
     dispatch(getSelectedUserDetailsAction(obj));
-    // });
   };
 
   return (

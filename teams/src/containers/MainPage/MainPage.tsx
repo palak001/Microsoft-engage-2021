@@ -1,19 +1,21 @@
 import { Stack } from "@fluentui/react";
 import React from "react";
-import { NavBar } from "../../components/Navbar/NavBar";
-import { MainBody } from "../../components/MainBody/MainBody";
 import { MainPageStackProps } from "./MainPage.style";
+import { HomeComponent } from "../../components/HomeComponent";
 
 export const MainPage: React.FunctionComponent = () => {
   return (
     <div>
       <Stack {...MainPageStackProps} style={{ height: "100vh" }}>
-        <Stack style={{ height: "9%" }}>
-          <NavBar />
-        </Stack>
-        <Stack style={{ height: "91%", width: "100%" }}>
-          <MainBody />
-        </Stack>
+        <HomeComponent />{" "}
+        {/* <MeetingComponent
+          {...{
+            cameraPermission: "Denied",
+            cameraActive: true,
+            micActive: true,
+            microphonePermission: "Denied",
+          }}
+        /> */}
       </Stack>
     </div>
   );

@@ -9,8 +9,6 @@ export const fetchUserContacts = async (): Promise<any> => {
     .then((snapshot) => {
       snapshot.forEach((doc: any) => {
         const snap = doc.data();
-        // console.log(snap);
-        // if (snap.email !== auth.currentUser?.email)
         userDetails = userDetails.concat(snap);
       });
     });
