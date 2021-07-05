@@ -7,6 +7,9 @@ import {
   CallVideoOffIcon,
 } from "@fluentui/react-icons-northstar";
 import { SocketContext } from "../SockectContext";
+import FirebaseUser from "../interfaces/user.interface";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux-store";
 
 const previewStackProps: IStackProps = {
   tokens: {
@@ -31,6 +34,9 @@ const previewStackProps: IStackProps = {
 
 export const PreviewComponent: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
+  const enteredUserDetails: FirebaseUser = useSelector(
+    (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
+  );
   const [toggleMicStatus, setToggleMicStatus] = useState<string>("on");
   const [toggleCamStatus, setToggleCamStatus] = useState<string>("on");
 
@@ -38,12 +44,18 @@ export const PreviewComponent: React.FunctionComponent = () => {
     toggleCamStatus === "on"
       ? setToggleCamStatus("off")
       : setToggleCamStatus("on");
+    context.toggleVideoSettings();
   };
 
   const handleOnMicToggle = () => {
     toggleMicStatus === "on"
       ? setToggleMicStatus("off")
       : setToggleMicStatus("on");
+    context.toggleAudioSettings();
+  };
+
+  const handleJoin = () => {
+    context.startCall(enteredUserDetails.socketID);
   };
 
   return (
@@ -60,6 +72,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
             playsInline
             ref={context.yourVideo}
             style={{ objectFit: "cover" }}
+            poster={enteredUserDetails.photoURL}
             autoPlay
           />
         </Stack>
@@ -69,14 +82,14 @@ export const PreviewComponent: React.FunctionComponent = () => {
             verticalAlign="center"
             tokens={{ padding: "12px", childrenGap: "5px" }}
           >
-            <Stack style={{ width: "30px" }}>
+            <Stack verticalAlign="center" style={{ width: "30px" }}>
               {toggleCamStatus === "on" ? (
                 <CallVideoIcon size="smaller" />
               ) : (
                 <CallVideoOffIcon size="smaller" />
               )}
             </Stack>
-            <Stack>
+            <Stack verticalAlign="center">
               <Toggle
                 defaultChecked
                 onChange={handleOnCamToggle}
@@ -85,23 +98,34 @@ export const PreviewComponent: React.FunctionComponent = () => {
             </Stack>
           </Stack>
           <Stack horizontal verticalAlign="center" tokens={{ padding: "10px" }}>
-            <Stack style={{ width: "30px" }}>
+            <Stack verticalAlign="center" style={{ width: "30px" }}>
               {toggleMicStatus === "on" ? (
                 <MicIcon size="smaller" />
               ) : (
                 <MicOffIcon size="smaller" />
               )}
             </Stack>
-            <Stack>
+            <Stack verticalAlign="center">
               <Toggle
                 defaultChecked
                 ariaLabel="Microphone Icon"
                 onChange={handleOnMicToggle}
               />
             </Stack>
-            <Stack verticalAlign="center" tokens={{ padding: "10px" }}>
-              <PrimaryButton text="Sign out" allowDisabledFocus />
+            <Stack verticalAlign="center" tokens={{ padding: "20px" }}>
+              <PrimaryButton
+                text="Join"
+                allowDisabledFocus
+                onClick={handleJoin}
+              />
             </Stack>
+          </Stack>
+          <Stack verticalAlign="center" tokens={{ padding: "10px" }}>
+            <PrimaryButton
+              text="Leave"
+              allowDisabledFocus
+              onClick={context.leaveCall}
+            />
           </Stack>
         </Stack>
       </Stack>

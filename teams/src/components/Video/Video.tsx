@@ -52,9 +52,9 @@ const Video: React.FunctionComponent = () => {
           />
         )}
       </Stack>
-      <Stack>
+      {/* <Stack>
         <Controllers />
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 };

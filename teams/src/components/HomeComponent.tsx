@@ -120,7 +120,7 @@ export const HomeComponent: React.FunctionComponent = () => {
             return doc.data()?.socketID;
           }
         });
-      context.startCall(socketIDofB);
+      context.getUserMediaFunction();
       history.push(
         `/meeting?socketIDofA=${socketIDofA}&socketIDofB=${socketIDofB}`
       );

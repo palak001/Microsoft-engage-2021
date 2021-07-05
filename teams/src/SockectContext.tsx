@@ -32,6 +32,7 @@ interface IContext {
   rejectCall: () => void;
   toggleAudioSettings: () => void;
   toggleVideoSettings: () => void;
+  getUserMediaFunction: () => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
@@ -126,143 +127,141 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   // Helper Functions
 
   const startCall = (socketId: string) => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setOtherPersonID(socketId);
-        setStream(currentStream);
-        setCallStarted(true);
-        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-        const peer = new Peer({
-          initiator: true,
-          trickle: false,
-          config: {
-            iceServers: [
-              { urls: "stun:stun01.sipphone.com" },
-              { urls: "stun:stun.ekiga.net" },
-              { urls: "stun:stun.fwdnet.net" },
-              { urls: "stun:stun.ideasip.com" },
-              { urls: "stun:stun.iptel.org" },
-              { urls: "stun:stun.rixtelecom.se" },
-              { urls: "stun:stun.schlund.de" },
-              { urls: "stun:stun.l.google.com:19302" },
-              { urls: "stun:stun1.l.google.com:19302" },
-              { urls: "stun:stun2.l.google.com:19302" },
-              { urls: "stun:stun3.l.google.com:19302" },
-              { urls: "stun:stun4.l.google.com:19302" },
-              { urls: "stun:stunserver.org" },
-              { urls: "stun:stun.softjoys.com" },
-              { urls: "stun:stun.voiparound.com" },
-              { urls: "stun:stun.voipbuster.com" },
-              { urls: "stun:stun.voipstunt.com" },
-              { urls: "stun:stun.voxgratia.org" },
-              { urls: "stun:stun.xten.com" },
-            ],
-          },
-          stream: currentStream,
-        });
+    // navigator.mediaDevices
+    //   .getUserMedia({ video: true, audio: true })
+    //   .then((currentStream) => {
+    setOtherPersonID(socketId);
+    // setStream(currentStream);
+    setCallStarted(true);
+    // if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      config: {
+        iceServers: [
+          { urls: "stun:stun01.sipphone.com" },
+          { urls: "stun:stun.ekiga.net" },
+          { urls: "stun:stun.fwdnet.net" },
+          { urls: "stun:stun.ideasip.com" },
+          { urls: "stun:stun.iptel.org" },
+          { urls: "stun:stun.rixtelecom.se" },
+          { urls: "stun:stun.schlund.de" },
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+          { urls: "stun:stun2.l.google.com:19302" },
+          { urls: "stun:stun3.l.google.com:19302" },
+          { urls: "stun:stun4.l.google.com:19302" },
+          { urls: "stun:stunserver.org" },
+          { urls: "stun:stun.softjoys.com" },
+          { urls: "stun:stun.voiparound.com" },
+          { urls: "stun:stun.voipbuster.com" },
+          { urls: "stun:stun.voipstunt.com" },
+          { urls: "stun:stun.voxgratia.org" },
+          { urls: "stun:stun.xten.com" },
+        ],
+      },
+      stream: stream,
+    });
 
-        connectionRef.current = peer;
+    connectionRef.current = peer;
 
-        // fires when the peer want to send signalling data to other peers
-        peer.on("signal", (signalData: any) => {
-          socket.current.emit("callUser", {
-            userToCall: socketId,
-            signalData: signalData,
-            from: yourID,
-            photoURL: auth.currentUser?.photoURL,
-            name: auth.currentUser?.displayName,
-            uid: auth.currentUser?.uid,
-          });
-        });
-
-        peer.on("stream", (currentStream) => {
-          if (friendVideo.current)
-            friendVideo.current.srcObject = currentStream;
-          setFriendStream(currentStream);
-        });
-
-        peer.on("error", (err) => {
-          console.log("call start error");
-          console.log(err);
-        });
-
-        socket.current.on("callAccepted", (signal: any) => {
-          setCallAccepted(true);
-          peer.signal(JSON.stringify(signal));
-        });
-
-        socket.current.on("callEnded", () => {
-          stopMediaTracks(currentStream);
-          setCallEnded(true);
-          console.log("callEnded");
-          setCallAccepted(false);
-          setCallStarted(false);
-        });
-
-        socket.current.on("callRejected", () => {
-          stopMediaTracks(currentStream);
-          setCallEnded(true);
-          console.log("callRejected");
-          setCallAccepted(false);
-          setCallStarted(false);
-          // setCallDetails(null);
-        });
+    // fires when the peer want to send signalling data to other peers
+    peer.on("signal", (signalData: any) => {
+      socket.current.emit("callUser", {
+        userToCall: socketId,
+        signalData: signalData,
+        from: yourID,
+        photoURL: auth.currentUser?.photoURL,
+        name: auth.currentUser?.displayName,
+        uid: auth.currentUser?.uid,
       });
+    });
+
+    peer.on("stream", (friendStream) => {
+      if (friendVideo.current) friendVideo.current.srcObject = friendStream;
+      setFriendStream(friendStream);
+    });
+
+    peer.on("error", (err) => {
+      console.log("call start error");
+      console.log(err);
+    });
+
+    socket.current.on("callAccepted", (signal: any) => {
+      setCallAccepted(true);
+      peer.signal(JSON.stringify(signal));
+    });
+
+    socket.current.on("callEnded", () => {
+      stopMediaTracks(stream);
+      setCallEnded(true);
+      console.log("callEnded");
+      setCallAccepted(false);
+      setCallStarted(false);
+    });
+
+    socket.current.on("callRejected", () => {
+      stopMediaTracks(stream);
+      setCallEnded(true);
+      console.log("callRejected");
+      setCallAccepted(false);
+      setCallStarted(false);
+      // setCallDetails(null);
+    });
+    // });
   };
 
   const answerCall = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        setCallAccepted(true);
-        setGettingCall(false);
-        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-        // console.log("yourVideo:", yourVideo);
-        const peer = new Peer({
-          initiator: false,
-          trickle: false,
-          stream: currentStream,
-        });
+    // navigator.mediaDevices
+    //   .getUserMedia({ video: true, audio: true })
+    //   .then((currentStream) => {
+    //     setStream(currentStream);
+    setCallAccepted(true);
+    setGettingCall(false);
+    // if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+    // console.log("yourVideo:", yourVideo);
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: stream,
+    });
 
-        connectionRef.current = peer;
+    connectionRef.current = peer;
 
-        peer.on("signal", (signalData) => {
-          socket.current.emit("acceptedCall", {
-            signal: signalData,
-            to: callDetails.from,
-          });
-        });
-
-        peer.on("stream", (currentStream) => {
-          setFriendStream(currentStream);
-          if (friendVideo.current)
-            friendVideo.current.srcObject = currentStream;
-        });
-
-        peer.on("error", (err) => {
-          console.log(err);
-        });
-
-        peer.signal(JSON.stringify(callDetails.signal));
-
-        socket.current.on("callEnded", () => {
-          stopMediaTracks(currentStream);
-          setCallEnded(true);
-          console.log("callEnded");
-          setCallAccepted(false);
-          setCallStarted(false);
-        });
-
-        socket.current.on("callRejected", () => {
-          stopMediaTracks(currentStream);
-          setCallEnded(true);
-          console.log("callRejected");
-          setCallAccepted(false);
-          setCallStarted(false);
-        });
+    peer.on("signal", (signalData) => {
+      socket.current.emit("acceptedCall", {
+        signal: signalData,
+        to: callDetails.from,
       });
+    });
+
+    peer.on("stream", (friendStream) => {
+      setFriendStream(friendStream);
+      if (friendVideo.current) friendVideo.current.srcObject = friendStream;
+    });
+
+    peer.on("error", (err) => {
+      console.log(err);
+    });
+
+    peer.signal(JSON.stringify(callDetails.signal));
+
+    socket.current.on("callEnded", () => {
+      stopMediaTracks(stream);
+      setCallEnded(true);
+      console.log("callEnded");
+      setCallAccepted(false);
+      setCallStarted(false);
+    });
+
+    socket.current.on("callRejected", () => {
+      stopMediaTracks(stream);
+      setCallEnded(true);
+      console.log("callRejected");
+      setCallAccepted(false);
+      setCallStarted(false);
+    });
+    // });
   };
 
   const leaveCall = () => {
@@ -276,6 +275,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setCallStarted(false);
     setGettingCall(false);
     socket.current.emit("callEnded", { to: otherPersonID });
+    // check why this is not working
+    history.push("/");
   };
 
   const rejectCall = () => {
@@ -287,6 +288,19 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setCallStarted(false);
     setGettingCall(false);
     socket.current.emit("callRejected", { to: otherPersonID });
+    history.push("/");
+  };
+
+  const getUserMediaFunction = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const toggleAudioSettings = () => {
@@ -341,6 +355,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         rejectCall,
         toggleAudioSettings,
         toggleVideoSettings,
+        getUserMediaFunction,
         // setCallerStreamFunction,
         // setCalleeStreamFunction,
       }}

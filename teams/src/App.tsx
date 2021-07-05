@@ -73,7 +73,12 @@ const App: React.FunctionComponent = () => {
     <Switch>
       <Route path="/signup" exact={true} component={() => <SignUp />} />
       <Route path="/activesession" exact={true} component={ActiveSession} />
-      <Route path="/meeting" exact={true} component={PreviewComponent} />
+      {context.callStarted || context.callAccepted ? (
+        <Route path="/meeting" exact={true} component={MeetingComponent} />
+      ) : (
+        <Route path="/meeting" exact={true} component={PreviewComponent} />
+      )}
+
       <Route
         path="/"
         exact={true}

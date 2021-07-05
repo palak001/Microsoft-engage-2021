@@ -1,5 +1,5 @@
-import { PrimaryButton, Stack, CommandButton, Image } from "@fluentui/react";
-import React from "react";
+import { PrimaryButton, Stack, Image } from "@fluentui/react";
+import React, { useContext, useState } from "react";
 import {
   IPersonaSharedProps,
   Persona,
@@ -10,8 +10,6 @@ import {
   headerProps,
   personaLayoutProps,
   personaStyles,
-  cmdStackProps,
-  meetingActionProps,
   declineCallProps,
   imageStyleProps,
   personaStyle,
@@ -23,6 +21,9 @@ import {
   CallVideoIcon,
   CallVideoOffIcon,
 } from "@fluentui/react-icons-northstar";
+import { auth } from "../config/firebase";
+import { SocketContext } from "../SockectContext";
+import Video from "./Video/Video";
 
 export interface MediaControlsProps {
   micActive: boolean;
@@ -40,23 +41,28 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
   props: MediaControlsProps
 ) => {
   const examplePersona: IPersonaSharedProps = {
-    imageUrl: "https://miro.medium.com/max/948/0*9UgsryOBGjrws1_z.jpg",
+    imageUrl: auth.currentUser?.photoURL!,
     imageInitials: "AL",
-    text: "Payal",
-    secondaryText: "quepayal@gmail.com",
+    text: auth.currentUser?.displayName!,
+    secondaryText: auth.currentUser?.email!,
     tertiaryText: "In a meeting",
   };
   const imageProps = { src: personaSVG.toString() };
-  const cameraActive =
-    props.cameraPermission === "Denied" ? false : props.cameraActive;
-  const cameraDisabled = props.cameraPermission === "Denied";
-  const cameraOnClick =
-    props.cameraPermission !== "Denied" ? props.onCameraChange : undefined;
-  const micActive =
-    props.microphonePermission === "Denied" ? false : props.micActive;
-  const micDisabled = props.microphonePermission === "Denied";
-  const micOnClick =
-    props.microphonePermission !== "Denied" ? props.onMicChange : undefined;
+
+  const context = useContext(SocketContext);
+
+  const [camStatus, setCamStatus] = useState<string>("on");
+  const [micStatus, setMicStatus] = useState<string>("on");
+
+  const handleOnCamClick = () => {
+    camStatus === "on" ? setCamStatus("off") : setCamStatus("on");
+    context.toggleVideoSettings();
+  };
+
+  const handleOnMicClick = () => {
+    micStatus === "on" ? setMicStatus("off") : setMicStatus("on");
+    context.toggleAudioSettings();
+  };
 
   return (
     <>
@@ -68,41 +74,41 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
             presence={PersonaPresence.busy}
             styles={personaStyles}
           />
-          <Stack {...meetingActionProps}>
-            <CommandButton onClick={cameraOnClick} disabled={cameraDisabled}>
-              <Stack {...cmdStackProps}>
-                <CallVideoIcon size="medium" />
-
-                {cameraActive ? (
-                  <CallVideoIcon size="medium" />
-                ) : (
-                  <CallVideoOffIcon size="medium" />
-                )}
-              </Stack>
-            </CommandButton>
-            <CommandButton onClick={micOnClick} disabled={micDisabled}>
-              <Stack {...cmdStackProps}>
-                {micActive ? (
-                  <MicIcon size="medium" />
-                ) : (
-                  <MicOffIcon size="medium" />
-                )}
-              </Stack>
-            </CommandButton>
-            <PrimaryButton
-              onClick={props.onEndCallClick}
-              {...declineCallProps}
-            />
+          <Stack horizontal tokens={{ childrenGap: "18px" }}>
+            <Stack
+              verticalAlign="center"
+              style={{ width: "18px", cursor: "pointer" }}
+              onClick={handleOnCamClick}
+            >
+              {camStatus === "on" ? (
+                <CallVideoIcon size="smaller" />
+              ) : (
+                <CallVideoOffIcon size="smaller" />
+              )}
+            </Stack>
+            <Stack
+              verticalAlign="center"
+              style={{ width: "18px", cursor: "pointer" }}
+              onClick={handleOnMicClick}
+            >
+              {micStatus === "on" ? (
+                <MicIcon size="smaller" />
+              ) : (
+                <MicOffIcon size="smaller" />
+              )}
+            </Stack>
+            <PrimaryButton onClick={context.leaveCall} {...declineCallProps} />
           </Stack>
         </Stack>
 
         <Stack {...personaLayoutProps}>
-          <Image
+          {/* <Image
             alt="Welcome to the Microsoft Teams"
             className={personaStyle}
             styles={imageStyleProps}
             {...imageProps}
-          />
+          /> */}
+          <Video />
         </Stack>
       </Stack>
     </>
