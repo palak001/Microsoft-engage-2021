@@ -8,6 +8,10 @@ import {
   initializeIcons,
   MessageBar,
   MessageBarType,
+  ActionButton,
+  FocusZone,
+  List,
+  FocusZoneDirection,
 } from "@fluentui/react";
 import React, { useContext, useState } from "react";
 import {
@@ -19,6 +23,7 @@ import {
 import {
   actionProps,
   cancelActionProps,
+  classNames,
   container,
   descProps,
   emailActionProps,
@@ -28,13 +33,17 @@ import {
   imageStyleProps,
   imgStyle,
   LayoutProps,
+  meetingListProps,
+  meetingNameActionProps,
   modalActionProps,
   modalProps,
   modalStackChildProps,
   modalStackProps,
+  newMeetingProps,
   nextActionProps,
   personaStyles,
   sandbox,
+  vertical,
   videoCallActionProps,
 } from "./Styles";
 import teamsSVG from "../assets/teams.svg";
@@ -54,6 +63,8 @@ const ModalHeading = "Email address of the person to connect";
 const errorMessage1 = "You cannot video call yourself";
 const errorMessage2 = "User doesn't exist in our database";
 const errorMessage3 = "Email can't be empty";
+const errorMessage4 = "Meeting Name can't be empty";
+const erroMessage5 = "Meeting Name already exists";
 
 export const HomeComponent: React.FunctionComponent = () => {
   initializeIcons();
@@ -63,7 +74,9 @@ export const HomeComponent: React.FunctionComponent = () => {
 
   // Local States
   const [email, setEmail] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [meetingName, setMeetingName] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
+  const [meetingNameError, setMeetingNameError] = useState<string>("");
 
   const [isModalOpen, { setTrue: showModal, setFalse: hideModal }] =
     useBoolean(false);
@@ -77,6 +90,14 @@ export const HomeComponent: React.FunctionComponent = () => {
   const imageProps = { src: teamsSVG.toString() };
   const titleId = useId("title");
 
+  // Meeting history
+  const meetingHistory: any = [
+    { name: "Meeting with Person A" },
+    { name: "Meeting with Person B" },
+    { name: "Meeting with Person C" },
+    { name: "Meeting with Person D" },
+  ];
+
   const handleSignOut = () => {
     auth.signOut().then(() => {
       context.socket.current.emit("signOut");
@@ -88,19 +109,35 @@ export const HomeComponent: React.FunctionComponent = () => {
     setEmail(e.target.value);
   };
 
+  const handleMeetingNameInput = (e: any) => {
+    setMeetingName(e.target.value);
+  };
+
   const handleNext = async () => {
     if (email === "") {
-      setError(errorMessage3);
+      setEmailError(errorMessage3);
+    }
+    if (meetingName === "") {
+      setMeetingNameError(errorMessage4);
     } else {
       await fetchEnteredUserDetails(email).then((result: FirebaseUser) => {
-        if (result.email === "same") setError(errorMessage1);
-        else if (result.email === "") setError(errorMessage2);
-        else setError("");
+        if (result.email === "same") setEmailError(errorMessage1);
+        else if (result.email === "") setEmailError(errorMessage2);
+        else setEmailError("");
         dispatch(fetchEnteredUserDetailsAction(result));
       });
+
+      // check validity of the meeting name
     }
 
-    if (error === "") {
+    if (
+      emailError === "" &&
+      email !== "" &&
+      meetingNameError === "" &&
+      meetingName !== ""
+    ) {
+      // Direct them to the chat window instead of getusermedia function
+
       const socketIDofA = await db
         .collection("users")
         .doc(auth.currentUser?.email + "")
@@ -125,6 +162,19 @@ export const HomeComponent: React.FunctionComponent = () => {
         `/meeting?socketIDofA=${socketIDofA}&socketIDofB=${socketIDofB}`
       );
     }
+  };
+
+  const onRenderCell = (
+    item: any | undefined,
+    index: number | undefined
+  ): JSX.Element => {
+    return (
+      <div className={classNames.itemCell} data-is-focusable={true}>
+        <div className={classNames.itemContent}>
+          <div className={classNames.itemName}>{item.name}</div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -154,9 +204,43 @@ export const HomeComponent: React.FunctionComponent = () => {
             </Stack>
             <Stack {...actionProps}>
               <PrimaryButton {...videoCallActionProps} onClick={showModal} />
+            </Stack>
+          </Stack>
+          <Stack {...vertical}></Stack>
+          <Stack {...sandbox}>
+            <Stack>
+              <Text {...headingProps}>Meetings History</Text>
+            </Stack>
+            <Stack {...descProps}>
+              <ActionButton {...newMeetingProps}>
+                <Text>Add new meeting</Text>
+              </ActionButton>
+            </Stack>
+            <Stack {...meetingListProps}>
+              <FocusZone direction={FocusZoneDirection.vertical}>
+                <div className={classNames.container} data-is-scrollable>
+                  <List items={meetingHistory} onRenderCell={onRenderCell} />
+                </div>
+              </FocusZone>
+            </Stack>
+          </Stack>
+        </Stack>
+      </Stack>
+
+      {/* <Stack {...LayoutProps}>
+          <Stack {...sandbox}>
+            <Stack>
+              <Text {...headingProps}>{TeamsHeading} </Text>
+            </Stack>
+            <Stack>
+              <Text {...descProps}>{TeamsDesc}</Text>
+            </Stack>
+            <Stack {...actionProps}>
+              <PrimaryButton {...videoCallActionProps} onClick={showModal} />
               <TextField {...groupCallActionProps} />
             </Stack>
           </Stack>
+          
           <Stack>
             <Image
               alt="Welcome to the Microsoft Teams"
@@ -166,7 +250,7 @@ export const HomeComponent: React.FunctionComponent = () => {
             />
           </Stack>
         </Stack>
-      </Stack>
+      </Stack> */}
       <Modal
         titleAriaId={titleId}
         isOpen={isModalOpen}
@@ -181,20 +265,41 @@ export const HomeComponent: React.FunctionComponent = () => {
           <Stack {...modalStackProps}>
             <Stack {...modalStackChildProps}>
               <TextField
+                {...meetingNameActionProps}
+                value={meetingName}
+                onChange={handleMeetingNameInput}
+              />
+              {meetingNameError !== "" ? (
+                <MessageBar
+                  messageBarType={MessageBarType.error}
+                  onDismiss={() => {
+                    setMeetingNameError("");
+                    setMeetingName("");
+                  }}
+                  dismissButtonAriaLabel="Close"
+                >
+                  {meetingNameError}
+                </MessageBar>
+              ) : (
+                <> </>
+              )}
+            </Stack>
+            <Stack {...modalStackChildProps}>
+              <TextField
                 {...emailActionProps}
                 value={email}
                 onChange={handleEmailInput}
               />
-              {error !== "" ? (
+              {emailError !== "" ? (
                 <MessageBar
                   messageBarType={MessageBarType.error}
                   onDismiss={() => {
-                    setError("");
+                    setEmailError("");
                     setEmail("");
                   }}
                   dismissButtonAriaLabel="Close"
                 >
-                  {error}
+                  {emailError}
                 </MessageBar>
               ) : (
                 <> </>

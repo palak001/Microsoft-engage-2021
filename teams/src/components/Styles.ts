@@ -1,4 +1,6 @@
 import {
+  getFocusStyle,
+  getTheme,
   IButtonProps,
   IIconProps,
   IImageStyles,
@@ -6,7 +8,9 @@ import {
   IStackProps,
   ITextFieldProps,
   ITextProps,
+  ITheme,
   mergeStyles,
+  mergeStyleSets,
 } from "@fluentui/react";
 
 export const personaStyles: Partial<IPersonaStyles> = {
@@ -18,7 +22,7 @@ export const headerProps: IStackProps = {
   horizontalAlign: "space-between",
   verticalAlign: "center",
   tokens: {
-    padding: "20px 50px 20px 50px",
+    padding: "10px 50px 10px 50px",
   },
 };
 
@@ -100,6 +104,19 @@ const emailIcon: IIconProps = { iconName: "Mail" };
 export const emailActionProps: Partial<ITextFieldProps> = {
   iconProps: emailIcon,
   placeholder: "Enter the Email Address",
+  autoComplete: "false",
+  styles: {
+    root: {
+      width: "400px",
+    },
+    icon: {
+      fontSize: "20px",
+    },
+  },
+};
+
+export const meetingNameActionProps: Partial<ITextFieldProps> = {
+  placeholder: "Enter the Meeting Name",
   autoComplete: "false",
   styles: {
     root: {
@@ -292,6 +309,91 @@ export const declineCallProps: Partial<IButtonProps> = {
     icon: {
       fontSize: "20px",
       color: "#ffffff",
+    },
+  },
+};
+
+const theme: ITheme = getTheme();
+const { palette, semanticColors, fonts } = theme;
+export const classNames = mergeStyleSets({
+  container: {
+    overflow: "auto",
+    maxHeight: 500,
+  },
+  itemCell: [
+    getFocusStyle(theme, { inset: -1 }),
+    {
+      minHeight: 54,
+      padding: 10,
+      boxSizing: "border-box",
+      borderBottom: `1px solid ${semanticColors.bodyDivider}`,
+      display: "flex",
+      selectors: {
+        "&:hover": { background: palette.neutralLight },
+      },
+    },
+  ],
+  itemContent: {
+    marginLeft: 10,
+    overflow: "hidden",
+    flexGrow: 1,
+  },
+  itemName: [
+    fonts.xLarge,
+    {
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+    },
+  ],
+});
+
+export const meetingListProps: IStackProps = {
+  tokens: {
+    childrenGap: "20px",
+  },
+  styles: {
+    root: {
+      width: "700px",
+    },
+  },
+};
+
+export const vertical: IStackProps = {
+  styles: {
+    root: {
+      width: "0px",
+      height: "40vh",
+      borderRight: "00.05px solid #bcbcbc",
+    },
+  },
+};
+
+export const newMeetingProps: Partial<IButtonProps> = {
+  iconProps: {
+    iconName: "CircleAddition",
+  },
+  styles: {
+    root: {
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "20px",
+      lineHeight: "20px",
+      color: "#0064BF",
+      height: "40px",
+      width: "300px",
+    },
+    rootPressed: {
+      color: "#0064BF",
+    },
+    rootHovered: {
+      color: "#0064BF",
+    },
+    icon: {
+      fontSize: "20px",
+    },
+    iconHovered: {
+      color: "#0064BF",
     },
   },
 };

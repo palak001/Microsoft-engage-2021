@@ -1,4 +1,4 @@
-import { PrimaryButton, Stack, Image } from "@fluentui/react";
+import { PrimaryButton, Stack, Image, TextField } from "@fluentui/react";
 import React, { useContext, useState } from "react";
 import {
   IPersonaSharedProps,
@@ -47,12 +47,13 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
     secondaryText: auth.currentUser?.email!,
     tertiaryText: "In a meeting",
   };
-  const imageProps = { src: personaSVG.toString() };
 
   const context = useContext(SocketContext);
 
   const [camStatus, setCamStatus] = useState<string>("on");
   const [micStatus, setMicStatus] = useState<string>("on");
+  // chat
+  const [chat, setChat] = useState<string>("");
 
   const handleOnCamClick = () => {
     camStatus === "on" ? setCamStatus("off") : setCamStatus("on");
@@ -62,6 +63,16 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
   const handleOnMicClick = () => {
     micStatus === "on" ? setMicStatus("off") : setMicStatus("on");
     context.toggleAudioSettings();
+  };
+
+  const handleSubmit = () => {
+    console.log(chat);
+    setChat("");
+    context.sendChatMessage(chat);
+  };
+
+  const handleChange = (e: any) => {
+    setChat(e.target.value);
   };
 
   return (
@@ -100,15 +111,18 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
             <PrimaryButton onClick={context.leaveCall} {...declineCallProps} />
           </Stack>
         </Stack>
-
-        <Stack {...personaLayoutProps}>
-          {/* <Image
+        <Stack horizontal>
+          <Stack {...personaLayoutProps}>
+            {/* <Image
             alt="Welcome to the Microsoft Teams"
-            className={personaStyle}
-            styles={imageStyleProps}
-            {...imageProps}
-          /> */}
-          <Video />
+            class
+            <Video />
+          </Stack>
+          <Stack>
+            {/* chat */}
+            <TextField value={chat} onChange={handleChange} />
+            <button onClick={handleSubmit}>Send</button>
+          </Stack>
         </Stack>
       </Stack>
     </>
