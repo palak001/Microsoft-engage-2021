@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Route, Switch, useHistory } from "react-router";
-import { BrowserRouter } from "react-router-dom";
 import AuthRoute from "./services/auth/AuthRouter";
 import { auth, db } from "./config/firebase";
 import { MainPage } from "./containers/MainPage/MainPage";
 import { SignUp } from "./containers/SignUp/SignUp";
 import { fetchUserContacts } from "./services/firebase/FirebaseService";
-import FirebaseUsers from "./interfaces/user.interface";
+import FirebaseUser from "./interfaces/user.interface";
 import { useDispatch } from "react-redux";
 import { fetchUserContactsAction } from "./redux-store/Firebase/UserContactsReducer";
 import { SocketContext } from "./SockectContext";
 import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
 import { IStackProps, Stack } from "@fluentui/react/lib/Stack";
 import { ActiveSession } from "./containers/SignUp/ActiveSession";
+import { MeetingComponent } from "./components/MeetingComponent";
+import { PreviewComponent } from "./components/PreviewComponent";
 
 export interface IApplicationProps {}
 
@@ -31,7 +32,6 @@ const App: React.FunctionComponent = () => {
   const history = useHistory();
 
   useEffect(() => {
-    console.log("App.tsx useEffect");
     auth.onAuthStateChanged((user) => {
       if (user) {
         context.socket.current.connect();
@@ -43,6 +43,7 @@ const App: React.FunctionComponent = () => {
             photoURL: user.photoURL,
             displayName: user.displayName,
             email: user.email,
+            socketID: "",
           });
         history.push("/");
       } else history.push("/signup");
@@ -53,7 +54,7 @@ const App: React.FunctionComponent = () => {
   // // for monitoring and updating user state
   useEffect(() => {
     if (auth.currentUser) {
-      fetchUserContacts().then((result: Array<FirebaseUsers>) => {
+      fetchUserContacts().then((result: Array<FirebaseUser>) => {
         dispatch(fetchUserContactsAction(result));
       });
       setLoading(false);
@@ -71,11 +72,13 @@ const App: React.FunctionComponent = () => {
     // <BrowserRouter>
     <Switch>
       <Route path="/signup" exact={true} component={() => <SignUp />} />
-      <Route
-        path="/activesession"
-        exact={true}
-        component={ActiveSession}
-      ></Route>
+      <Route path="/activesession" exact={true} component={ActiveSession} />
+      {context.callStarted || context.callAccepted ? (
+        <Route path="/meeting" exact={true} component={MeetingComponent} />
+      ) : (
+        <Route path="/meeting" exact={true} component={PreviewComponent} />
+      )}
+
       <Route
         path="/"
         exact={true}

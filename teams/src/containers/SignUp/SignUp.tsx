@@ -29,20 +29,19 @@ export const SignUp: React.FunctionComponent = () => {
       <Stack {...signUpStackChildrenProps}>
         <Stack horizontalAlign="center">
           <Icon
-            iconName={"TeamsLogo16"}
-            style={{ fontSize: "40px", color: "#6264A7" }}
+            iconName={"Signin"}
+            style={{ fontSize: "40px", color: "#0078D4" }}
             // {...IconProps}
           />
           <Text variant={"xxLarge"}>Sign in to Microsoft Teams</Text>
         </Stack>
         <Stack horizontalAlign="center">
           <PrimaryButton
-            style={{ backgroundColor: "#6264A7" }}
+            style={{ backgroundColor: "#0078D4" }}
             onClick={() => signInWithSocialMedia(Providers.google)}
           >
             <Text style={{ color: "white" }}>Sign in using Google</Text>
           </PrimaryButton>
-          {/* <Text>Already have an account? Sign in here</Text> */}
         </Stack>
       </Stack>
     </Stack>
