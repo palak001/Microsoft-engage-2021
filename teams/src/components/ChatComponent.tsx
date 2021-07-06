@@ -93,7 +93,7 @@ export const ChatComponent: React.FunctionComponent = () => {
       setTeamsChat({
         message: [
           ...teamsChat.message,
-          { content: message, time: "1", sender: SenderType.frnd },
+          { content: data.message, time: "1", sender: SenderType.frnd },
         ],
       });
     });
