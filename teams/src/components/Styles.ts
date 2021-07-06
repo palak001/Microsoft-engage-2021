@@ -1,12 +1,19 @@
 import {
+  getFocusStyle,
+  getTheme,
   IButtonProps,
   IIconProps,
   IImageStyles,
   IPersonaStyles,
+  IScrollablePaneProps,
+  IStackItemProps,
   IStackProps,
   ITextFieldProps,
   ITextProps,
+  ITheme,
   mergeStyles,
+  mergeStyleSets,
+  ScrollbarVisibility,
 } from "@fluentui/react";
 
 export const personaStyles: Partial<IPersonaStyles> = {
@@ -18,7 +25,7 @@ export const headerProps: IStackProps = {
   horizontalAlign: "space-between",
   verticalAlign: "center",
   tokens: {
-    padding: "20px 50px 20px 50px",
+    padding: "10px 50px 10px 50px",
   },
 };
 
@@ -100,6 +107,19 @@ const emailIcon: IIconProps = { iconName: "Mail" };
 export const emailActionProps: Partial<ITextFieldProps> = {
   iconProps: emailIcon,
   placeholder: "Enter the Email Address",
+  autoComplete: "false",
+  styles: {
+    root: {
+      width: "400px",
+    },
+    icon: {
+      fontSize: "20px",
+    },
+  },
+};
+
+export const meetingNameActionProps: Partial<ITextFieldProps> = {
+  placeholder: "Enter the Meeting Name",
   autoComplete: "false",
   styles: {
     root: {
@@ -292,6 +312,245 @@ export const declineCallProps: Partial<IButtonProps> = {
     icon: {
       fontSize: "20px",
       color: "#ffffff",
+    },
+  },
+};
+
+const theme: ITheme = getTheme();
+const { palette, semanticColors, fonts } = theme;
+export const classNames = mergeStyleSets({
+  container: {
+    overflow: "auto",
+    maxHeight: 500,
+  },
+  itemCell: [
+    getFocusStyle(theme, { inset: -1 }),
+    {
+      minHeight: 54,
+      padding: 10,
+      boxSizing: "border-box",
+      borderBottom: `1px solid ${semanticColors.bodyDivider}`,
+      display: "flex",
+      selectors: {
+        "&:hover": { background: palette.neutralLight },
+      },
+    },
+  ],
+  itemContent: {
+    marginLeft: 10,
+    overflow: "hidden",
+    flexGrow: 1,
+  },
+  itemName: [
+    fonts.xLarge,
+    {
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+    },
+  ],
+});
+
+export const meetingListProps: IStackProps = {
+  tokens: {
+    childrenGap: "20px",
+  },
+  styles: {
+    root: {
+      width: "700px",
+    },
+  },
+};
+
+export const vertical: IStackProps = {
+  styles: {
+    root: {
+      width: "0px",
+      height: "40vh",
+      borderRight: "00.05px solid #bcbcbc",
+    },
+  },
+};
+
+export const newMeetingProps: Partial<IButtonProps> = {
+  iconProps: {
+    iconName: "CircleAddition",
+  },
+  styles: {
+    root: {
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "20px",
+      lineHeight: "20px",
+      color: "#0064BF",
+      height: "40px",
+      width: "300px",
+    },
+    rootPressed: {
+      color: "#0064BF",
+    },
+    rootHovered: {
+      color: "#0064BF",
+    },
+    icon: {
+      fontSize: "20px",
+    },
+    iconHovered: {
+      color: "#0064BF",
+    },
+  },
+};
+
+// chat component
+export const chatHeadingProps: IStackProps = {
+  styles: {
+    root: {
+      fontFamily: "Segoe UI",
+      fontStyle: "normal",
+      fontWeight: "500",
+      fontSize: "30px",
+      lineHeight: "40px",
+      color: "#605e5c",
+    },
+  },
+};
+
+export const videoCallProps: IStackProps = {
+  styles: {
+    root: {
+      width: "2rem",
+      fill: "#0078d4",
+    },
+  },
+};
+
+export const textActionProps: Partial<ITextFieldProps> = {
+  placeholder: "Type a new message",
+  styles: {
+    root: {
+      width: "1700px",
+      selectors: {
+        "@media only screen and (max-width: 1367px)": {
+          width: "1200px",
+        },
+        "@media only screen and (max-width: 1024px)": {
+          width: "900px",
+        },
+        "@media only screen and (max-width: 640px)": {
+          width: "485px",
+        },
+        "@media only screen and (max-width: 480px)": {
+          width: "341px",
+        },
+        "@media only screen and (max-width: 320px)": {
+          width: "300px",
+        },
+      },
+    },
+    field: {
+      fontFamily: "Segoe UI",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "14px",
+      lineHeight: "20px",
+      color: "#171717",
+    },
+  },
+};
+
+export const textStackProps: IStackProps = {
+  horizontal: true,
+  horizontalAlign: "space-between",
+  verticalAlign: "center",
+  tokens: {
+    childrenGap: "1%",
+    padding: "20px 50px 20px 50px",
+  },
+};
+
+export const sendTextProps: Partial<IButtonProps> = {
+  iconProps: sendIcon,
+  allowDisabledFocus: true,
+  styles: {
+    icon: {
+      fontSize: "24px",
+      fill: "#0078d4",
+    },
+  },
+};
+
+export const chatLayoutProps: IStackProps = {
+  tokens: {
+    childrenGap: "20px",
+  },
+  styles: {
+    root: {
+      height: "100vh",
+    },
+  },
+};
+
+export const chatContainerProps: IStackItemProps = {
+  styles: {
+    root: {
+      position: "relative",
+    },
+  },
+};
+
+export const scrollablePaneProps: IScrollablePaneProps = {
+  scrollbarVisibility: ScrollbarVisibility.auto,
+  styles: {
+    root: {
+      position: "absolute",
+    },
+  },
+};
+
+export const chatScreenProps: IStackProps = {
+  tokens: {
+    padding: "20px 50px 20px 50px",
+    childrenGap: "20px",
+  },
+  styles: {
+    root: {
+      height: "80vh",
+    },
+  },
+};
+
+export const neutralLight: IStackProps = {
+  tokens: {
+    padding: "10px",
+  },
+  styles: {
+    root: {
+      maxWidth: "1000px",
+      background: "#f3f2f1",
+      borderRadius: "4px",
+      fontFamily: "Segoe UI",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "18px",
+      lineHeight: "22px",
+    },
+  },
+};
+
+export const duskLight: IStackProps = {
+  tokens: {
+    padding: "10px",
+  },
+  styles: {
+    root: {
+      maxWidth: "1000px",
+      background: "#c7e0f4",
+      borderRadius: "4px",
+      fontFamily: "Segoe UI",
+      fontStyle: "normal",
+      fontWeight: "normal",
+      fontSize: "18px",
+      lineHeight: "22px",
     },
   },
 };

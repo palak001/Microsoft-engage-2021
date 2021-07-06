@@ -33,6 +33,7 @@ interface IContext {
   toggleAudioSettings: () => void;
   toggleVideoSettings: () => void;
   getUserMediaFunction: () => void;
+  sendChatMessage: (chat: any) => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
@@ -127,13 +128,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   // Helper Functions
 
   const startCall = (socketId: string) => {
-    // navigator.mediaDevices
-    //   .getUserMedia({ video: true, audio: true })
-    //   .then((currentStream) => {
     setOtherPersonID(socketId);
-    // setStream(currentStream);
     setCallStarted(true);
-    // if (yourVideo.current) yourVideo.current.srcObject = currentStream;
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -212,14 +208,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const answerCall = () => {
-    // navigator.mediaDevices
-    //   .getUserMedia({ video: true, audio: true })
-    //   .then((currentStream) => {
-    //     setStream(currentStream);
     setCallAccepted(true);
     setGettingCall(false);
-    // if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-    // console.log("yourVideo:", yourVideo);
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -334,6 +324,24 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     }
   };
 
+  // Chatting related
+  const sendChatMessage = (chatObject: any) => {
+    if (socket.current) {
+      db.collection("users")
+        .doc(chatObject.receiverEmail)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            socket.current.emit("chat", {
+              to: doc.data()?.socketID,
+              message: chatObject.message,
+              from: yourID,
+              senderEmail: auth.currentUser?.email,
+            });
+          }
+        });
+    }
+  };
   return (
     <SocketContext.Provider
       value={{
@@ -356,8 +364,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         toggleAudioSettings,
         toggleVideoSettings,
         getUserMediaFunction,
-        // setCallerStreamFunction,
-        // setCalleeStreamFunction,
+        sendChatMessage,
       }}
     >
       {children}

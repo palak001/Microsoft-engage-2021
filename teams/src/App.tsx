@@ -4,7 +4,7 @@ import AuthRoute from "./services/auth/AuthRouter";
 import { auth, db } from "./config/firebase";
 import { MainPage } from "./containers/MainPage/MainPage";
 import { SignUp } from "./containers/SignUp/SignUp";
-import { fetchUserContacts } from "./services/firebase/FirebaseService";
+import { fetchUserContacts } from "./services/firebase/FetchUserContacts";
 import FirebaseUser from "./interfaces/user.interface";
 import { useDispatch } from "react-redux";
 import { fetchUserContactsAction } from "./redux-store/Firebase/UserContactsReducer";
@@ -14,6 +14,10 @@ import { IStackProps, Stack } from "@fluentui/react/lib/Stack";
 import { ActiveSession } from "./containers/SignUp/ActiveSession";
 import { MeetingComponent } from "./components/MeetingComponent";
 import { PreviewComponent } from "./components/PreviewComponent";
+import { fetchMeetingHistory } from "./services/firebase/FetchMeetingHistory";
+import MeetingHistory from "./interfaces/meetingHistory.interface";
+import { fetchMeetingHistoryAction } from "./redux-store/Firebase/MeetingHistoryReducer";
+import { ChatComponent } from "./components/ChatComponent";
 
 export interface IApplicationProps {}
 
@@ -35,16 +39,21 @@ const App: React.FunctionComponent = () => {
     auth.onAuthStateChanged((user) => {
       if (user) {
         context.socket.current.connect();
-
+        // db.collection("users").doc(user.email + "").get().then((doc) => {
+        //   if(doc.exists) {}
+        // })
         db.collection("users")
           .doc(user.email + "")
-          .set({
-            uid: user.uid,
-            photoURL: user.photoURL,
-            displayName: user.displayName,
-            email: user.email,
-            socketID: "",
-          });
+          .set(
+            {
+              uid: user.uid,
+              photoURL: user.photoURL,
+              displayName: user.displayName,
+              email: user.email,
+              socketID: "",
+            },
+            { merge: true }
+          );
         history.push("/");
       } else history.push("/signup");
       setLoading(false);
@@ -56,6 +65,9 @@ const App: React.FunctionComponent = () => {
     if (auth.currentUser) {
       fetchUserContacts().then((result: Array<FirebaseUser>) => {
         dispatch(fetchUserContactsAction(result));
+      });
+      fetchMeetingHistory().then((result: Array<MeetingHistory>) => {
+        dispatch(fetchMeetingHistoryAction(result));
       });
       setLoading(false);
     }
@@ -78,6 +90,8 @@ const App: React.FunctionComponent = () => {
       ) : (
         <Route path="/meeting" exact={true} component={PreviewComponent} />
       )}
+
+      <Route path="/chat" exact component={ChatComponent} />
 
       <Route
         path="/"

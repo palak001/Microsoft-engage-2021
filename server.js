@@ -144,6 +144,17 @@ io.on("connection", (socket) => {
       socket.on("callRejected", (data) => {
         io.to(data.to).emit("callRejected");
       });
+
+      // chat related logic
+      socket.on("chat", (data) => {
+        if (data.to) {
+          io.to(data.to).emit("newChat", {
+            from: data.from,
+            message: data.message,
+            senderEmail: data.senderEmail,
+          });
+        }
+      });
     }
   });
 });
