@@ -33,7 +33,7 @@ interface IContext {
   toggleAudioSettings: () => void;
   toggleVideoSettings: () => void;
   getUserMediaFunction: () => void;
-  sendChatMessage: (chat: string) => void;
+  sendChatMessage: (chat: any) => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
@@ -324,17 +324,24 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     }
   };
 
-  const sendChatMessage = (chat: string) => {
+  // Chatting related
+  const sendChatMessage = (chatObject: any) => {
     if (socket.current) {
-      socket.current.emit("chat", {
-        to: otherPersonID,
-        content: chat,
-        from: yourID,
-        name: auth.currentUser?.displayName,
-      });
+      db.collection("users")
+        .doc(chatObject.receiverEmail)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            socket.current.emit("chat", {
+              to: doc.data()?.socketID,
+              message: chatObject.message,
+              from: yourID,
+              senderEmail: auth.currentUser?.email,
+            });
+          }
+        });
     }
   };
-
   return (
     <SocketContext.Provider
       value={{

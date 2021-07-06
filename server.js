@@ -147,11 +147,13 @@ io.on("connection", (socket) => {
 
       // chat related logic
       socket.on("chat", (data) => {
-        io.to(data.to).emit("newChat", {
-          from: data.from,
-          content: data.content,
-          name: data.name,
-        });
+        if (data.to) {
+          io.to(data.to).emit("newChat", {
+            from: data.from,
+            message: data.message,
+            senderEmail: data.senderEmail,
+          });
+        }
       });
     }
   });
