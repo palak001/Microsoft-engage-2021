@@ -9,8 +9,10 @@ export const fetchMeetingHistory = async (): Promise<any> => {
     .get()
     .then((doc) => {
       if (doc.exists) {
-        let newArray = [...meetingHistory, ...doc.data()?.meetingHistory];
-        meetingHistory = newArray;
+        if (doc.data()?.meetingHistory) {
+          let newArray = [...meetingHistory, ...doc.data()?.meetingHistory];
+          meetingHistory = newArray;
+        }
       }
     });
   return meetingHistory;
