@@ -2,6 +2,7 @@ import { auth, db } from "../../config/firebase";
 import FirebaseUser from "../../interfaces/user.interface";
 
 export const fetchEnteredUserDetails = async (email: string): Promise<any> => {
+  console.log("emailemail: ", email);
   let dummyUser1: FirebaseUser = {
     displayName: "",
     photoURL: "",
@@ -33,5 +34,6 @@ export const fetchEnteredUserDetails = async (email: string): Promise<any> => {
         dummyUser1.socketID = doc.data()?.socketID;
       }
     });
+  // console.log(dummyUser1);
   return dummyUser1;
 };

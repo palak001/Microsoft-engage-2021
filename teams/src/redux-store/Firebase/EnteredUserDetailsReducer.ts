@@ -21,6 +21,7 @@ export const enteredUserDetailsReducer = createReducer(
         if (action.payload) {
           state.enteredUserDetails = action.payload;
         }
+        // console.log("entereasync dUSersDetails:", state.enteredUserDetails);
         return state;
       }
     );

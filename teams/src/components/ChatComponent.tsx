@@ -1,12 +1,4 @@
-import {
-  Stack,
-  CommandButton,
-  TextField,
-  Sticky,
-  StickyPositionType,
-  ScrollablePane,
-  IconButton,
-} from "@fluentui/react";
+import { Stack, CommandButton, TextField, IconButton } from "@fluentui/react";
 import React, { useEffect, useState } from "react";
 import {
   IPersonaSharedProps,
@@ -160,51 +152,104 @@ export const ChatComponent: React.FunctionComponent = () => {
   };
 
   return (
-    <>
-      <Stack {...chatLayoutProps}>
-        <Stack {...headerProps}>
-          <Persona
-            {...examplePersona}
-            size={PersonaSize.size72}
-            presence={PersonaPresence.busy}
-            styles={personaStyles}
-          />
-          <Stack {...chatHeadingProps}>Monday Meeting with Palak</Stack>
-          <CommandButton>
-            <Stack {...videoCallProps}>
-              <CallVideoIcon size="medium" />
-            </Stack>
-          </CommandButton>
+    <Stack {...chatLayoutProps}>
+      <Stack style={{ height: "10%" }} {...headerProps}>
+        <Persona
+          {...examplePersona}
+          size={PersonaSize.size72}
+          presence={PersonaPresence.busy}
+          styles={personaStyles}
+        />
+        <Stack {...chatHeadingProps}>Monday Meeting with Palak</Stack>
+        <CommandButton>
+          <Stack {...videoCallProps}>
+            <CallVideoIcon size="medium" />
+          </Stack>
+        </CommandButton>
+      </Stack>
+
+      <Stack style={{ height: "90%" }} verticalAlign="end">
+        <Stack
+          style={{
+            height: "90%",
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+            width: "100%",
+            // height: "100%",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          {/* <ScrollablePane {...scrollablePaneProps}> */}
+          <Stack
+            {...chatScreenProps}
+            style={{
+              position: "absolute",
+              top: "0",
+              left: "0",
+              bottom: "-20px",
+              right: "-20px",
+              overflow: "scroll",
+            }}
+          >
+            {teamsChat?.message?.map((chat: Chat) =>
+              chat.sender === SenderType.self ? (
+                <Stack horizontalAlign="end">
+                  <Stack {...duskLight}>{chat.content}</Stack>
+                </Stack>
+              ) : (
+                <Stack horizontalAlign="start">
+                  <Stack {...neutralLight}>{chat.content}</Stack>
+                </Stack>
+              )
+            )}
+          </Stack>
+          {/* </ScrollablePane> */}
         </Stack>
 
-        <Stack.Item grow {...chatContainerProps}>
-          <ScrollablePane {...scrollablePaneProps}>
-            <Stack {...chatScreenProps}>
-              {teamsChat?.message?.map((chat: Chat) =>
-                chat.sender === SenderType.self ? (
-                  <Stack horizontalAlign="end">
-                    <Stack {...duskLight}>{chat.content}</Stack>
-                  </Stack>
-                ) : (
-                  <Stack horizontalAlign="start">
-                    <Stack {...neutralLight}>{chat.content}</Stack>
-                  </Stack>
-                )
-              )}
-            </Stack>
-            <Sticky stickyPosition={StickyPositionType.Both}>
-              <Stack {...textStackProps}>
-                <TextField
-                  {...textActionProps}
-                  onChange={handleMessageInput}
-                  value={message}
-                />
-                <IconButton {...sendTextProps} onClick={handleSendMsg} />
-              </Stack>
-            </Sticky>
-          </ScrollablePane>
-        </Stack.Item>
+        <Stack
+          // style={{}}
+          style={{ height: "10%" }}
+          {...textStackProps}
+        >
+          <TextField
+            {...textActionProps}
+            onChange={handleMessageInput}
+            value={message}
+          />
+          <IconButton {...sendTextProps} onClick={handleSendMsg} />
+        </Stack>
       </Stack>
-    </>
+    </Stack>
   );
 };
+
+// {
+//   /* <Stack.Item grow {...chatContainerProps}>
+//           <ScrollablePane {...scrollablePaneProps}>
+//             <Stack {...chatScreenProps}>
+//               {teamsChat?.message?.map((chat: Chat) =>
+//                 chat.sender === SenderType.self ? (
+//                   <Stack horizontalAlign="end">
+//                     <Stack {...duskLight}>{chat.content}</Stack>
+//                   </Stack>
+//                 ) : (
+//                   <Stack horizontalAlign="start">
+//                     <Stack {...neutralLight}>{chat.content}</Stack>
+//                   </Stack>
+//                 )
+//               )}
+//             </Stack>
+//           </ScrollablePane>
+//           <Sticky stickyPosition={StickyPositionType.Both}>
+//             <Stack {...textStackProps}>
+//               <TextField
+//                 {...textActionProps}
+//                 onChange={handleMessageInput}
+//                 value={message}
+//               />
+//               <IconButton {...sendTextProps} onClick={handleSendMsg} />
+//             </Stack>
+//           </Sticky>
+//         </Stack.Item> */
+// }

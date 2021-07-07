@@ -374,7 +374,7 @@ export const vertical: IStackProps = {
 
 export const newMeetingProps: Partial<IButtonProps> = {
   iconProps: {
-    iconName: "CircleAddition",
+    iconName: "Handwriting",
   },
   styles: {
     root: {
@@ -448,7 +448,6 @@ export const textActionProps: Partial<ITextFieldProps> = {
       },
     },
     field: {
-      fontFamily: "Segoe UI",
       fontStyle: "normal",
       fontWeight: "normal",
       fontSize: "14px",
@@ -481,7 +480,7 @@ export const sendTextProps: Partial<IButtonProps> = {
 
 export const chatLayoutProps: IStackProps = {
   tokens: {
-    childrenGap: "20px",
+    // childrenGap: "20px",
   },
   styles: {
     root: {
@@ -514,7 +513,7 @@ export const chatScreenProps: IStackProps = {
   },
   styles: {
     root: {
-      height: "80vh",
+      // height: "80vh",
     },
   },
 };
