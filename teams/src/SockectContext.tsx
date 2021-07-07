@@ -26,6 +26,8 @@ interface IContext {
   callEnded: any;
   yourID: string;
   callRejected: any;
+  startingCall: any;
+  acceptingCall: any;
   answerCall: () => void;
   startCall: (id: string) => void;
   leaveCall: () => void;
@@ -34,6 +36,8 @@ interface IContext {
   toggleVideoSettings: () => void;
   getUserMediaFunction: () => void;
   sendChatMessage: (chat: any) => void;
+  setAcceptingCallToTrue: () => void;
+  setStartingCallToTrue: () => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
@@ -53,6 +57,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const [callRejected, setCallRejected] = useState<any>(false);
   const [gettingCall, setGettingCall] = useState<any>(false);
   const [otherPersonID, setOtherPersonID] = useState<any>();
+  const [startingCall, setStartingCall] = useState<any>(false);
+  const [acceptingCall, setAcceptingCall] = useState<any>(false);
   // refs
   const yourVideo = useRef<any>();
   const friendVideo = useRef<any>();
@@ -128,8 +134,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   // Helper Functions
 
   const startCall = (socketId: string) => {
-    setOtherPersonID(socketId);
     setCallStarted(true);
+    setOtherPersonID(socketId);
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -208,60 +214,49 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const answerCall = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+    setCallAccepted(true);
+    setGettingCall(false);
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: stream,
+    });
 
-        setCallAccepted(true);
-        setGettingCall(false);
-        const peer = new Peer({
-          initiator: false,
-          trickle: false,
-          stream: stream,
-        });
+    connectionRef.current = peer;
 
-        connectionRef.current = peer;
-
-        peer.on("signal", (signalData) => {
-          socket.current.emit("acceptedCall", {
-            signal: signalData,
-            to: callDetails.from,
-          });
-        });
-
-        peer.on("stream", (friendStream) => {
-          setFriendStream(friendStream);
-          if (friendVideo.current) friendVideo.current.srcObject = friendStream;
-        });
-
-        peer.on("error", (err) => {
-          console.log(err);
-        });
-
-        peer.signal(JSON.stringify(callDetails.signal));
-
-        socket.current.on("callEnded", () => {
-          stopMediaTracks(stream);
-          setCallEnded(true);
-          console.log("callEnded");
-          setCallAccepted(false);
-          setCallStarted(false);
-        });
-
-        socket.current.on("callRejected", () => {
-          stopMediaTracks(stream);
-          setCallEnded(true);
-          console.log("callRejected");
-          setCallAccepted(false);
-          setCallStarted(false);
-        });
-      })
-      .catch((error) => {
-        console.log(error);
+    peer.on("signal", (signalData) => {
+      socket.current.emit("acceptedCall", {
+        signal: signalData,
+        to: callDetails.from,
       });
+    });
 
+    peer.on("stream", (friendStream) => {
+      setFriendStream(friendStream);
+      if (friendVideo.current) friendVideo.current.srcObject = friendStream;
+    });
+
+    peer.on("error", (err) => {
+      console.log(err);
+    });
+
+    peer.signal(JSON.stringify(callDetails.signal));
+
+    socket.current.on("callEnded", () => {
+      stopMediaTracks(stream);
+      setCallEnded(true);
+      console.log("callEnded");
+      setCallAccepted(false);
+      setCallStarted(false);
+    });
+
+    socket.current.on("callRejected", () => {
+      stopMediaTracks(stream);
+      setCallEnded(true);
+      console.log("callRejected");
+      setCallAccepted(false);
+      setCallStarted(false);
+    });
     // });
   };
 
@@ -290,6 +285,14 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setGettingCall(false);
     socket.current.emit("callRejected", { to: otherPersonID });
     history.push("/");
+  };
+
+  const setStartingCallToTrue = () => {
+    setStartingCall(true);
+  };
+
+  const setAcceptingCallToTrue = () => {
+    setAcceptingCall(true);
   };
 
   const getUserMediaFunction = () => {
@@ -369,6 +372,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         callEnded,
         yourID,
         callRejected,
+        startingCall,
+        acceptingCall,
         answerCall,
         startCall,
         leaveCall,
@@ -377,6 +382,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         toggleVideoSettings,
         getUserMediaFunction,
         sendChatMessage,
+        setStartingCallToTrue,
+        setAcceptingCallToTrue,
       }}
     >
       {children}
