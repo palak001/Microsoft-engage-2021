@@ -38,7 +38,7 @@ const Video: React.FunctionComponent = () => {
           >
             <Persona
               imageUrl={enteredUserDetails.photoURL}
-              size={PersonaSize.size56}
+              size={PersonaSize.size72}
               imageAlt="Palak, status is online"
             />
           </Stack>

@@ -104,7 +104,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         }
       });
       socket.current.on("callingYou", (data: ICallDetails) => {
-        console.log("you are getting a call");
         setGettingCall(true);
         setCallDetails({
           from: data.from,
@@ -115,7 +114,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
           isReceivedCall: data.isReceivedCall,
         });
         setOtherPersonID(data.from);
-        console.log(data.from);
       });
     });
   }, [history]);
@@ -197,7 +195,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     socket.current.on("callEnded", () => {
       stopMediaTracks(stream);
       setCallEnded(true);
-      console.log("callEnded");
       setCallAccepted(false);
       setCallStarted(false);
     });
@@ -205,7 +202,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     socket.current.on("callRejected", () => {
       stopMediaTracks(stream);
       setCallEnded(true);
-      console.log("callRejected");
       setCallAccepted(false);
       setCallStarted(false);
       // setCallDetails(null);
@@ -245,7 +241,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     socket.current.on("callEnded", () => {
       stopMediaTracks(stream);
       setCallEnded(true);
-      console.log("callEnded");
       setCallAccepted(false);
       setCallStarted(false);
     });
@@ -253,7 +248,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     socket.current.on("callRejected", () => {
       stopMediaTracks(stream);
       setCallEnded(true);
-      console.log("callRejected");
       setCallAccepted(false);
       setCallStarted(false);
     });
@@ -330,7 +324,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const stopMediaTracks = (currentStream: any) => {
     if (currentStream) {
       currentStream.getTracks().forEach(function (track: any) {
-        console.log("stopping tracks:", track);
         track.stop();
       });
       if (yourVideo.current) yourVideo.current.srcObject = null;
@@ -340,7 +333,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // Chatting related
   const sendChatMessage = (chatObject: any) => {
-    console.log("new message");
     if (socket.current) {
       db.collection("users")
         .doc(chatObject.receiverEmail)

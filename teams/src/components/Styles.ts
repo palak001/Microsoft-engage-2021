@@ -25,7 +25,7 @@ export const headerProps: IStackProps = {
   horizontalAlign: "space-between",
   verticalAlign: "center",
   tokens: {
-    padding: "10px 50px 10px 50px",
+    padding: "20px 50px 20px 50px",
   },
 };
 
@@ -56,6 +56,15 @@ export const LayoutProps: IStackProps = {
   tokens: {
     padding: "5% 10% 0 10%",
   },
+  // styles: {
+  //   root: {
+  //     selectors: {
+  //       "@media only screen and (max-width: 640px)": {
+  //         width: "485px",
+  //       }
+  //     },
+  //   },
+  // },
 };
 
 export const personaLayoutProps: IStackProps = {
@@ -106,7 +115,7 @@ const emailIcon: IIconProps = { iconName: "Mail" };
 
 export const emailActionProps: Partial<ITextFieldProps> = {
   iconProps: emailIcon,
-  placeholder: "Enter the Email Address",
+  placeholder: "Enter the email of the person to connect",
   autoComplete: "false",
   styles: {
     root: {
@@ -374,7 +383,7 @@ export const vertical: IStackProps = {
 
 export const newMeetingProps: Partial<IButtonProps> = {
   iconProps: {
-    iconName: "Handwriting",
+    iconName: "PeopleAdd",
   },
   styles: {
     root: {
@@ -405,7 +414,6 @@ export const newMeetingProps: Partial<IButtonProps> = {
 export const chatHeadingProps: IStackProps = {
   styles: {
     root: {
-      fontFamily: "Segoe UI",
       fontStyle: "normal",
       fontWeight: "500",
       fontSize: "30px",

@@ -42,7 +42,6 @@ import {
   vertical,
   videoCallActionProps,
 } from "./Styles";
-import teamsSVG from "../assets/teams.svg";
 import { useBoolean, useId } from "@fluentui/react-hooks";
 import { Text } from "@fluentui/react/lib/Text";
 import { auth, db } from "../config/firebase";
@@ -59,9 +58,9 @@ import MeetingHistory from "../interfaces/meetingHistory.interface";
 import { RootState } from "../redux-store";
 import { CallNotification } from "./CallNotification/CallNotification";
 
-const TeamsHeading = "Microsoft Teams Meetings, Here, there, anywhere!";
-const TeamsDesc = "Try video calling or group calling, your call!";
-const ModalHeading = "Email address of the person to connect";
+const TeamsHeading = "Microsoft Teams Meetings";
+const TeamsDesc = "Try video calling or chat, your call!";
+const ModalHeading = "Meeting Details";
 const errorMessage1 = "You cannot video call yourself";
 const errorMessage2 = "User doesn't exist in our database";
 const errorMessage3 = "Email can't be empty";
@@ -89,10 +88,8 @@ export const HomeComponent: React.FunctionComponent = () => {
     useBoolean(false);
   const examplePersona: IPersonaSharedProps = {
     imageUrl: auth.currentUser?.photoURL!,
-    imageInitials: "AL",
     text: auth.currentUser?.displayName!,
     secondaryText: auth.currentUser?.email!,
-    tertiaryText: "In a meeting",
   };
   const titleId = useId("title");
 
@@ -152,6 +149,7 @@ export const HomeComponent: React.FunctionComponent = () => {
         db.collection("meetings").doc(meetingID).set({
           user1: auth.currentUser?.email,
           user2: email,
+          meetingName: meetingName,
         });
 
         // user 1
@@ -183,6 +181,7 @@ export const HomeComponent: React.FunctionComponent = () => {
 
         context.getUserMediaFunction();
         context.setStartingCallToTrue();
+        // important *****************************************************
         history.push(
           `/meeting?uid1=${auth.currentUser?.uid}&uid2=${uidOfEmail}&meetingID=${meetingID}`
         );
@@ -264,31 +263,6 @@ export const HomeComponent: React.FunctionComponent = () => {
           </Stack>
         </Stack>
       </Stack>
-
-      {/* <Stack {...LayoutProps}>
-          <Stack {...sandbox}>
-            <Stack>
-              <Text {...headingProps}>{TeamsHeading} </Text>
-            </Stack>
-            <Stack>
-              <Text {...descProps}>{TeamsDesc}</Text>
-            </Stack>
-            <Stack {...actionProps}>
-              <PrimaryButton {...videoCallActionProps} onClick={showModal} />
-              <TextField {...groupCallActionProps} />
-            </Stack>
-          </Stack>
-          
-          <Stack>
-            <Image
-              alt="Welcome to the Microsoft Teams"
-              className={imgStyle}
-              styles={imageStyleProps}
-              {...imageProps}
-            />
-          </Stack>
-        </Stack>
-      </Stack> */}
 
       {context.gettingCall && !context.callAccepted && context.callDetails ? (
         <Stack style={{ height: "10%", width: "10%" }}>

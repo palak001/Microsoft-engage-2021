@@ -17,7 +17,6 @@ export const CallNotification: React.FunctionComponent = () => {
   const context = React.useContext(SocketContext);
   const history = useHistory();
 
-  console.log("callDetails:", context.callDetails);
   return (
     <Stack
       verticalAlign="space-around"
