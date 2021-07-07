@@ -207,6 +207,7 @@ export const HomeComponent: React.FunctionComponent = () => {
               `/chat?uid1=${item.uid1}&uid2=${item.uid2}&meetingID=${item.meetingID}`
             );
           }}
+          style={{ cursor: "pointer" }}
         >
           <div className={classNames.itemName}>{item.meetingName}</div>
         </div>
