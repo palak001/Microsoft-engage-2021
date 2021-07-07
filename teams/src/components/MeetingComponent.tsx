@@ -1,4 +1,4 @@
-import { PrimaryButton, Stack, Image, TextField } from "@fluentui/react";
+import { PrimaryButton, Stack } from "@fluentui/react";
 import React, { useContext, useState } from "react";
 import {
   IPersonaSharedProps,
@@ -11,10 +11,7 @@ import {
   personaLayoutProps,
   personaStyles,
   declineCallProps,
-  imageStyleProps,
-  personaStyle,
 } from "./Styles";
-import personaSVG from "../assets/persona.svg";
 import {
   MicIcon,
   MicOffIcon,
@@ -42,18 +39,14 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
 ) => {
   const examplePersona: IPersonaSharedProps = {
     imageUrl: auth.currentUser?.photoURL!,
-    imageInitials: "AL",
     text: auth.currentUser?.displayName!,
     secondaryText: auth.currentUser?.email!,
-    tertiaryText: "In a meeting",
   };
 
   const context = useContext(SocketContext);
 
   const [camStatus, setCamStatus] = useState<string>("on");
   const [micStatus, setMicStatus] = useState<string>("on");
-  // chat
-  const [chat, setChat] = useState<string>("");
 
   const handleOnCamClick = () => {
     camStatus === "on" ? setCamStatus("off") : setCamStatus("on");
@@ -63,16 +56,6 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
   const handleOnMicClick = () => {
     micStatus === "on" ? setMicStatus("off") : setMicStatus("on");
     context.toggleAudioSettings();
-  };
-
-  const handleSubmit = () => {
-    console.log(chat);
-    setChat("");
-    context.sendChatMessage(chat);
-  };
-
-  const handleChange = (e: any) => {
-    setChat(e.target.value);
   };
 
   return (

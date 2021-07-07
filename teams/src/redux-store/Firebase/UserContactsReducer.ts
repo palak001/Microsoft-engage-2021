@@ -22,7 +22,6 @@ export const userContactsReducer = createReducer(initialState, (builder) => {
     (state, action: PayloadAction<Array<FirebaseUser>>) => {
       if (action.payload) {
         state.userContacts = action.payload;
-        // console.log(state.userContacts);
       }
       return state;
     }

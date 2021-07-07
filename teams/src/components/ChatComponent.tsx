@@ -1,4 +1,12 @@
-import { Stack, CommandButton, TextField, IconButton } from "@fluentui/react";
+import {
+  Stack,
+  CommandButton,
+  TextField,
+  IconButton,
+  initializeIcons,
+  Icon,
+  Text,
+} from "@fluentui/react";
 import React, { useEffect, useState } from "react";
 import {
   IPersonaSharedProps,
@@ -14,8 +22,6 @@ import {
   textActionProps,
   textStackProps,
   sendTextProps,
-  chatContainerProps,
-  scrollablePaneProps,
   chatLayoutProps,
   chatScreenProps,
   neutralLight,
@@ -23,7 +29,7 @@ import {
 } from "./Styles";
 import { CallVideoIcon } from "@fluentui/react-icons-northstar";
 import { auth, db } from "../config/firebase";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import qs from "qs";
 import firebase from "firebase";
 import { useContext } from "react";
@@ -45,24 +51,65 @@ interface Chats {
 }
 
 export const ChatComponent: React.FunctionComponent = () => {
+  initializeIcons();
+  const history = useHistory();
   const [message, setMessage] = useState<string>("");
   const { search }: any = useLocation();
   const queryParameter = qs.parse(search, { ignoreQueryPrefix: true });
   const context = useContext(SocketContext);
+  const [receiverEmailID, setReceiverEmailID] = useState<string>("");
+  const [meetingName, setMeetingName] = useState<string>("");
 
   const [teamsChat, setTeamsChat] = useState<Chats>({ message: [] });
   const [initChat, setInitChat] = useState<Chats>({ message: [] });
+  const [receiverPhotoURL, setReceiverPhotoURL] = useState<string>("");
 
   useEffect(() => {
-    console.log("how many times are we executing this thing?");
-    console.log("emitting");
+    const participantsEmail = {
+      user1: "",
+      user2: "",
+    };
+    let meetingName = "";
+    db.collection("meetings")
+      .doc(`${queryParameter.meetingID}`)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          participantsEmail.user1 = doc.data()?.user1;
+          participantsEmail.user2 = doc.data()?.user2;
+          meetingName = doc.data()?.meetingName;
+
+          const receiverEmail =
+            auth.currentUser?.email === participantsEmail.user1
+              ? participantsEmail.user2
+              : participantsEmail.user1;
+
+          setReceiverEmailID(receiverEmail);
+          setMeetingName(meetingName);
+        }
+      });
+  }, [queryParameter.meetingID]);
+
+  useEffect(() => {
+    if (receiverEmailID) {
+      db.collection("users")
+        .doc(receiverEmailID)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            setReceiverPhotoURL(doc.data()?.photoURL);
+          }
+        });
+    }
+  }, [receiverEmailID]);
+
+  useEffect(() => {
     context.socket.current.emit("sendOldChats", {
       meetingID: queryParameter.meetingID,
       user: context.yourID,
       userEmail: auth.currentUser?.email,
     });
     context.socket.current.on("oldChats", (chatHistory: any) => {
-      console.log("atlast");
       setInitChat({
         message: [...chatHistory],
       });
@@ -70,14 +117,11 @@ export const ChatComponent: React.FunctionComponent = () => {
   }, [queryParameter.meetingID, context.socket, context.yourID]);
 
   useEffect(() => {
-    console.log("setting initial chat");
     setTeamsChat(initChat);
   }, [initChat]);
 
   useEffect(() => {
-    console.log("u wanna tell how many times are you called?");
     context.socket.current.on("newChat", (data: any) => {
-      console.log("recieved new message");
       setTeamsChat({
         message: [
           ...teamsChat.message,
@@ -88,19 +132,16 @@ export const ChatComponent: React.FunctionComponent = () => {
   }, [context.socket, teamsChat.message]);
 
   const examplePersona: IPersonaSharedProps = {
-    imageUrl: "https://miro.medium.com/max/948/0*9UgsryOBGjrws1_z.jpg",
-    imageInitials: "AL",
-    text: "Payal",
-    secondaryText: "quepayal@gmail.com",
-    tertiaryText: "In a meeting",
+    imageUrl: auth.currentUser?.photoURL!,
+    text: auth.currentUser?.displayName!,
+    secondaryText: auth.currentUser?.email!,
+    // tertiaryText: "In a meeting",
   };
 
   const handleSendMsg = async () => {
     if (message === "") {
-      console.log("no allowed");
+      console.log("not allowed");
     }
-    console.log(message);
-    console.log(queryParameter);
     db.collection("meetings")
       .doc(`${queryParameter.meetingID}`)
       .update({
@@ -118,30 +159,10 @@ export const ChatComponent: React.FunctionComponent = () => {
       ],
     });
 
-    const participantsEmail = {
-      user1: "",
-      user2: "",
-    };
-    await db
-      .collection("meetings")
-      .doc(`${queryParameter.meetingID}`)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          participantsEmail.user1 = doc.data()?.user1;
-          participantsEmail.user2 = doc.data()?.user2;
-        }
-      });
-
-    const receiverEmail =
-      auth.currentUser?.email === participantsEmail.user1
-        ? participantsEmail.user2
-        : participantsEmail.user1;
-
     // Emit socket event
     context.sendChatMessage({
       message: message,
-      receiverEmail: receiverEmail,
+      receiverEmail: receiverEmailID,
     });
 
     setMessage("");
@@ -153,14 +174,28 @@ export const ChatComponent: React.FunctionComponent = () => {
 
   return (
     <Stack {...chatLayoutProps}>
-      <Stack style={{ height: "10%" }} {...headerProps}>
-        <Persona
-          {...examplePersona}
-          size={PersonaSize.size72}
-          presence={PersonaPresence.busy}
-          styles={personaStyles}
-        />
-        <Stack {...chatHeadingProps}>Monday Meeting with Palak</Stack>
+      <Stack style={{ height: "13%" }} {...headerProps}>
+        <Stack
+          horizontal
+          verticalAlign="center"
+          tokens={{ childrenGap: "15px" }}
+        >
+          <Icon
+            iconName="Back"
+            style={{ cursor: "pointer" }}
+            onClick={() => history.push("/")}
+          />
+          <Persona
+            {...examplePersona}
+            size={PersonaSize.size72}
+            presence={PersonaPresence.busy}
+            styles={personaStyles}
+          />
+        </Stack>
+
+        <Stack>
+          <Text {...chatHeadingProps}>{meetingName}</Text>
+        </Stack>
         <CommandButton>
           <Stack {...videoCallProps}>
             <CallVideoIcon size="medium" />
@@ -168,19 +203,17 @@ export const ChatComponent: React.FunctionComponent = () => {
         </CommandButton>
       </Stack>
 
-      <Stack style={{ height: "90%" }} verticalAlign="end">
+      <Stack style={{ height: "87%" }} verticalAlign="end">
         <Stack
           style={{
-            height: "90%",
+            height: "92%",
             overflowY: "scroll",
             scrollbarWidth: "none",
             width: "100%",
-            // height: "100%",
             overflow: "hidden",
             position: "relative",
           }}
         >
-          {/* <ScrollablePane {...scrollablePaneProps}> */}
           <Stack
             {...chatScreenProps}
             style={{
@@ -198,20 +231,24 @@ export const ChatComponent: React.FunctionComponent = () => {
                   <Stack {...duskLight}>{chat.content}</Stack>
                 </Stack>
               ) : (
-                <Stack horizontalAlign="start">
+                <Stack
+                  horizontal
+                  horizontalAlign="start"
+                  verticalAlign="center"
+                >
+                  <Persona
+                    imageUrl={receiverPhotoURL}
+                    size={PersonaSize.size24}
+                    styles={personaStyles}
+                  />
                   <Stack {...neutralLight}>{chat.content}</Stack>
                 </Stack>
               )
             )}
           </Stack>
-          {/* </ScrollablePane> */}
         </Stack>
 
-        <Stack
-          // style={{}}
-          style={{ height: "10%" }}
-          {...textStackProps}
-        >
+        <Stack style={{ height: "8%" }} {...textStackProps}>
           <TextField
             {...textActionProps}
             onChange={handleMessageInput}
@@ -223,33 +260,3 @@ export const ChatComponent: React.FunctionComponent = () => {
     </Stack>
   );
 };
-
-// {
-//   /* <Stack.Item grow {...chatContainerProps}>
-//           <ScrollablePane {...scrollablePaneProps}>
-//             <Stack {...chatScreenProps}>
-//               {teamsChat?.message?.map((chat: Chat) =>
-//                 chat.sender === SenderType.self ? (
-//                   <Stack horizontalAlign="end">
-//                     <Stack {...duskLight}>{chat.content}</Stack>
-//                   </Stack>
-//                 ) : (
-//                   <Stack horizontalAlign="start">
-//                     <Stack {...neutralLight}>{chat.content}</Stack>
-//                   </Stack>
-//                 )
-//               )}
-//             </Stack>
-//           </ScrollablePane>
-//           <Sticky stickyPosition={StickyPositionType.Both}>
-//             <Stack {...textStackProps}>
-//               <TextField
-//                 {...textActionProps}
-//                 onChange={handleMessageInput}
-//                 value={message}
-//               />
-//               <IconButton {...sendTextProps} onClick={handleSendMsg} />
-//             </Stack>
-//           </Sticky>
-//         </Stack.Item> */
-// }
