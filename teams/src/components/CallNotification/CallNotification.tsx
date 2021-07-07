@@ -8,11 +8,15 @@ import {
 import * as React from "react";
 import { Text } from "@fluentui/react/lib/Text";
 import { SocketContext } from "../../SockectContext";
+import { useHistory } from "react-router";
+import { auth } from "../../config/firebase";
 
 const stackTokens: IStackTokens = { childrenGap: 40 };
 
 export const CallNotification: React.FunctionComponent = () => {
   const context = React.useContext(SocketContext);
+  const history = useHistory();
+
   console.log("callDetails:", context.callDetails);
   return (
     <Stack
@@ -24,9 +28,9 @@ export const CallNotification: React.FunctionComponent = () => {
         left: "80%",
         width: "20%",
         height: "30%",
-        background: "black",
+        background: "#FAFAFA",
         // opacity: "0.75",
-        color: "#FFFFFF",
+        color: "#1C1C1C",
       }}
     >
       <Stack horizontalAlign="center">
@@ -36,23 +40,31 @@ export const CallNotification: React.FunctionComponent = () => {
           // presence={PersonaPresence.online}
           imageAlt="Palak, status is online"
         />
-        <Text style={{ color: "white" }} variant={"xLarge"}>
+        <Text style={{ color: "#1C1C1C" }} variant={"xLarge"}>
           {context.callDetails.name} is calling...
         </Text>
       </Stack>
 
       <Stack horizontal tokens={stackTokens}>
         <DefaultButton
-          style={{ backgroundColor: "#4DAA57", color: "white" }}
+          style={{ backgroundColor: "#0064BF", color: "white" }}
           text="Accept"
-          onClick={context.answerCall}
+          onClick={() => {
+            // context.getUserMediaFunction();
+            context.answerCall();
+            history.push(
+              `/meeting?uid1=${
+                auth.currentUser?.uid
+              }&uid2=${"uidOfEmail"}&meetingID=${"meetingID"}`
+            );
+          }}
           allowDisabledFocus
         />
         <DefaultButton
           text="Decline"
           onClick={context.rejectCall}
           allowDisabledFocus
-          style={{ backgroundColor: "#D1462F", color: "white" }}
+          style={{ backgroundColor: "#d74654", color: "white", border: "none" }}
         />
       </Stack>
     </Stack>

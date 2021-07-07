@@ -208,49 +208,60 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const answerCall = () => {
-    setCallAccepted(true);
-    setGettingCall(false);
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream: stream,
-    });
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
 
-    connectionRef.current = peer;
+        setCallAccepted(true);
+        setGettingCall(false);
+        const peer = new Peer({
+          initiator: false,
+          trickle: false,
+          stream: stream,
+        });
 
-    peer.on("signal", (signalData) => {
-      socket.current.emit("acceptedCall", {
-        signal: signalData,
-        to: callDetails.from,
+        connectionRef.current = peer;
+
+        peer.on("signal", (signalData) => {
+          socket.current.emit("acceptedCall", {
+            signal: signalData,
+            to: callDetails.from,
+          });
+        });
+
+        peer.on("stream", (friendStream) => {
+          setFriendStream(friendStream);
+          if (friendVideo.current) friendVideo.current.srcObject = friendStream;
+        });
+
+        peer.on("error", (err) => {
+          console.log(err);
+        });
+
+        peer.signal(JSON.stringify(callDetails.signal));
+
+        socket.current.on("callEnded", () => {
+          stopMediaTracks(stream);
+          setCallEnded(true);
+          console.log("callEnded");
+          setCallAccepted(false);
+          setCallStarted(false);
+        });
+
+        socket.current.on("callRejected", () => {
+          stopMediaTracks(stream);
+          setCallEnded(true);
+          console.log("callRejected");
+          setCallAccepted(false);
+          setCallStarted(false);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
       });
-    });
 
-    peer.on("stream", (friendStream) => {
-      setFriendStream(friendStream);
-      if (friendVideo.current) friendVideo.current.srcObject = friendStream;
-    });
-
-    peer.on("error", (err) => {
-      console.log(err);
-    });
-
-    peer.signal(JSON.stringify(callDetails.signal));
-
-    socket.current.on("callEnded", () => {
-      stopMediaTracks(stream);
-      setCallEnded(true);
-      console.log("callEnded");
-      setCallAccepted(false);
-      setCallStarted(false);
-    });
-
-    socket.current.on("callRejected", () => {
-      stopMediaTracks(stream);
-      setCallEnded(true);
-      console.log("callRejected");
-      setCallAccepted(false);
-      setCallStarted(false);
-    });
     // });
   };
 

@@ -57,6 +57,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useSelector } from "react-redux";
 import MeetingHistory from "../interfaces/meetingHistory.interface";
 import { RootState } from "../redux-store";
+import { CallNotification } from "./CallNotification/CallNotification";
 
 const TeamsHeading = "Microsoft Teams Meetings, Here, there, anywhere!";
 const TeamsDesc = "Try video calling or group calling, your call!";
@@ -287,6 +288,15 @@ export const HomeComponent: React.FunctionComponent = () => {
           </Stack>
         </Stack>
       </Stack> */}
+
+      {context.gettingCall && !context.callAccepted && context.callDetails ? (
+        <Stack style={{ height: "10%", width: "10%" }}>
+          <CallNotification />
+        </Stack>
+      ) : (
+        <></>
+      )}
+
       <Modal
         titleAriaId={titleId}
         isOpen={isModalOpen}
