@@ -5,8 +5,26 @@ const server = http.createServer(app);
 const cors = require("cors");
 const adapter = require("socket.io-redis");
 const redis = require("./redis");
+const firebase = require("firebase");
 
 require("dotenv").config();
+
+/* Firebase related code*/
+/* Firebase Config */
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+};
+
+/* Initialize firebase app */
+firebase.initializeApp(firebaseConfig);
+
+/* Firebase database ref */
+const db = firebase.firestore();
 
 /* Handling CORS error */
 let whitelist = [
@@ -146,7 +164,34 @@ io.on("connection", (socket) => {
       });
 
       // chat related logic
+      socket.on("sendOldChats", (data) => {
+        console.log("sending");
+        if (data.meetingID) {
+          db.collection("meetings")
+            .doc(data.meetingID)
+            .get()
+            .then((doc) => {
+              let chatHistory = [];
+              if (doc.exists) {
+                if (doc.data().meetingHistory) {
+                  doc.data().meetingHistory.forEach((element) => {
+                    let senderType = data.userEmail === element.from ? 0 : 1;
+                    chatHistory.push({
+                      content: element.message,
+                      time: "1",
+                      sender: senderType,
+                    });
+                  });
+                }
+              }
+              // socket.emit("oldChats", chatHistory);
+              io.to(data.user).emit("oldChats", chatHistory);
+            });
+        }
+      });
+
       socket.on("chat", (data) => {
+        console.log("chat!");
         if (data.to) {
           io.to(data.to).emit("newChat", {
             from: data.from,

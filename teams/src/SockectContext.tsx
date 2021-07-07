@@ -326,6 +326,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // Chatting related
   const sendChatMessage = (chatObject: any) => {
+    console.log("new message");
     if (socket.current) {
       db.collection("users")
         .doc(chatObject.receiverEmail)

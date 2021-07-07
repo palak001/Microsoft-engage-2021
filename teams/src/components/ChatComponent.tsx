@@ -58,36 +58,32 @@ export const ChatComponent: React.FunctionComponent = () => {
   const queryParameter = qs.parse(search, { ignoreQueryPrefix: true });
   const context = useContext(SocketContext);
 
-  const initChat: Chats = {
-    message: [
-      {
-        content: "Hi there fellow",
-        time: "1",
-        sender: SenderType.frnd,
-      },
-      {
-        content: "What's up buddy?",
-        time: "1",
-        sender: SenderType.self,
-      },
-      {
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
-        time: "1",
-        sender: SenderType.frnd,
-      },
-      {
-        content:
-          "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. ",
-        time: "1",
-        sender: SenderType.self,
-      },
-    ],
-  };
-
-  const [teamsChat, setTeamsChat] = useState<Chats>(initChat);
+  const [teamsChat, setTeamsChat] = useState<Chats>({ message: [] });
+  const [initChat, setInitChat] = useState<Chats>({ message: [] });
 
   useEffect(() => {
+    console.log("how many times are we executing this thing?");
+    console.log("emitting");
+    context.socket.current.emit("sendOldChats", {
+      meetingID: queryParameter.meetingID,
+      user: context.yourID,
+      userEmail: auth.currentUser?.email,
+    });
+    context.socket.current.on("oldChats", (chatHistory: any) => {
+      console.log("atlast");
+      setInitChat({
+        message: [...chatHistory],
+      });
+    });
+  }, [queryParameter.meetingID, context.socket, context.yourID]);
+
+  useEffect(() => {
+    console.log("setting initial chat");
+    setTeamsChat(initChat);
+  }, [initChat]);
+
+  useEffect(() => {
+    console.log("u wanna tell how many times are you called?");
     context.socket.current.on("newChat", (data: any) => {
       console.log("recieved new message");
       setTeamsChat({
@@ -97,7 +93,7 @@ export const ChatComponent: React.FunctionComponent = () => {
         ],
       });
     });
-  }, [context.socket, message, teamsChat.message]);
+  }, [context.socket, teamsChat.message]);
 
   const examplePersona: IPersonaSharedProps = {
     imageUrl: "https://miro.medium.com/max/948/0*9UgsryOBGjrws1_z.jpg",
@@ -118,7 +114,7 @@ export const ChatComponent: React.FunctionComponent = () => {
       .update({
         meetingHistory: firebase.firestore.FieldValue.arrayUnion({
           message: message,
-          from: queryParameter.uid1,
+          from: auth.currentUser?.email,
           time: firebase.firestore.Timestamp.now(),
         }),
       });
