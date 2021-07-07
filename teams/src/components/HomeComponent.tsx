@@ -74,9 +74,9 @@ export const HomeComponent: React.FunctionComponent = () => {
   const meetingHistory: Array<MeetingHistory> = useSelector(
     (state: RootState) => state.meetingHistoryReducer.meetingHistory
   );
-  const enteredUserDetails: FirebaseUser = useSelector(
-    (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
-  );
+  // const enteredUserDetails: FirebaseUser = useSelector(
+  //   (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
+  // );
 
   // Local States
   const [email, setEmail] = useState<string>("");
@@ -110,7 +110,7 @@ export const HomeComponent: React.FunctionComponent = () => {
     setMeetingName(e.target.value);
   };
 
-  const handleNext = async () => {
+  const checkEmailValidity = async (): Promise<any> => {
     // Checking for possible errors
     if (email === "") {
       setEmailError(errorMessage3);
@@ -121,65 +121,71 @@ export const HomeComponent: React.FunctionComponent = () => {
       await fetchEnteredUserDetails(email).then((result: FirebaseUser) => {
         if (result.email === "same") setEmailError(errorMessage1);
         else if (result.email === "") setEmailError(errorMessage2);
-        dispatch(fetchEnteredUserDetailsAction(result));
+        else {
+          dispatch(fetchEnteredUserDetailsAction(result));
+        }
       });
     }
+  };
 
-    if (
-      emailError === "" &&
-      email !== "" &&
-      meetingNameError === "" &&
-      meetingName !== ""
-    ) {
-      const meetingID = uuidv4();
-      const uidOfEmail = await db
-        .collection("users")
-        .doc(email)
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
-            return doc.data()?.uid;
-          }
+  const handleNext = async () => {
+    await checkEmailValidity().then(async () => {
+      if (
+        emailError === "" &&
+        email !== "" &&
+        meetingNameError === "" &&
+        meetingName !== ""
+      ) {
+        const meetingID = uuidv4();
+        const uidOfEmail = await db
+          .collection("users")
+          .doc(email)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              return doc.data()?.uid;
+            }
+          });
+
+        // adding two participants involved in conversation having this meeting ID
+        db.collection("meetings").doc(meetingID).set({
+          user1: auth.currentUser?.email,
+          user2: email,
         });
 
-      // adding two participants involved in conversation having this meeting ID
-      db.collection("meetings").doc(meetingID).set({
-        user1: auth.currentUser?.email,
-        user2: email,
-      });
+        // user 1
+        db.collection("users")
+          .doc(auth.currentUser?.email + "")
+          .update({
+            meetingHistory: firebase.firestore.FieldValue.arrayUnion({
+              meetingName: meetingName,
+              meetingID: meetingID,
+              user1Email: auth.currentUser?.email,
+              user2Email: email,
+              uid1: auth.currentUser?.uid,
+              uid2: uidOfEmail,
+            }),
+          });
+        // user 2
+        db.collection("users")
+          .doc(email + "")
+          .update({
+            meetingHistory: firebase.firestore.FieldValue.arrayUnion({
+              meetingName: meetingName,
+              meetingID: meetingID,
+              user1Email: email,
+              user2Email: auth.currentUser?.email,
+              uid1: uidOfEmail,
+              uid2: auth.currentUser?.uid,
+            }),
+          });
 
-      // user 1
-      db.collection("users")
-        .doc(auth.currentUser?.email + "")
-        .update({
-          meetingHistory: firebase.firestore.FieldValue.arrayUnion({
-            meetingName: meetingName,
-            meetingID: meetingID,
-            user1Email: auth.currentUser?.email,
-            user2Email: email,
-            uid1: auth.currentUser?.uid,
-            uid2: uidOfEmail,
-          }),
-        });
-      // user 2
-      db.collection("users")
-        .doc(email + "")
-        .update({
-          meetingHistory: firebase.firestore.FieldValue.arrayUnion({
-            meetingName: meetingName,
-            meetingID: meetingID,
-            user1Email: email,
-            user2Email: auth.currentUser?.email,
-            uid1: uidOfEmail,
-            uid2: auth.currentUser?.uid,
-          }),
-        });
-
-      // context.getUserMediaFunction();
-      // history.push(
-      //   `/meeting?uid1A=${auth.currentUser?.uid}&uid2=${enteredUserDetails.uid}&meetingID=${meetingID}`
-      // );
-    }
+        context.getUserMediaFunction();
+        history.push(
+          `/meeting?uid1=${auth.currentUser?.uid}&uid2=${uidOfEmail}&meetingID=${meetingID}`
+        );
+      }
+    });
   };
 
   const onRenderCell = (
@@ -241,7 +247,7 @@ export const HomeComponent: React.FunctionComponent = () => {
             <Stack>
               <Text {...headingProps}>Meetings History</Text>
             </Stack>
-            <Stack {...descProps}>
+            <Stack {...descProps} verticalAlign="center">
               <ActionButton {...newMeetingProps}>
                 <Text>Add new meeting</Text>
               </ActionButton>

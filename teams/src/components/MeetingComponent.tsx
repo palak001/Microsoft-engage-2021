@@ -111,18 +111,8 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
             <PrimaryButton onClick={context.leaveCall} {...declineCallProps} />
           </Stack>
         </Stack>
-        <Stack horizontal>
-          <Stack {...personaLayoutProps}>
-            {/* <Image
-            alt="Welcome to the Microsoft Teams"
-            class
-            <Video />
-          </Stack>
-          <Stack>
-            {/* chat */}
-            <TextField value={chat} onChange={handleChange} />
-            <button onClick={handleSubmit}>Send</button>
-          </Stack>
+        <Stack {...personaLayoutProps}>
+          <Video />
         </Stack>
       </Stack>
     </>
