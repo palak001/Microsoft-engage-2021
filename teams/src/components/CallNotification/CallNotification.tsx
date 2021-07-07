@@ -50,8 +50,8 @@ export const CallNotification: React.FunctionComponent = () => {
           style={{ backgroundColor: "#0064BF", color: "white" }}
           text="Accept"
           onClick={() => {
-            // context.getUserMediaFunction();
-            context.answerCall();
+            context.getUserMediaFunction();
+            context.setAcceptingCallToTrue();
             history.push(
               `/meeting?uid1=${
                 auth.currentUser?.uid

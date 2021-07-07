@@ -182,6 +182,7 @@ export const HomeComponent: React.FunctionComponent = () => {
           });
 
         context.getUserMediaFunction();
+        context.setStartingCallToTrue();
         history.push(
           `/meeting?uid1=${auth.currentUser?.uid}&uid2=${uidOfEmail}&meetingID=${meetingID}`
         );
