@@ -327,7 +327,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
           } else {
             dispatch(
               fetchMediaStreamErrorAction(
-                "Unable to detect cam and/or microphone"
+                "Can't find your camera and microphone. Check your system settings to make sure that a camera and microphone is available. You may need to restart your browser."
               )
             );
           }
@@ -340,8 +340,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       case "NotFoundError":
         dispatch(
           fetchMediaStreamErrorAction(
-            "Unable to open your call because no camera and/or microphone" +
-              "were found."
+            "Can't find your camera and microphone. Check your system settings to make sure that a camera and/or microphone is available. You may need to restart your browser."
           )
         );
         break;
@@ -351,7 +350,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       case "PermissionDeniedError":
         dispatch(
           fetchMediaStreamErrorAction(
-            "Camera and/or microphone permission denied"
+            "Can't access your camera and microphone. System has denied Permission. Check your system settings to allow access to camera and microphone. You may need to restart your browser."
           )
         );
         break;
