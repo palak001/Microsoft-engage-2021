@@ -86,6 +86,10 @@ export const HomeComponent: React.FunctionComponent = () => {
 
   const [isModalOpen, { setTrue: showModal, setFalse: hideModal }] =
     useBoolean(false);
+  const [
+    isAddMeetingModalOpen,
+    { setTrue: showAddMeetingModal, setFalse: hideAddMeetingModal },
+  ] = useBoolean(false);
   const examplePersona: IPersonaSharedProps = {
     imageUrl: auth.currentUser?.photoURL!,
     text: auth.currentUser?.displayName!,
@@ -126,7 +130,7 @@ export const HomeComponent: React.FunctionComponent = () => {
     }
   };
 
-  const handleNext = async () => {
+  const handleNext = async (flag: any) => {
     await checkEmailValidity().then(async () => {
       if (
         emailError === "" &&
@@ -176,14 +180,18 @@ export const HomeComponent: React.FunctionComponent = () => {
                   }),
                 });
 
-              context.getUserMediaFunction();
-              context.setStartingCallToTrue();
-              // important *****************************************************
-              history.push(
-                `/meeting?uid1=${auth.currentUser?.uid}&uid2=${
-                  doc.data()?.uid
-                }&meetingID=${meetingID}`
-              );
+              if (flag) {
+                context.getUserMediaFunction();
+                context.setStartingCallToTrue();
+                // important *****************************************************
+                history.push(
+                  `/meeting?uid1=${auth.currentUser?.uid}&uid2=${
+                    doc.data()?.uid
+                  }&meetingID=${meetingID}`
+                );
+              } else {
+                hideAddMeetingModal();
+              }
             }
           });
       }
@@ -255,7 +263,11 @@ export const HomeComponent: React.FunctionComponent = () => {
             <Stack>
               <Text {...headingProps}>Meetings History</Text>
             </Stack>
-            <Stack {...descProps} verticalAlign="center">
+            <Stack
+              {...descProps}
+              verticalAlign="center"
+              onClick={showAddMeetingModal}
+            >
               <ActionButton {...newMeetingProps}>
                 <Text>Add new meeting</Text>
               </ActionButton>
@@ -339,10 +351,83 @@ export const HomeComponent: React.FunctionComponent = () => {
                 {...nextActionProps}
                 onClick={() => {
                   console.log(email);
-                  handleNext();
+                  handleNext(1);
                 }}
               />
               <DefaultButton {...cancelActionProps} onClick={hideModal} />
+            </Stack>
+          </Stack>
+        </Stack>
+      </Modal>
+
+      {/* Add new meeting Modal */}
+      <Modal
+        titleAriaId={titleId}
+        isOpen={isAddMeetingModalOpen}
+        onDismiss={hideAddMeetingModal}
+        isModeless={true}
+      >
+        <Stack {...container}>
+          <Stack id={titleId}>
+            <Text {...modalProps}>{ModalHeading}</Text>
+          </Stack>
+
+          <Stack {...modalStackProps}>
+            <Stack {...modalStackChildProps}>
+              <TextField
+                {...meetingNameActionProps}
+                value={meetingName}
+                onChange={handleMeetingNameInput}
+              />
+              {meetingNameError !== "" ? (
+                <MessageBar
+                  messageBarType={MessageBarType.error}
+                  onDismiss={() => {
+                    setMeetingNameError("");
+                    setMeetingName("");
+                  }}
+                  dismissButtonAriaLabel="Close"
+                >
+                  {meetingNameError}
+                </MessageBar>
+              ) : (
+                <> </>
+              )}
+            </Stack>
+            <Stack {...modalStackChildProps}>
+              <TextField
+                {...emailActionProps}
+                value={email}
+                onChange={handleEmailInput}
+              />
+              {emailError !== "" ? (
+                <MessageBar
+                  messageBarType={MessageBarType.error}
+                  onDismiss={() => {
+                    setEmailError("");
+                    setEmail("");
+                  }}
+                  dismissButtonAriaLabel="Close"
+                >
+                  {emailError}
+                </MessageBar>
+              ) : (
+                <> </>
+              )}
+            </Stack>
+
+            <Stack {...modalActionProps}>
+              <PrimaryButton
+                {...nextActionProps}
+                onClick={() => {
+                  console.log(email);
+                  handleNext(0);
+                }}
+              />
+              <DefaultButton
+                {...cancelActionProps}
+                onClick={hideAddMeetingModal}
+              />
             </Stack>
           </Stack>
         </Stack>

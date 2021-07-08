@@ -1,5 +1,12 @@
 import React, { useContext, useState } from "react";
-import { IStackProps, PrimaryButton, Stack, Toggle } from "@fluentui/react";
+import {
+  IStackProps,
+  MessageBar,
+  MessageBarType,
+  PrimaryButton,
+  Stack,
+  Toggle,
+} from "@fluentui/react";
 import {
   MicIcon,
   CallVideoIcon,
@@ -37,6 +44,10 @@ export const PreviewComponent: React.FunctionComponent = () => {
   const enteredUserDetails: FirebaseUser = useSelector(
     (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
   );
+  const mediaStreamError: string = useSelector(
+    (state: RootState) => state.mediaStreamErrorReducer.mediaStreamError
+  );
+
   const [toggleMicStatus, setToggleMicStatus] = useState<string>("on");
   const [toggleCamStatus, setToggleCamStatus] = useState<string>("on");
 
@@ -62,76 +73,91 @@ export const PreviewComponent: React.FunctionComponent = () => {
   };
 
   return (
-    <Stack
-      horizontalAlign="center"
-      verticalAlign="center"
-      style={{ height: "100%" }}
-    >
-      <Stack {...previewStackProps}>
-        <Stack style={{ height: "90%", width: "100%" }}>
-          <video
-            width="100%"
-            height="100%"
-            playsInline
-            ref={context.yourVideo}
-            style={{ objectFit: "cover" }}
-            poster={enteredUserDetails.photoURL}
-            autoPlay
-          />
+    <>
+      <Stack
+        horizontalAlign="center"
+        verticalAlign="center"
+        style={{ height: "100%" }}
+      >
+        <Stack tokens={{ padding: "0px 0px 30px 0px" }}>
+          {mediaStreamError ? (
+            <MessageBar messageBarType={MessageBarType.severeWarning}>
+              {mediaStreamError}
+            </MessageBar>
+          ) : (
+            ""
+          )}
         </Stack>
-        <Stack horizontal horizontalAlign="center" style={{ width: "100%" }}>
-          <Stack
-            horizontal
-            verticalAlign="center"
-            tokens={{ padding: "12px", childrenGap: "5px" }}
-          >
-            <Stack verticalAlign="center" style={{ width: "30px" }}>
-              {toggleCamStatus === "on" ? (
-                <CallVideoIcon size="smaller" />
-              ) : (
-                <CallVideoOffIcon size="smaller" />
-              )}
-            </Stack>
-            <Stack verticalAlign="center">
-              <Toggle
-                defaultChecked
-                onChange={handleOnCamToggle}
-                ariaLabel="Video Icon"
-              />
-            </Stack>
-          </Stack>
-          <Stack horizontal verticalAlign="center" tokens={{ padding: "10px" }}>
-            <Stack verticalAlign="center" style={{ width: "30px" }}>
-              {toggleMicStatus === "on" ? (
-                <MicIcon size="smaller" />
-              ) : (
-                <MicOffIcon size="smaller" />
-              )}
-            </Stack>
-            <Stack verticalAlign="center">
-              <Toggle
-                defaultChecked
-                ariaLabel="Microphone Icon"
-                onChange={handleOnMicToggle}
-              />
-            </Stack>
-            <Stack verticalAlign="center" tokens={{ padding: "20px" }}>
-              <PrimaryButton
-                text="Join"
-                allowDisabledFocus
-                onClick={handleJoin}
-              />
-            </Stack>
-          </Stack>
-          <Stack verticalAlign="center" tokens={{ padding: "10px" }}>
-            <PrimaryButton
-              text="Leave"
-              allowDisabledFocus
-              onClick={context.leaveCall}
+        <Stack {...previewStackProps}>
+          <Stack style={{ height: "90%", width: "100%" }}>
+            <video
+              width="100%"
+              height="100%"
+              playsInline
+              ref={context.yourVideo}
+              style={{ objectFit: "cover" }}
+              poster={enteredUserDetails.photoURL}
+              autoPlay
             />
+          </Stack>
+          <Stack horizontal horizontalAlign="center" style={{ width: "100%" }}>
+            <Stack
+              horizontal
+              verticalAlign="center"
+              tokens={{ padding: "12px", childrenGap: "5px" }}
+            >
+              <Stack verticalAlign="center" style={{ width: "30px" }}>
+                {toggleCamStatus === "on" ? (
+                  <CallVideoIcon size="smaller" />
+                ) : (
+                  <CallVideoOffIcon size="smaller" />
+                )}
+              </Stack>
+              <Stack verticalAlign="center">
+                <Toggle
+                  defaultChecked
+                  onChange={handleOnCamToggle}
+                  ariaLabel="Video Icon"
+                />
+              </Stack>
+            </Stack>
+            <Stack
+              horizontal
+              verticalAlign="center"
+              tokens={{ padding: "10px" }}
+            >
+              <Stack verticalAlign="center" style={{ width: "30px" }}>
+                {toggleMicStatus === "on" ? (
+                  <MicIcon size="smaller" />
+                ) : (
+                  <MicOffIcon size="smaller" />
+                )}
+              </Stack>
+              <Stack verticalAlign="center">
+                <Toggle
+                  defaultChecked
+                  ariaLabel="Microphone Icon"
+                  onChange={handleOnMicToggle}
+                />
+              </Stack>
+              <Stack verticalAlign="center" tokens={{ padding: "20px" }}>
+                <PrimaryButton
+                  text="Join"
+                  allowDisabledFocus
+                  onClick={handleJoin}
+                />
+              </Stack>
+            </Stack>
+            <Stack verticalAlign="center" tokens={{ padding: "10px" }}>
+              <PrimaryButton
+                text="Leave"
+                allowDisabledFocus
+                onClick={context.leaveCall}
+              />
+            </Stack>
           </Stack>
         </Stack>
       </Stack>
-    </Stack>
+    </>
   );
 };

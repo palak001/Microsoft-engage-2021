@@ -4,7 +4,9 @@ import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
 import { useHistory, useLocation } from "react-router";
 import qs from "qs";
-import SimplePeer from "simple-peer";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "./redux-store";
+import { fetchMediaStreamErrorAction } from "./redux-store/Video/MediaStreamErrorReducer";
 
 interface ICallDetails {
   from: string;
@@ -49,6 +51,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const history = useHistory();
   const { search }: any = useLocation();
   const queryParameter = qs.parse(search, { ignoreQueryPrefix: true });
+
+  const dispatch = useDispatch();
 
   // Local States
 
@@ -306,17 +310,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const getUserMediaFunction = () => {
-    // console.log("navigator", navigator.mediaDevices);
-    // navigator.mediaDevices
-    //   .getUserMedia({ video: true, audio: true })
-    //   .then((currentStream) => {
-    //     setStream(currentStream);
-    //     if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-
     navigator.mediaDevices.enumerateDevices().then(function (devices) {
       console.log(devices);
       var cam = devices.find(function (device) {
@@ -344,23 +337,33 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   function handleGetUserMediaError(e: any) {
-    // switch (e.name) {
-    //   case "NotFoundError":
-    //     alert(
-    //       "Unable to open your call because no camera and/or microphone" +
-    //         "were found."
-    //     );
-    //     break;
-    //   case "SecurityError":
-    //   case "PermissionDeniedError":
-    //     // Do nothing; this is the same as the user canceling the call.
-    //     break;
-    //   default:
-    //     alert("Error opening your camera and/or microphone: " + e.message);
-    //     break;
-    // }
-    // connectionRef.current.close();
-    // closeVideoCall();
+    switch (e.name) {
+      case "NotFoundError":
+        dispatch(
+          fetchMediaStreamErrorAction(
+            "Unable to open your call because no camera and/or microphone" +
+              "were found."
+          )
+        );
+        break;
+      case "SecurityError":
+        dispatch(fetchMediaStreamErrorAction("Security Error"));
+        break;
+      case "PermissionDeniedError":
+        dispatch(
+          fetchMediaStreamErrorAction(
+            "Camera and/or microphone permission denied"
+          )
+        );
+        break;
+      default:
+        dispatch(
+          fetchMediaStreamErrorAction(
+            "Error while opening your camera and/or microphone: " + e.message
+          )
+        );
+        break;
+    }
   }
 
   const toggleAudioSettings = () => {

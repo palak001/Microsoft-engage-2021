@@ -1,4 +1,9 @@
-import { PrimaryButton, Stack } from "@fluentui/react";
+import {
+  MessageBar,
+  MessageBarType,
+  PrimaryButton,
+  Stack,
+} from "@fluentui/react";
 import React, { useContext, useState } from "react";
 import {
   IPersonaSharedProps,
@@ -21,6 +26,8 @@ import {
 import { auth } from "../config/firebase";
 import { SocketContext } from "../SockectContext";
 import Video from "./Video/Video";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux-store";
 
 export interface MediaControlsProps {
   micActive: boolean;
@@ -44,6 +51,9 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
   };
 
   const context = useContext(SocketContext);
+  const mediaStreamError: string = useSelector(
+    (state: RootState) => state.mediaStreamErrorReducer.mediaStreamError
+  );
 
   const [camStatus, setCamStatus] = useState<string>("on");
   const [micStatus, setMicStatus] = useState<string>("on");
@@ -69,6 +79,13 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
             styles={personaStyles}
           />
           <Stack horizontal tokens={{ childrenGap: "18px" }}>
+            {mediaStreamError ? (
+              <MessageBar messageBarType={MessageBarType.severeWarning}>
+                {mediaStreamError}
+              </MessageBar>
+            ) : (
+              ""
+            )}
             <Stack
               verticalAlign="center"
               style={{ width: "18px", cursor: "pointer" }}

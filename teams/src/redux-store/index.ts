@@ -3,6 +3,7 @@ import { userContactsReducer } from "./Firebase/UserContactsReducer";
 import { selectedUserReducer } from "./Chat/selectedUserReducer";
 import { enteredUserDetailsReducer } from "./Firebase/EnteredUserDetailsReducer";
 import { meetingHistoryReducer } from "./Firebase/MeetingHistoryReducer";
+import { mediaStreamErrorReducer } from "./Video/MediaStreamErrorReducer";
 
 // Import other reducers
 
@@ -12,6 +13,7 @@ export const rootReducer = combineReducers({
   selectedUserReducer,
   enteredUserDetailsReducer,
   meetingHistoryReducer,
+  mediaStreamErrorReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
