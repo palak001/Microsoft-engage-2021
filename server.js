@@ -147,6 +147,7 @@ io.on("connection", (socket) => {
           name: data.name,
           photoURL: data.photoURL,
           uid: data.uid,
+          meetingID: data.meetingID,
           isReceivedCall: true,
         });
       });

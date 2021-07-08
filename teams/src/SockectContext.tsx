@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
+import qs from "qs";
 
 interface ICallDetails {
   from: string;
@@ -11,6 +12,7 @@ interface ICallDetails {
   uid: string;
   signal: any;
   isReceivedCall: boolean;
+  meetingID: string;
 }
 
 interface IContext {
@@ -44,6 +46,8 @@ export const SocketContext = React.createContext({} as IContext);
 
 const ContextProvider: React.FunctionComponent = ({ children }) => {
   const history = useHistory();
+  const { search }: any = useLocation();
+  const queryParameter = qs.parse(search, { ignoreQueryPrefix: true });
 
   // Local States
 
@@ -105,12 +109,14 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
       socket.current.on("callingYou", (data: ICallDetails) => {
         setGettingCall(true);
+        // console.log("getting call", callDetails);
         setCallDetails({
           from: data.from,
           name: data.name,
           photoURL: data.photoURL,
           uid: data.uid,
           signal: data.signal,
+          meetingID: data.meetingID,
           isReceivedCall: data.isReceivedCall,
         });
         setOtherPersonID(data.from);
@@ -164,7 +170,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     connectionRef.current = peer;
-
+    console.log("queryParamenter", queryParameter);
     // fires when the peer want to send signalling data to other peers
     peer.on("signal", (signalData: any) => {
       socket.current.emit("callUser", {
@@ -174,6 +180,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         photoURL: auth.currentUser?.photoURL,
         name: auth.currentUser?.displayName,
         uid: auth.currentUser?.uid,
+        meetingID: queryParameter.meetingID,
       });
     });
 
@@ -294,6 +301,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const getUserMediaFunction = () => {
+    console.log("navigator", navigator.mediaDevices);
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {

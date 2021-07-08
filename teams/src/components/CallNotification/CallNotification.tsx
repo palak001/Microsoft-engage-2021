@@ -41,6 +41,7 @@ export const CallNotification: React.FunctionComponent = () => {
         />
         <Text style={{ color: "#1C1C1C" }} variant={"xLarge"}>
           {context.callDetails.name} is calling...
+          {console.log(context.callDetails)};
         </Text>
       </Stack>
 
@@ -52,9 +53,9 @@ export const CallNotification: React.FunctionComponent = () => {
             context.getUserMediaFunction();
             context.setAcceptingCallToTrue();
             history.push(
-              `/meeting?uid1=${
-                auth.currentUser?.uid
-              }&uid2=${"uidOfEmail"}&meetingID=${"meetingID"}`
+              `/meeting?uid1=${auth.currentUser?.uid}&uid2=${
+                context.callDetails.uid
+              }&meetingID=${"meetingID"}`
             );
           }}
           allowDisabledFocus
