@@ -4,8 +4,7 @@ import Peer from "simple-peer";
 import { auth, db } from "./config/firebase";
 import { useHistory, useLocation } from "react-router";
 import qs from "qs";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "./redux-store";
+import { useDispatch } from "react-redux";
 import { fetchMediaStreamErrorAction } from "./redux-store/Video/MediaStreamErrorReducer";
 
 interface ICallDetails {
@@ -168,10 +167,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     connectionRef.current = peer;
-    console.log("queryParamenter", queryParameter);
     // fires when the peer want to send signalling data to other peers
     peer.on("signal", (signalData: any) => {
-      console.log("How many times:", signalData);
       socket.current.emit("callUser", {
         userToCall: socketId,
         signalData: signalData,
@@ -181,11 +178,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         uid: auth.currentUser?.uid,
         meetingID: queryParameter.meetingID,
       });
-      console.log("seriously!");
     });
 
     peer.on("stream", (friendStream) => {
-      console.log("receiving friendStream");
       if (friendVideo.current) friendVideo.current.srcObject = friendStream;
       setFriendStream(friendStream);
     });
@@ -196,9 +191,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     socket.current.on("callAccepted", (signal: any) => {
-      console.log("call Accepted");
-      console.log("signal: ", signal);
-      console.log("signal");
       setCallAccepted(true);
       peer.signal(JSON.stringify(signal));
     });
@@ -208,7 +200,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
-      history.push("/");
+      window.location.reload();
     });
 
     socket.current.on("callRejected", () => {
@@ -217,7 +209,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallAccepted(false);
       setCallStarted(false);
       // setCallDetails(null);
-      history.push("/");
+      window.location.reload();
     });
     // });
   };
@@ -261,7 +253,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
-      history.push("/");
+      window.location.reload();
     });
 
     socket.current.on("callRejected", () => {
@@ -269,7 +261,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
-      history.push("/");
+      window.location.reload();
     });
     // });
   };
@@ -285,8 +277,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setCallStarted(false);
     setGettingCall(false);
     socket.current.emit("callEnded", { to: otherPersonID });
-    // check why this is not working
-    history.push("/");
+    window.location.reload();
   };
 
   const rejectCall = () => {
@@ -298,7 +289,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setCallStarted(false);
     setGettingCall(false);
     socket.current.emit("callRejected", { to: otherPersonID });
-    history.push("/");
+    window.location.reload();
   };
 
   const setStartingCallToTrue = () => {
@@ -327,11 +318,19 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
           if (yourVideo.current) yourVideo.current.srcObject = stream;
         })
         .catch(function (err) {
-          console.log(err);
-          setStream(null);
-          if (yourVideo.current) yourVideo.current.srcObject = null;
+          if (cam || mic) {
+            console.log(err);
+            setStream(null);
+            if (yourVideo.current) yourVideo.current.srcObject = null;
 
-          handleGetUserMediaError(err);
+            handleGetUserMediaError(err);
+          } else {
+            dispatch(
+              fetchMediaStreamErrorAction(
+                "Unable to detect cam and/or microphone"
+              )
+            );
+          }
         });
     });
   };
