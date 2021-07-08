@@ -202,8 +202,13 @@ export const HomeComponent: React.FunctionComponent = () => {
       >
         <div
           className={classNames.itemContent}
-          onClick={() => {
+          onClick={async () => {
             console.log(item);
+            await fetchEnteredUserDetails(item.user2Email).then(
+              (result: FirebaseUser) => {
+                dispatch(fetchEnteredUserDetailsAction(result));
+              }
+            );
             history.push(
               `/chat?uid1=${item.uid1}&uid2=${item.uid2}&meetingID=${item.meetingID}`
             );

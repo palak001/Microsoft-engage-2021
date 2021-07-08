@@ -53,9 +53,7 @@ export const CallNotification: React.FunctionComponent = () => {
             context.getUserMediaFunction();
             context.setAcceptingCallToTrue();
             history.push(
-              `/meeting?uid1=${auth.currentUser?.uid}&uid2=${
-                context.callDetails.uid
-              }&meetingID=${"meetingID"}`
+              `/meeting?uid1=${auth.currentUser?.uid}&uid2=${context.callDetails.uid}&meetingID=${context.callDetails.meetingID}`
             );
           }}
           allowDisabledFocus

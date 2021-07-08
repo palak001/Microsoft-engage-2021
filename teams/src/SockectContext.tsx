@@ -110,6 +110,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       socket.current.on("callingYou", (data: ICallDetails) => {
         setGettingCall(true);
         // console.log("getting call", callDetails);
+        console.log("details: ", data);
         setCallDetails({
           from: data.from,
           name: data.name,
@@ -140,6 +141,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const startCall = (socketId: string) => {
     setCallStarted(true);
     setOtherPersonID(socketId);
+    console.log("stream", stream);
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -185,6 +187,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     peer.on("stream", (friendStream) => {
+      console.log("receiving friendStream");
       if (friendVideo.current) friendVideo.current.srcObject = friendStream;
       setFriendStream(friendStream);
     });
@@ -195,6 +198,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     socket.current.on("callAccepted", (signal: any) => {
+      console.log("call Accepted");
+      console.log("signal: ", signal);
+      console.log("signal");
       setCallAccepted(true);
       peer.signal(JSON.stringify(signal));
     });
@@ -301,17 +307,62 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const getUserMediaFunction = () => {
-    console.log("navigator", navigator.mediaDevices);
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        if (yourVideo.current) yourVideo.current.srcObject = currentStream;
-      })
-      .catch((error) => {
-        console.log(error);
+    // console.log("navigator", navigator.mediaDevices);
+    // navigator.mediaDevices
+    //   .getUserMedia({ video: true, audio: true })
+    //   .then((currentStream) => {
+    //     setStream(currentStream);
+    //     if (yourVideo.current) yourVideo.current.srcObject = currentStream;
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
+    navigator.mediaDevices.enumerateDevices().then(function (devices) {
+      console.log(devices);
+      var cam = devices.find(function (device) {
+        return device.kind === "videoinput";
       });
+      var mic = devices.find(function (device) {
+        return device.kind === "audioinput";
+      });
+
+      var constraints = { video: cam, audio: mic };
+      return navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then(function (stream) {
+          setStream(stream);
+          if (yourVideo.current) yourVideo.current.srcObject = stream;
+        })
+        .catch(function (err) {
+          console.log(err);
+          setStream(null);
+          if (yourVideo.current) yourVideo.current.srcObject = null;
+
+          handleGetUserMediaError(err);
+        });
+    });
   };
+
+  function handleGetUserMediaError(e: any) {
+    // switch (e.name) {
+    //   case "NotFoundError":
+    //     alert(
+    //       "Unable to open your call because no camera and/or microphone" +
+    //         "were found."
+    //     );
+    //     break;
+    //   case "SecurityError":
+    //   case "PermissionDeniedError":
+    //     // Do nothing; this is the same as the user canceling the call.
+    //     break;
+    //   default:
+    //     alert("Error opening your camera and/or microphone: " + e.message);
+    //     break;
+    // }
+    // connectionRef.current.close();
+    // closeVideoCall();
+  }
 
   const toggleAudioSettings = () => {
     if (stream) {

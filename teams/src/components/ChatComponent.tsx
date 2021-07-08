@@ -34,6 +34,10 @@ import qs from "qs";
 import firebase from "firebase";
 import { useContext } from "react";
 import { SocketContext } from "../SockectContext";
+import { enteredUserDetailsReducer } from "../redux-store/Firebase/EnteredUserDetailsReducer";
+import FirebaseUser from "../interfaces/user.interface";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux-store";
 
 enum SenderType {
   self = 0,
@@ -63,6 +67,9 @@ export const ChatComponent: React.FunctionComponent = () => {
   const [teamsChat, setTeamsChat] = useState<Chats>({ message: [] });
   const [initChat, setInitChat] = useState<Chats>({ message: [] });
   const [receiverPhotoURL, setReceiverPhotoURL] = useState<string>("");
+  const enteredUserDetails: FirebaseUser = useSelector(
+    (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
+  );
 
   useEffect(() => {
     const participantsEmail = {
@@ -172,6 +179,15 @@ export const ChatComponent: React.FunctionComponent = () => {
     setMessage(e.target.value);
   };
 
+  const handleVideoCall = () => {
+    context.getUserMediaFunction();
+    context.setStartingCallToTrue();
+    console.log(enteredUserDetails);
+    history.push(
+      `/meeting?uid1=${auth.currentUser?.uid}&uid2=${queryParameter.uid2}&meetingID=${queryParameter.meetingID}`
+    );
+  };
+
   return (
     <Stack {...chatLayoutProps}>
       <Stack style={{ height: "13%" }} {...headerProps}>
@@ -197,7 +213,7 @@ export const ChatComponent: React.FunctionComponent = () => {
           <Text {...chatHeadingProps}>{meetingName}</Text>
         </Stack>
         <CommandButton>
-          <Stack {...videoCallProps}>
+          <Stack {...videoCallProps} onClick={handleVideoCall}>
             <CallVideoIcon size="medium" />
           </Stack>
         </CommandButton>

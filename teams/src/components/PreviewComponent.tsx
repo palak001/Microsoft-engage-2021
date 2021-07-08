@@ -55,6 +55,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
   };
 
   const handleJoin = () => {
+    console.log("enteredUserDetails.socketID: ", enteredUserDetails.socketID);
     if (context.acceptingCall) {
       context.answerCall();
     } else context.startCall(enteredUserDetails.socketID);
