@@ -83,9 +83,15 @@ export const HomeComponent: React.FunctionComponent = () => {
   const [meetingName, setMeetingName] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [meetingNameError, setMeetingNameError] = useState<string>("");
+  const [uidOfEmail, setUidOfEmail] = useState<string>("");
 
   const [isModalOpen, { setTrue: showModal, setFalse: hideModal }] =
     useBoolean(false);
+  const [
+    isAddMeetingModalOpen,
+    { setTrue: showAddMeetingModal, setFalse: hideAddMeetingModal },
+  ] = useBoolean(false);
+
   const examplePersona: IPersonaSharedProps = {
     imageUrl: auth.currentUser?.photoURL!,
     text: auth.currentUser?.displayName!,
@@ -135,13 +141,13 @@ export const HomeComponent: React.FunctionComponent = () => {
         meetingName !== ""
       ) {
         const meetingID = uuidv4();
-        const uidOfEmail = await db
+        await db
           .collection("users")
           .doc(email)
           .get()
           .then((doc) => {
             if (doc.exists) {
-              return doc.data()?.uid;
+              setUidOfEmail(doc.data()?.uid);
             }
           });
 
@@ -185,6 +191,53 @@ export const HomeComponent: React.FunctionComponent = () => {
         history.push(
           `/meeting?uid1=${auth.currentUser?.uid}&uid2=${uidOfEmail}&meetingID=${meetingID}`
         );
+      }
+    });
+  };
+
+  const handleAddMeetingNext = async () => {
+    await checkEmailValidity().then(async () => {
+      if (
+        emailError === "" &&
+        email !== "" &&
+        meetingNameError === "" &&
+        meetingName !== ""
+      ) {
+        const meetingID = uuidv4();
+
+        // adding two participants involved in conversation having this meeting ID
+        db.collection("meetings").doc(meetingID).set({
+          user1: auth.currentUser?.email,
+          user2: email,
+          meetingName: meetingName,
+        });
+        // user 1
+        db.collection("users")
+          .doc(auth.currentUser?.email + "")
+          .update({
+            meetingHistory: firebase.firestore.FieldValue.arrayUnion({
+              meetingName: meetingName,
+              meetingID: meetingID,
+              user1Email: auth.currentUser?.email,
+              user2Email: email,
+              uid1: auth.currentUser?.uid,
+              uid2: uidOfEmail,
+            }),
+          });
+        // user 2
+        db.collection("users")
+          .doc(email + "")
+          .update({
+            meetingHistory: firebase.firestore.FieldValue.arrayUnion({
+              meetingName: meetingName,
+              meetingID: meetingID,
+              user1Email: email,
+              user2Email: auth.currentUser?.email,
+              uid1: uidOfEmail,
+              uid2: auth.currentUser?.uid,
+            }),
+          });
+        hideAddMeetingModal();
       }
     });
   };
@@ -249,7 +302,11 @@ export const HomeComponent: React.FunctionComponent = () => {
             <Stack>
               <Text {...headingProps}>Meetings History</Text>
             </Stack>
-            <Stack {...descProps} verticalAlign="center">
+            <Stack
+              {...descProps}
+              verticalAlign="center"
+              onClick={showAddMeetingModal}
+            >
               <ActionButton {...newMeetingProps}>
                 <Text>Add new meeting</Text>
               </ActionButton>
@@ -337,6 +394,79 @@ export const HomeComponent: React.FunctionComponent = () => {
                 }}
               />
               <DefaultButton {...cancelActionProps} onClick={hideModal} />
+            </Stack>
+          </Stack>
+        </Stack>
+      </Modal>
+
+      {/* Add meeting modal */}
+      <Modal
+        titleAriaId={titleId}
+        isOpen={isAddMeetingModalOpen}
+        onDismiss={hideAddMeetingModal}
+        isModeless={true}
+      >
+        <Stack {...container}>
+          <Stack id={titleId}>
+            <Text {...modalProps}>{ModalHeading}</Text>
+          </Stack>
+
+          <Stack {...modalStackProps}>
+            <Stack {...modalStackChildProps}>
+              <TextField
+                {...meetingNameActionProps}
+                value={meetingName}
+                onChange={handleMeetingNameInput}
+              />
+              {meetingNameError !== "" ? (
+                <MessageBar
+                  messageBarType={MessageBarType.error}
+                  onDismiss={() => {
+                    setMeetingNameError("");
+                    setMeetingName("");
+                  }}
+                  dismissButtonAriaLabel="Close"
+                >
+                  {meetingNameError}
+                </MessageBar>
+              ) : (
+                <> </>
+              )}
+            </Stack>
+            <Stack {...modalStackChildProps}>
+              <TextField
+                {...emailActionProps}
+                value={email}
+                onChange={handleEmailInput}
+              />
+              {emailError !== "" ? (
+                <MessageBar
+                  messageBarType={MessageBarType.error}
+                  onDismiss={() => {
+                    setEmailError("");
+                    setEmail("");
+                  }}
+                  dismissButtonAriaLabel="Close"
+                >
+                  {emailError}
+                </MessageBar>
+              ) : (
+                <> </>
+              )}
+            </Stack>
+
+            <Stack {...modalActionProps}>
+              <PrimaryButton
+                {...nextActionProps}
+                onClick={() => {
+                  console.log(email);
+                  handleAddMeetingNext();
+                }}
+              />
+              <DefaultButton
+                {...cancelActionProps}
+                onClick={hideAddMeetingModal}
+              />
             </Stack>
           </Stack>
         </Stack>

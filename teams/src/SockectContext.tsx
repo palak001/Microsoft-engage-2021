@@ -115,6 +115,14 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         });
         setOtherPersonID(data.from);
       });
+
+      socket.current.on("callEnded", () => {
+        setCallEnded(true);
+        setCallAccepted(false);
+        setCallStarted(false);
+        connectionRef.current.destroy();
+        history.push("/");
+      });
     });
   }, [history]);
 
@@ -132,6 +140,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   // Helper Functions
 
   const startCall = (socketId: string) => {
+    setStartingCall(false);
     setCallStarted(true);
     setOtherPersonID(socketId);
     const peer = new Peer({
@@ -194,9 +203,11 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
     socket.current.on("callEnded", () => {
       stopMediaTracks(stream);
-      setCallEnded(true);
-      setCallAccepted(false);
-      setCallStarted(false);
+      // setCallEnded(true);
+      // setCallAccepted(false);
+      // setCallStarted(false);
+      // if (connectionRef) connectionRef.current.destroy();
+      // history.push("/");
     });
 
     socket.current.on("callRejected", () => {
@@ -205,11 +216,14 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallAccepted(false);
       setCallStarted(false);
       // setCallDetails(null);
+      // if (connectionRef) connectionRef.current.destroy();
+      history.push("/");
     });
     // });
   };
 
   const answerCall = () => {
+    setAcceptingCall(false);
     setCallAccepted(true);
     setGettingCall(false);
     const peer = new Peer({
@@ -240,9 +254,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
     socket.current.on("callEnded", () => {
       stopMediaTracks(stream);
-      setCallEnded(true);
-      setCallAccepted(false);
-      setCallStarted(false);
+      // setCallEnded(true);
+      // setCallAccepted(false);
+      // setCallStarted(false);
+      // history.push("/");
     });
 
     socket.current.on("callRejected", () => {
@@ -250,6 +265,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
+      history.push("/");
     });
     // });
   };
@@ -259,7 +275,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     stopMediaTracks(stream);
 
     setCallEnded(true);
-    if (connectionRef.current) connectionRef.current.destroy();
+    // if (connectionRef.current) connectionRef.current.destroy();
     console.log("streams: ", stream);
     setCallAccepted(false);
     setCallStarted(false);
@@ -273,7 +289,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     // To switch your webcam light!
     stopMediaTracks(stream);
     setCallRejected(true);
-    if (connectionRef.current) connectionRef.current.destroy();
+    // if (connectionRef.current) connectionRef.current.destroy();
     setCallAccepted(false);
     setCallStarted(false);
     setGettingCall(false);
