@@ -135,56 +135,57 @@ export const HomeComponent: React.FunctionComponent = () => {
         meetingName !== ""
       ) {
         const meetingID = uuidv4();
-        const uidOfEmail = await db
+        await db
           .collection("users")
           .doc(email)
           .get()
           .then((doc) => {
             if (doc.exists) {
-              return doc.data()?.uid;
+              // return doc.data()?.uid;
+              // adding two participants involved in conversation having this meeting ID
+              db.collection("meetings").doc(meetingID).set({
+                user1: auth.currentUser?.email,
+                user2: email,
+                meetingName: meetingName,
+              });
+
+              // user 1
+              db.collection("users")
+                .doc(auth.currentUser?.email + "")
+                .update({
+                  meetingHistory: firebase.firestore.FieldValue.arrayUnion({
+                    meetingName: meetingName,
+                    meetingID: meetingID,
+                    user1Email: auth.currentUser?.email,
+                    user2Email: email,
+                    uid1: auth.currentUser?.uid,
+                    uid2: doc.data()?.uid,
+                  }),
+                });
+              // user 2
+              db.collection("users")
+                .doc(email + "")
+                .update({
+                  meetingHistory: firebase.firestore.FieldValue.arrayUnion({
+                    meetingName: meetingName,
+                    meetingID: meetingID,
+                    user1Email: email,
+                    user2Email: auth.currentUser?.email,
+                    uid1: doc.data()?.uid,
+                    uid2: auth.currentUser?.uid,
+                  }),
+                });
+
+              context.getUserMediaFunction();
+              context.setStartingCallToTrue();
+              // important *****************************************************
+              history.push(
+                `/meeting?uid1=${auth.currentUser?.uid}&uid2=${
+                  doc.data()?.uid
+                }&meetingID=${meetingID}`
+              );
             }
           });
-
-        // adding two participants involved in conversation having this meeting ID
-        db.collection("meetings").doc(meetingID).set({
-          user1: auth.currentUser?.email,
-          user2: email,
-          meetingName: meetingName,
-        });
-
-        // user 1
-        db.collection("users")
-          .doc(auth.currentUser?.email + "")
-          .update({
-            meetingHistory: firebase.firestore.FieldValue.arrayUnion({
-              meetingName: meetingName,
-              meetingID: meetingID,
-              user1Email: auth.currentUser?.email,
-              user2Email: email,
-              uid1: auth.currentUser?.uid,
-              uid2: uidOfEmail,
-            }),
-          });
-        // user 2
-        db.collection("users")
-          .doc(email + "")
-          .update({
-            meetingHistory: firebase.firestore.FieldValue.arrayUnion({
-              meetingName: meetingName,
-              meetingID: meetingID,
-              user1Email: email,
-              user2Email: auth.currentUser?.email,
-              uid1: uidOfEmail,
-              uid2: auth.currentUser?.uid,
-            }),
-          });
-
-        context.getUserMediaFunction();
-        context.setStartingCallToTrue();
-        // important *****************************************************
-        history.push(
-          `/meeting?uid1=${auth.currentUser?.uid}&uid2=${uidOfEmail}&meetingID=${meetingID}`
-        );
       }
     });
   };

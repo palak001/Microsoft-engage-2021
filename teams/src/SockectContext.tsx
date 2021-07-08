@@ -197,6 +197,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
+      history.push("/");
     });
 
     socket.current.on("callRejected", () => {
@@ -205,6 +206,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallAccepted(false);
       setCallStarted(false);
       // setCallDetails(null);
+      history.push("/");
     });
     // });
   };
@@ -243,6 +245,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
+      history.push("/");
     });
 
     socket.current.on("callRejected", () => {
@@ -250,6 +253,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
+      history.push("/");
     });
     // });
   };
