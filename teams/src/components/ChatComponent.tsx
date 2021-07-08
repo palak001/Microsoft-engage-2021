@@ -214,7 +214,7 @@ export const ChatComponent: React.FunctionComponent = () => {
         </Stack>
         <CommandButton>
           <Stack {...videoCallProps} onClick={handleVideoCall}>
-            <CallVideoIcon size="medium" />
+            <CallVideoIcon size="medium" style={{}} />
           </Stack>
         </CommandButton>
       </Stack>
