@@ -66,13 +66,7 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
   return (
     <>
       <Stack>
-        <Stack {...headerProps}>
-          <Persona
-            {...examplePersona}
-            size={PersonaSize.size72}
-            presence={PersonaPresence.busy}
-            // styles={personaStyles}
-          />
+        <Stack {...headerProps} horizontal horizontalAlign="space-between">
           <Persona
             {...examplePersona}
             size={PersonaSize.size72}
@@ -80,13 +74,6 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
             // styles={personaStyles}
           />
           <Stack horizontal tokens={{ childrenGap: "18px" }}>
-            {mediaStreamError ? (
-              <MessageBar messageBarType={MessageBarType.severeWarning}>
-                {mediaStreamError}
-              </MessageBar>
-            ) : (
-              ""
-            )}
             <Stack
               verticalAlign="center"
               style={{ width: "18px", cursor: "pointer" }}
@@ -112,8 +99,19 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
             <PrimaryButton onClick={context.leaveCall} {...declineCallProps} />
           </Stack>
         </Stack>
-        <Stack {...personaLayoutProps}>
-          <Video />
+        <Stack>
+          <Stack tokens={{ padding: "20px 50px 20px 50px" }}>
+            {mediaStreamError ? (
+              <MessageBar messageBarType={MessageBarType.severeWarning}>
+                {mediaStreamError}
+              </MessageBar>
+            ) : (
+              ""
+            )}
+          </Stack>
+          <Stack {...personaLayoutProps}>
+            <Video />
+          </Stack>
         </Stack>
       </Stack>
     </>
