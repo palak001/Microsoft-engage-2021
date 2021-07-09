@@ -4,19 +4,14 @@ import {
   PrimaryButton,
   Stack,
 } from "@fluentui/react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   IPersonaSharedProps,
   Persona,
   PersonaSize,
   PersonaPresence,
 } from "@fluentui/react/lib/Persona";
-import {
-  headerProps,
-  personaLayoutProps,
-  personaStyles,
-  declineCallProps,
-} from "./Styles";
+import { headerProps, personaLayoutProps, declineCallProps } from "./Styles";
 import {
   MicIcon,
   MicOffIcon,
@@ -76,7 +71,13 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
             {...examplePersona}
             size={PersonaSize.size72}
             presence={PersonaPresence.busy}
-            styles={personaStyles}
+            // styles={personaStyles}
+          />
+          <Persona
+            {...examplePersona}
+            size={PersonaSize.size72}
+            presence={PersonaPresence.busy}
+            // styles={personaStyles}
           />
           <Stack horizontal tokens={{ childrenGap: "18px" }}>
             {mediaStreamError ? (

@@ -16,7 +16,7 @@ import {
 } from "@fluentui/react/lib/Persona";
 import {
   headerProps,
-  personaStyles,
+  // personaStyles,
   chatHeadingProps,
   videoCallProps,
   textActionProps,
@@ -54,6 +54,15 @@ interface Chats {
   message: Chat[];
 }
 
+const getWindowDimensions = () => {
+  console.log("now whatQ");
+  const { innerWidth: width, innerHeight: height } = window;
+  return {
+    width,
+    height,
+  };
+};
+
 export const ChatComponent: React.FunctionComponent = () => {
   initializeIcons();
   const history = useHistory();
@@ -67,9 +76,24 @@ export const ChatComponent: React.FunctionComponent = () => {
   const [teamsChat, setTeamsChat] = useState<Chats>({ message: [] });
   const [initChat, setInitChat] = useState<Chats>({ message: [] });
   const [receiverPhotoURL, setReceiverPhotoURL] = useState<string>("");
+  const [receiverName, setReceiverName] = useState<string>("");
+
   const enteredUserDetails: FirebaseUser = useSelector(
     (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
   );
+
+  const [windowDimensions, setWindowDimensions] = useState(
+    getWindowDimensions()
+  );
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const participantsEmail = {
@@ -105,6 +129,7 @@ export const ChatComponent: React.FunctionComponent = () => {
         .then((doc) => {
           if (doc.exists) {
             setReceiverPhotoURL(doc.data()?.photoURL);
+            setReceiverName(doc.data()?.displayName);
           }
         });
     }
@@ -138,10 +163,10 @@ export const ChatComponent: React.FunctionComponent = () => {
     });
   }, [context.socket, teamsChat.message]);
 
-  const examplePersona: IPersonaSharedProps = {
-    imageUrl: auth.currentUser?.photoURL!,
-    text: auth.currentUser?.displayName!,
-    secondaryText: auth.currentUser?.email!,
+  const friendPersona: IPersonaSharedProps = {
+    imageUrl: receiverPhotoURL,
+    text: receiverName,
+    secondaryText: receiverEmailID,
     // tertiaryText: "In a meeting",
   };
 
@@ -190,39 +215,64 @@ export const ChatComponent: React.FunctionComponent = () => {
 
   return (
     <Stack {...chatLayoutProps}>
-      <Stack style={{ height: "13%" }} {...headerProps}>
+      <Stack {...headerProps} horizontal>
         <Stack
           horizontal
-          verticalAlign="center"
-          tokens={{ childrenGap: "15px" }}
+          horizontalAlign="space-between"
+          style={{ width: "100%" }}
         >
-          <Icon
-            iconName="Back"
-            style={{ cursor: "pointer" }}
-            onClick={() => history.push("/")}
-          />
-          <Persona
-            {...examplePersona}
-            size={PersonaSize.size72}
-            presence={PersonaPresence.busy}
-            styles={personaStyles}
-          />
-        </Stack>
-
-        <Stack>
-          <Text {...chatHeadingProps}>{meetingName}</Text>
-        </Stack>
-        <CommandButton>
-          <Stack {...videoCallProps} onClick={handleVideoCall}>
-            <CallVideoIcon size="medium" style={{}} />
+          <Stack
+            horizontal
+            verticalAlign="center"
+            tokens={{ childrenGap: "20px" }}
+          >
+            <Icon
+              iconName="Back"
+              style={{ cursor: "pointer" }}
+              onClick={() => history.push("/")}
+            />
+            <Stack>
+              <Text {...chatHeadingProps} className="meetingName">
+                {meetingName}
+              </Text>
+            </Stack>
           </Stack>
-        </CommandButton>
+
+          <CommandButton>
+            <Stack {...videoCallProps} onClick={handleVideoCall}>
+              <CallVideoIcon size="medium" style={{}} />
+            </Stack>
+          </CommandButton>
+        </Stack>
       </Stack>
 
       <Stack style={{ height: "87%" }} verticalAlign="end">
         <Stack
+          horizontal
+          horizontalAlign="space-between"
+          tokens={{ padding: "20px 50px 20px 50px" }}
           style={{
-            height: "92%",
+            height: "8%",
+            width: "100%",
+          }}
+        >
+          <Stack horizontal>
+            <Text style={{ color: "#646464", paddingRight: "9px" }}>
+              {receiverName}
+            </Text>
+            <Persona imageUrl={receiverPhotoURL} size={PersonaSize.size24} />
+          </Stack>
+          <Stack horizontal>
+            <Persona
+              imageUrl={auth.currentUser?.photoURL!}
+              size={PersonaSize.size24}
+            />
+            <Text style={{ color: "#646464" }}>You</Text>
+          </Stack>
+        </Stack>
+        <Stack
+          style={{
+            height: "84%",
             overflowY: "scroll",
             scrollbarWidth: "none",
             width: "100%",
@@ -255,7 +305,7 @@ export const ChatComponent: React.FunctionComponent = () => {
                   <Persona
                     imageUrl={receiverPhotoURL}
                     size={PersonaSize.size24}
-                    styles={personaStyles}
+                    // styles={personaStyles}
                   />
                   <Stack {...neutralLight}>{chat.content}</Stack>
                 </Stack>

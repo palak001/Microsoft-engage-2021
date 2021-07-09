@@ -1,0 +1,27 @@
+/* .layout-class {
+  background-color: gold;
+}
+
+.newMeeting-class {
+  background-color: blue;
+} */
+
+@media (max-width: 950px) {
+  .layout-class {
+    flex-direction: column;
+  }
+  .newMeeting-class,
+  .meetingHistory {
+    height: 50%;
+    width: 100%;
+  }
+  .verticalLine-class {
+    display: none;
+  }
+}
+
+/* @media (max-width: 700px) {
+  .meetingName {
+    font-size: 15px;
+  }
+} */

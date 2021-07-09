@@ -4,7 +4,6 @@ import {
   IButtonProps,
   IIconProps,
   IImageStyles,
-  IPersonaStyles,
   IScrollablePaneProps,
   IStackItemProps,
   IStackProps,
@@ -16,28 +15,49 @@ import {
   ScrollbarVisibility,
 } from "@fluentui/react";
 
-export const personaStyles: Partial<IPersonaStyles> = {
-  root: { margin: "0 0 10px 0" },
+export const mainStack: IStackProps = {
+  styles: {
+    root: {
+      height: "100%",
+      width: "100%",
+    },
+  },
 };
 
+// export const personaStyles: Partial<IPersonaStyles> = {
+//   root: { margin: "0 0 0 0" },
+// };
+
 export const headerProps: IStackProps = {
-  horizontal: true,
-  horizontalAlign: "space-between",
   verticalAlign: "center",
   tokens: {
     padding: "20px 50px 20px 50px",
+  },
+  styles: {
+    root: {
+      width: "100%",
+    },
   },
 };
 
 export const sandbox: IStackProps = {
   tokens: {
-    childrenGap: "20px",
+    padding: "15% 0 0 0 ",
   },
   styles: {
     root: {
-      maxWidth: "600px",
+      width: "50%",
+      height: "100%",
     },
   },
+};
+
+export const content: IStackProps = {
+  tokens: {
+    childrenGap: "1%",
+    padding: "0, 0, 0, 8%",
+  },
+  horizontalAlign: "start",
 };
 
 export const actionProps: IStackProps = {
@@ -54,17 +74,13 @@ export const LayoutProps: IStackProps = {
   horizontalAlign: "space-between",
   verticalAlign: "center",
   tokens: {
-    padding: "5% 10% 0 10%",
+    padding: "5px 10px 0 10px",
   },
-  // styles: {
-  //   root: {
-  //     selectors: {
-  //       "@media only screen and (max-width: 640px)": {
-  //         width: "485px",
-  //       }
-  //     },
-  //   },
-  // },
+  styles: {
+    root: {
+      height: "90%",
+    },
+  },
 };
 
 export const personaLayoutProps: IStackProps = {
@@ -148,6 +164,7 @@ export const headingProps: ITextProps = {
       fontSize: "50px",
       lineHeight: "60px",
       color: "#171717",
+      width: "100%",
     },
   },
 };
@@ -197,7 +214,6 @@ export const nextActionProps: Partial<IButtonProps> = {
     root: {
       height: "40px",
       width: "120px",
-      // fontFamily: "Segoe UI",
       fontStyle: "normal",
       fontWeight: "normal",
       fontSize: "16px",
@@ -366,7 +382,7 @@ export const meetingListProps: IStackProps = {
   },
   styles: {
     root: {
-      width: "700px",
+      width: "100%",
     },
   },
 };
@@ -393,7 +409,7 @@ export const newMeetingProps: Partial<IButtonProps> = {
       lineHeight: "20px",
       color: "#0064BF",
       height: "40px",
-      width: "300px",
+      width: "100%",
     },
     rootPressed: {
       color: "#0064BF",
@@ -424,6 +440,7 @@ export const chatHeadingProps: IStackProps = {
 };
 
 export const videoCallProps: IStackProps = {
+  verticalAlign: "center",
   styles: {
     root: {
       width: "2rem",

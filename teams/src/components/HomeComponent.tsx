@@ -24,11 +24,13 @@ import {
   cancelActionProps,
   classNames,
   container,
+  content,
   descProps,
   emailActionProps,
   headerProps,
   headingProps,
   LayoutProps,
+  mainStack,
   meetingListProps,
   meetingNameActionProps,
   modalActionProps,
@@ -37,9 +39,7 @@ import {
   modalStackProps,
   newMeetingProps,
   nextActionProps,
-  personaStyles,
   sandbox,
-  vertical,
   videoCallActionProps,
 } from "./Styles";
 import { useBoolean, useId } from "@fluentui/react-hooks";
@@ -57,6 +57,7 @@ import { useSelector } from "react-redux";
 import MeetingHistory from "../interfaces/meetingHistory.interface";
 import { RootState } from "../redux-store";
 import { CallNotification } from "./CallNotification/CallNotification";
+import "./MediaQueryStyles.css";
 
 const TeamsHeading = "Microsoft Teams Meetings";
 const TeamsDesc = "Try video calling or chat, your call!";
@@ -231,53 +232,61 @@ export const HomeComponent: React.FunctionComponent = () => {
 
   return (
     <>
-      <Stack>
-        <Stack {...headerProps}>
-          <Persona
-            {...examplePersona}
-            size={PersonaSize.size72}
-            presence={PersonaPresence.offline}
-            styles={personaStyles}
-          />
-
-          <PrimaryButton
-            text="Sign out"
-            allowDisabledFocus
-            onClick={handleSignOut}
-          />
+      <Stack {...mainStack}>
+        <Stack {...headerProps} horizontal>
+          <Stack style={{ width: "74%" }}>
+            <Persona
+              {...examplePersona}
+              size={PersonaSize.size72}
+              presence={PersonaPresence.offline}
+              // styles={personaStyles}
+            />
+          </Stack>
+          <Stack horizontalAlign="end" style={{ width: "26%" }}>
+            <PrimaryButton
+              text="Sign out"
+              allowDisabledFocus
+              onClick={handleSignOut}
+              style={{ width: "98px" }}
+            />
+          </Stack>
         </Stack>
-        <Stack {...LayoutProps}>
-          <Stack {...sandbox}>
-            <Stack>
-              <Text {...headingProps}>{TeamsHeading} </Text>
-            </Stack>
-            <Stack>
-              <Text {...descProps}>{TeamsDesc}</Text>
-            </Stack>
-            <Stack {...actionProps}>
-              <PrimaryButton {...videoCallActionProps} onClick={showModal} />
+        <Stack {...LayoutProps} className="layout-class">
+          <Stack {...sandbox} className="newMeeting-class">
+            <Stack {...content}>
+              <Stack>
+                <Text {...headingProps}>{TeamsHeading} </Text>
+              </Stack>
+              <Stack style={{ overflow: "hidden" }}>
+                <Text {...descProps}>{TeamsDesc}</Text>
+              </Stack>
+              <Stack {...actionProps}>
+                <PrimaryButton {...videoCallActionProps} onClick={showModal} />
+              </Stack>
             </Stack>
           </Stack>
-          <Stack {...vertical}></Stack>
-          <Stack {...sandbox}>
-            <Stack>
-              <Text {...headingProps}>Meetings History</Text>
-            </Stack>
-            <Stack
-              {...descProps}
-              verticalAlign="center"
-              onClick={showAddMeetingModal}
-            >
-              <ActionButton {...newMeetingProps}>
-                <Text>Add new meeting</Text>
-              </ActionButton>
-            </Stack>
-            <Stack {...meetingListProps}>
-              <FocusZone direction={FocusZoneDirection.vertical}>
-                <div className={classNames.container} data-is-scrollable>
-                  <List items={meetingHistory} onRenderCell={onRenderCell} />
-                </div>
-              </FocusZone>
+          {/* <Stack {...vertical} className="verticalLine-class"></Stack> */}
+          <Stack {...sandbox} className="meetingHistory">
+            <Stack {...content}>
+              <Stack>
+                <Text {...headingProps}>Meetings History</Text>
+              </Stack>
+              <Stack
+                {...descProps}
+                verticalAlign="center"
+                onClick={showAddMeetingModal}
+              >
+                <ActionButton {...newMeetingProps}>
+                  <Text>Add new meeting</Text>
+                </ActionButton>
+              </Stack>
+              <Stack {...meetingListProps}>
+                <FocusZone direction={FocusZoneDirection.vertical}>
+                  <div className={classNames.container} data-is-scrollable>
+                    <List items={meetingHistory} onRenderCell={onRenderCell} />
+                  </div>
+                </FocusZone>
+              </Stack>
             </Stack>
           </Stack>
         </Stack>
