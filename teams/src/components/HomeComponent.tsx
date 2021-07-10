@@ -12,6 +12,7 @@ import {
   List,
   FocusZoneDirection,
   ResponsiveMode,
+  Icon,
 } from "@fluentui/react";
 import React, { useContext, useState } from "react";
 import {
@@ -110,10 +111,12 @@ export const HomeComponent: React.FunctionComponent = () => {
 
   const handleEmailInput = (e: any) => {
     setEmail(e.target.value);
+    if (emailError) setEmailError("");
   };
 
   const handleMeetingNameInput = (e: any) => {
     setMeetingName(e.target.value);
+    if (meetingNameError) setMeetingNameError("");
   };
 
   const checkEmailValidity = async (): Promise<any> => {
@@ -166,6 +169,7 @@ export const HomeComponent: React.FunctionComponent = () => {
                     meetingID: meetingID,
                     user1Email: auth.currentUser?.email,
                     user2Email: email,
+                    user2PhotoURL: doc.data()?.photoURL,
                     uid1: auth.currentUser?.uid,
                     uid2: doc.data()?.uid,
                   }),
@@ -179,6 +183,7 @@ export const HomeComponent: React.FunctionComponent = () => {
                     meetingID: meetingID,
                     user1Email: email,
                     user2Email: auth.currentUser?.email,
+                    user2PhotoURL: auth.currentUser?.photoURL,
                     uid1: doc.data()?.uid,
                     uid2: auth.currentUser?.uid,
                   }),
@@ -232,7 +237,33 @@ export const HomeComponent: React.FunctionComponent = () => {
           }}
           style={{ cursor: "pointer" }}
         >
-          <div className={classNames.itemName}>{item.meetingName}</div>
+          <Stack
+            className={classNames.itemName}
+            horizontal
+            horizontalAlign="space-between"
+          >
+            <Stack
+              horizontal
+              verticalAlign="center"
+              tokens={{ childrenGap: "10px" }}
+            >
+              <Stack>
+                <Icon iconName="calendar"></Icon>
+              </Stack>
+              <Stack>{item.meetingName}</Stack>
+            </Stack>
+
+            <Stack horizontal>
+              <Persona
+                imageUrl={auth.currentUser?.photoURL!}
+                size={PersonaSize.size24}
+              />
+              <Persona
+                imageUrl={item.user2PhotoURL}
+                size={PersonaSize.size24}
+              />
+            </Stack>
+          </Stack>
         </div>
       </div>
     );
@@ -372,11 +403,18 @@ export const HomeComponent: React.FunctionComponent = () => {
               <PrimaryButton
                 {...nextActionProps}
                 onClick={() => {
-                  console.log(email);
+                  // console.log(email);
                   handleNext(1);
                 }}
               />
-              <DefaultButton {...cancelActionProps} onClick={hideModal} />
+              <DefaultButton
+                {...cancelActionProps}
+                onClick={() => {
+                  setEmail("");
+                  setMeetingName("");
+                  hideModal();
+                }}
+              />
             </Stack>
           </Stack>
         </Stack>
@@ -452,7 +490,11 @@ export const HomeComponent: React.FunctionComponent = () => {
               <DefaultButton
                 {...cancelActionProps}
                 className="cancelAction-class"
-                onClick={hideAddMeetingModal}
+                onClick={() => {
+                  setEmail("");
+                  setMeetingName("");
+                  hideAddMeetingModal();
+                }}
               />
             </Stack>
           </Stack>

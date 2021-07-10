@@ -388,6 +388,9 @@ export const meetingListProps: IStackProps = {
   styles: {
     root: {
       width: "100%",
+      maxHeight: "300px",
+      overflow: "scroll",
+      overflowX: "hidden",
     },
   },
 };
