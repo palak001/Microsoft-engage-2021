@@ -3,14 +3,14 @@ import { IStackProps } from "@fluentui/react";
 export const signUpStackChildrenProps: IStackProps = {
   tokens: {
     padding: "50px",
-    childrenGap: "50px",
+    // childrenGap: "50px",
   },
-  verticalAlign: "center",
+  // verticalAlign: "center",
   horizontalAlign: "center",
   // verticalAlign: "space-evenly",
   styles: {
     root: {
-      height: "50%",
+      // height: "0%",
       backgroundColor: "#FFFFFF",
       border: "0.5px solid #E5E5E5",
       boxSizing: "border-box",
