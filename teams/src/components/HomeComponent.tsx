@@ -11,6 +11,7 @@ import {
   FocusZone,
   List,
   FocusZoneDirection,
+  ResponsiveMode,
 } from "@fluentui/react";
 import React, { useContext, useState } from "react";
 import {
@@ -262,7 +263,9 @@ export const HomeComponent: React.FunctionComponent = () => {
           <Stack {...sandbox} className="newMeeting-class">
             <Stack {...content}>
               <Stack>
-                <Text {...headingProps}>{TeamsHeading} </Text>
+                <Text {...headingProps} className="heading-class">
+                  {TeamsHeading}{" "}
+                </Text>
               </Stack>
               <Stack style={{ overflow: "hidden" }}>
                 <Text {...descProps}>{TeamsDesc}</Text>
@@ -276,7 +279,9 @@ export const HomeComponent: React.FunctionComponent = () => {
           <Stack {...sandbox} className="meetingHistory">
             <Stack {...content}>
               <Stack>
-                <Text {...headingProps}>Meetings History</Text>
+                <Text {...headingProps} className="heading-class">
+                  Meetings History
+                </Text>
               </Stack>
               <Stack
                 {...descProps}
@@ -383,6 +388,7 @@ export const HomeComponent: React.FunctionComponent = () => {
         isOpen={isAddMeetingModalOpen}
         onDismiss={hideAddMeetingModal}
         isModeless={true}
+        responsiveMode={ResponsiveMode.small}
       >
         <Stack {...container}>
           <Stack id={titleId}>
@@ -437,6 +443,7 @@ export const HomeComponent: React.FunctionComponent = () => {
             <Stack {...modalActionProps}>
               <PrimaryButton
                 {...nextActionProps}
+                className="nextAction-class"
                 onClick={() => {
                   console.log(email);
                   handleNext(0);
@@ -444,6 +451,7 @@ export const HomeComponent: React.FunctionComponent = () => {
               />
               <DefaultButton
                 {...cancelActionProps}
+                className="cancelAction-class"
                 onClick={hideAddMeetingModal}
               />
             </Stack>

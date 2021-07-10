@@ -60,7 +60,6 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
 
   const [camStatus, setCamStatus] = useState<string>("on");
   const [micStatus, setMicStatus] = useState<string>("on");
-  const [showChats, setShowChats] = useState<boolean>(false);
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] =
     useBoolean(false);
 
@@ -119,7 +118,7 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
       <Stack style={{ height: "90%" }}>
         <Stack
           style={{ height: "10%" }}
-          tokens={{ padding: "20px 50px 20px 50px" }}
+          tokens={{ padding: "10px 40px 10px 40px" }}
         >
           {mediaStreamError ? (
             <MessageBar messageBarType={MessageBarType.severeWarning}>

@@ -31,7 +31,7 @@ export const mainStack: IStackProps = {
 export const headerProps: IStackProps = {
   verticalAlign: "center",
   tokens: {
-    padding: "20px 50px 20px 50px",
+    padding: "10px 40px 10px 40px",
   },
   styles: {
     root: {
@@ -142,7 +142,7 @@ export const emailActionProps: Partial<ITextFieldProps> = {
   autoComplete: "false",
   styles: {
     root: {
-      width: "400px",
+      width: "100%",
     },
     icon: {
       fontSize: "20px",
@@ -155,7 +155,7 @@ export const meetingNameActionProps: Partial<ITextFieldProps> = {
   autoComplete: "false",
   styles: {
     root: {
-      width: "400px",
+      width: "100%",
     },
     icon: {
       fontSize: "20px",
@@ -266,19 +266,19 @@ export const modalProps: ITextProps = {
 export const modalActionProps: IStackProps = {
   horizontal: true,
   horizontalAlign: "space-between",
-  verticalAlign: "center",
+  // verticalAlign: "center",
   tokens: {
     padding: "0px 0px 10px 0px",
-    childrenGap: "150px",
+    childrenGap: "120px",
   },
 };
 
 export const modalStackProps: IStackProps = {
-  horizontalAlign: "center",
-  verticalAlign: "center",
+  // horizontalAlign: "center",
+  // verticalAlign: "center",
   tokens: {
-    padding: "30px 0px 0px 0px",
-    childrenGap: "50px",
+    padding: "20px 0px 0px 0px",
+    childrenGap: "30px",
   },
 };
 
@@ -289,8 +289,6 @@ export const modalStackChildProps: IStackProps = {
 };
 
 export const container: IStackProps = {
-  horizontalAlign: "center",
-  verticalAlign: "center",
   tokens: {
     padding: "25px",
   },
@@ -540,7 +538,7 @@ export const scrollablePaneProps: IScrollablePaneProps = {
 
 export const chatScreenProps: IStackProps = {
   tokens: {
-    padding: "20px 50px 20px 50px",
+    padding: "10px 40px 10px 40px",
     childrenGap: "20px",
   },
   styles: {

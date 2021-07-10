@@ -195,7 +195,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
 
   return (
     <Stack {...chatLayoutProps}>
-      <Stack {...headerProps} horizontal verticalAlign="center">
+      <Stack {...headerProps} horizontal>
         <Stack
           horizontal
           horizontalAlign="space-between"
@@ -235,14 +235,13 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
           )}
         </Stack>
       </Stack>
-
-      <Stack style={{ height: "87%" }} verticalAlign="end">
+      <Stack style={{ height: "90%" }} verticalAlign="end">
         <Stack
           horizontal
           horizontalAlign="space-between"
-          tokens={{ padding: "20px 50px 20px 50px" }}
+          tokens={{ padding: "10px 40px 10px 40px" }}
           style={{
-            height: "8%",
+            height: "6%",
             width: "100%",
           }}
         >
@@ -255,9 +254,6 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
           <Stack horizontal>
             <Persona
               imageUrl={auth.currentUser?.photoURL!}
-              // text={
-              //   auth.currentUser?.photoURL ? "" : auth.currentUser?.displayName!
-              // }
               size={PersonaSize.size24}
             />
             <Text style={{ color: "#646464" }}>You</Text>
@@ -266,7 +262,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
 
         <Stack
           style={{
-            height: "84%",
+            height: "88%",
             overflowY: "scroll",
             scrollbarWidth: "none",
             width: "100%",
@@ -301,7 +297,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
                   <Persona
                     imageUrl={receiverPhotoURL}
                     size={PersonaSize.size24}
-                    text={receiverName}
+                    // text={receiverName}
                     // styles={personaStyles}
                   />
                   <Stack {...neutralLight}>
@@ -313,17 +309,24 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
           </Stack>
         </Stack>
 
-        <Stack style={{ height: "8%" }} {...textStackProps}>
-          <TextField
-            {...textActionProps}
-            onChange={handleMessageInput}
-            value={message}
-          />
-          <IconButton
-            {...sendTextProps}
-            disabled={disabledSendBtn}
-            onClick={handleSendMsg}
-          />
+        <Stack
+          style={{ height: "6%" }}
+          {...textStackProps}
+          verticalAlign="center"
+          horizontalAlign="center"
+        >
+          <Stack horizontal style={{ width: "100%" }}>
+            <TextField
+              {...textActionProps}
+              onChange={handleMessageInput}
+              value={message}
+            />
+            <IconButton
+              {...sendTextProps}
+              disabled={disabledSendBtn}
+              onClick={handleSendMsg}
+            />
+          </Stack>
         </Stack>
       </Stack>
     </Stack>
