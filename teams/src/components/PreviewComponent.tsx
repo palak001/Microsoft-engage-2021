@@ -119,7 +119,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
         style={{ height: "90%", width: "100%" }}
       >
         <Stack
-          style={{ height: "5%", width: "100%" }}
+          style={{ height: "5%", width: "50%" }}
           tokens={{ padding: "0px 0px 20px 0px" }}
         >
           {mediaStreamError ? (

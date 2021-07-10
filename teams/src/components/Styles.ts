@@ -101,7 +101,7 @@ const videoCallIcon: IIconProps = { iconName: "PresenceChickletVideo" };
 
 export const videoCallActionProps: Partial<IButtonProps> = {
   iconProps: videoCallIcon,
-  text: "New Meeting",
+  text: "Start a Meeting",
   allowDisabledFocus: true,
   styles: {
     root: {
