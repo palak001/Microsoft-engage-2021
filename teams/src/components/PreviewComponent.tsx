@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import {
+  Icon,
   IStackProps,
   MessageBar,
   MessageBarType,
@@ -15,20 +16,21 @@ import {
 } from "@fluentui/react-icons-northstar";
 import { SocketContext } from "../SockectContext";
 import FirebaseUser from "../interfaces/user.interface";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux-store";
+import { auth } from "../config/firebase";
+import { useEffect } from "react";
+import { useHistory } from "react-router";
+import { setControlsAction } from "../redux-store/Video/ControlsReducer";
+import "./MediaQueryStyles.css";
 
 const previewStackProps: IStackProps = {
-  tokens: {
-    padding: "50px",
-    childrenGap: "20px",
-  },
-  verticalAlign: "center",
-  horizontalAlign: "center",
+  // verticalAlign: "center",
+  // horizontalAlign: "center",
   styles: {
     root: {
-      height: "60%",
-      width: "35%",
+      height: "400px",
+      width: "400px",
       backgroundColor: "#FFFFFF",
       border: "0.5px solid #E5E5E5",
       boxSizing: "border-box",
@@ -41,17 +43,32 @@ const previewStackProps: IStackProps = {
 
 export const PreviewComponent: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
+  const dispatch = useDispatch();
   const enteredUserDetails: FirebaseUser = useSelector(
     (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
   );
   const mediaStreamError: string = useSelector(
     (state: RootState) => state.mediaStreamErrorReducer.mediaStreamError
   );
+  const history = useHistory();
 
   const [toggleMicStatus, setToggleMicStatus] = useState<string>("on");
   const [toggleCamStatus, setToggleCamStatus] = useState<string>("on");
+  const [disableIcons, setDisableIcons] = useState<boolean>(true);
+
+  useEffect(() => {
+    console.log();
+    if (context.stream || mediaStreamError) {
+      setDisableIcons(false);
+    }
+  }, [context.stream, mediaStreamError]);
 
   const handleOnCamToggle = () => {
+    if (toggleCamStatus === "on") {
+      dispatch(setControlsAction({ camera: "off", mic: toggleMicStatus }));
+    } else {
+      dispatch(setControlsAction({ camera: "on", mic: toggleMicStatus }));
+    }
     toggleCamStatus === "on"
       ? setToggleCamStatus("off")
       : setToggleCamStatus("on");
@@ -59,6 +76,11 @@ export const PreviewComponent: React.FunctionComponent = () => {
   };
 
   const handleOnMicToggle = () => {
+    if (toggleMicStatus === "on") {
+      dispatch(setControlsAction({ mic: "off", camera: toggleCamStatus }));
+    } else {
+      dispatch(setControlsAction({ mic: "on", camera: toggleCamStatus }));
+    }
     toggleMicStatus === "on"
       ? setToggleMicStatus("off")
       : setToggleMicStatus("on");
@@ -73,60 +95,85 @@ export const PreviewComponent: React.FunctionComponent = () => {
   };
 
   return (
-    <>
+    <Stack style={{ height: "100%" }}>
+      {/* Back Icon */}
       <Stack
-        horizontalAlign="center"
+        horizontalAlign="start"
         verticalAlign="center"
-        style={{ height: "100%" }}
+        style={{ height: "10%" }}
+        tokens={{ padding: "30px, 40px, 120px, 40px" }}
       >
-        <Stack tokens={{ padding: "0px 0px 30px 0px" }}>
+        <Icon
+          iconName="Back"
+          style={{ cursor: "pointer", fontWeight: "bolder" }}
+          onClick={() => {
+            context.stopMediaTracks();
+            history.push("/");
+          }}
+        />
+      </Stack>
+
+      <Stack
+        verticalAlign="center"
+        horizontalAlign="center"
+        style={{ height: "90%", width: "100%" }}
+      >
+        <Stack
+          style={{ height: "5%", width: "100%" }}
+          tokens={{ padding: "0px 0px 20px 0px" }}
+        >
           {mediaStreamError ? (
             <MessageBar messageBarType={MessageBarType.severeWarning}>
               {mediaStreamError}
             </MessageBar>
           ) : (
-            ""
+            <></>
           )}
         </Stack>
-        <Stack {...previewStackProps}>
-          <Stack style={{ height: "90%", width: "100%" }}>
+        <Stack {...previewStackProps} className="previewStack-class">
+          <Stack
+            horizontalAlign="center"
+            verticalAlign="center"
+            tokens={{ padding: "20px" }}
+            style={{ height: "80%" }}
+          >
             <video
               width="100%"
               height="100%"
               playsInline
               ref={context.yourVideo}
               style={{ objectFit: "cover" }}
-              poster={enteredUserDetails.photoURL}
+              poster={auth.currentUser?.photoURL!}
               autoPlay
             />
           </Stack>
-          <Stack horizontal horizontalAlign="center" style={{ width: "100%" }}>
-            <Stack
-              horizontal
-              verticalAlign="center"
-              tokens={{ padding: "12px", childrenGap: "5px" }}
-            >
-              <Stack verticalAlign="center" style={{ width: "30px" }}>
-                {toggleCamStatus === "on" ? (
-                  <CallVideoIcon size="smaller" />
-                ) : (
-                  <CallVideoOffIcon size="smaller" />
-                )}
-              </Stack>
-              <Stack verticalAlign="center">
-                <Toggle
-                  defaultChecked
-                  onChange={handleOnCamToggle}
-                  ariaLabel="Video Icon"
-                />
-              </Stack>
+          <Stack
+            horizontal
+            horizontalAlign="center"
+            style={{ width: "100%" }}
+            tokens={{ padding: "10px" }}
+          >
+            <Stack verticalAlign="center" style={{ width: "15px" }}>
+              {toggleCamStatus === "on" ? (
+                <CallVideoIcon size="smaller" />
+              ) : (
+                <CallVideoOffIcon size="smaller" />
+              )}
+            </Stack>
+            <Stack verticalAlign="center">
+              <Toggle
+                defaultChecked
+                onChange={handleOnCamToggle}
+                ariaLabel="Video Icon"
+                disabled={disableIcons}
+              />
             </Stack>
             <Stack
               horizontal
               verticalAlign="center"
               tokens={{ padding: "10px" }}
             >
-              <Stack verticalAlign="center" style={{ width: "30px" }}>
+              <Stack verticalAlign="center" style={{ width: "15px" }}>
                 {toggleMicStatus === "on" ? (
                   <MicIcon size="smaller" />
                 ) : (
@@ -138,26 +185,21 @@ export const PreviewComponent: React.FunctionComponent = () => {
                   defaultChecked
                   ariaLabel="Microphone Icon"
                   onChange={handleOnMicToggle}
-                />
-              </Stack>
-              <Stack verticalAlign="center" tokens={{ padding: "20px" }}>
-                <PrimaryButton
-                  text="Join"
-                  allowDisabledFocus
-                  onClick={handleJoin}
+                  disabled={disableIcons}
                 />
               </Stack>
             </Stack>
             <Stack verticalAlign="center" tokens={{ padding: "10px" }}>
               <PrimaryButton
-                text="Leave"
+                text="Join"
                 allowDisabledFocus
-                onClick={context.leaveCall}
+                onClick={handleJoin}
+                disabled={disableIcons}
               />
             </Stack>
           </Stack>
         </Stack>
       </Stack>
-    </>
+    </Stack>
   );
 };

@@ -7,7 +7,7 @@ import {
   PrimaryButton,
   Stack,
 } from "@fluentui/react";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Panel } from "@fluentui/react/lib/Panel";
 import {
   IPersonaSharedProps,
@@ -25,10 +25,11 @@ import {
 import { auth } from "../config/firebase";
 import { SocketContext } from "../SockectContext";
 import Video from "./Video/Video";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux-store";
 import { useBoolean } from "@fluentui/react-hooks";
 import { ChatComponent } from "./ChatComponent";
+import { setControlsAction } from "../redux-store/Video/ControlsReducer";
 
 export interface MediaControlsProps {
   micActive: boolean;
@@ -54,23 +55,33 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
   };
 
   const context = useContext(SocketContext);
+  const dispatch = useDispatch();
   const mediaStreamError: string = useSelector(
     (state: RootState) => state.mediaStreamErrorReducer.mediaStreamError
   );
 
-  const [camStatus, setCamStatus] = useState<string>("on");
-  const [micStatus, setMicStatus] = useState<string>("on");
+  const globalCamStatus: string = useSelector(
+    (state: RootState) => state.controlsReducer.camera
+  );
+  const globalMicStatus: string = useSelector(
+    (state: RootState) => state.controlsReducer.mic
+  );
+
+  const [camStatus, setCamStatus] = useState<string>(globalCamStatus);
+  const [micStatus, setMicStatus] = useState<string>(globalMicStatus);
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] =
     useBoolean(false);
 
   const handleOnCamClick = () => {
     camStatus === "on" ? setCamStatus("off") : setCamStatus("on");
     context.toggleVideoSettings();
+    dispatch(setControlsAction({ mic: micStatus, camera: camStatus }));
   };
 
   const handleOnMicClick = () => {
     micStatus === "on" ? setMicStatus("off") : setMicStatus("on");
     context.toggleAudioSettings();
+    dispatch(setControlsAction({ mic: micStatus, camera: camStatus }));
   };
 
   return (

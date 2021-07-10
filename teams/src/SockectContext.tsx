@@ -42,6 +42,7 @@ interface IContext {
   sendChatMessage: (chat: any) => void;
   setAcceptingCallToTrue: () => void;
   setStartingCallToTrue: () => void;
+  stopMediaTracks: () => void;
 }
 
 export const SocketContext = React.createContext({} as IContext);
@@ -196,7 +197,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     socket.current.on("callEnded", () => {
-      stopMediaTracks(stream);
+      // stopMediaTracks(stream);
+      stopMediaTracks();
+
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
@@ -206,7 +209,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     socket.current.on("callRejected", () => {
-      stopMediaTracks(stream);
+      // stopMediaTracks(stream);
+      stopMediaTracks();
+
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
@@ -253,7 +258,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     peer.signal(JSON.stringify(callDetails.signal));
 
     socket.current.on("callEnded", () => {
-      stopMediaTracks(stream);
+      // stopMediaTracks(stream);
+      stopMediaTracks();
+
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
@@ -262,7 +269,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
 
     socket.current.on("callRejected", () => {
-      stopMediaTracks(stream);
+      // stopMediaTracks(stream);
+      stopMediaTracks();
+
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
@@ -274,7 +283,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   const leaveCall = () => {
     // To switch your webcam light!
-    stopMediaTracks(stream);
+    // stopMediaTracks(stream);
+    stopMediaTracks();
 
     setCallEnded(true);
     if (connectionRef.current) connectionRef.current.destroy();
@@ -289,7 +299,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   const rejectCall = () => {
     // To switch your webcam light!
-    stopMediaTracks(stream);
+    // stopMediaTracks(stream);
+    stopMediaTracks();
     setCallRejected(true);
     if (connectionRef.current) connectionRef.current.destroy();
     setCallAccepted(false);
@@ -392,9 +403,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     }
   };
 
-  const stopMediaTracks = (currentStream: any) => {
-    if (currentStream) {
-      currentStream.getTracks().forEach(function (track: any) {
+  const stopMediaTracks = () => {
+    // currentStream: any
+    if (stream) {
+      stream.getTracks().forEach(function (track: any) {
         track.stop();
       });
       if (yourVideo.current) yourVideo.current.srcObject = null;
@@ -447,6 +459,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
         sendChatMessage,
         setStartingCallToTrue,
         setAcceptingCallToTrue,
+        stopMediaTracks,
       }}
     >
       {children}
