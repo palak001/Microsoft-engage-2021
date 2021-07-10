@@ -200,6 +200,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
+      history.push("/");
+
       window.location.reload();
     });
 
@@ -208,6 +210,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
+      history.push("/");
+
       // setCallDetails(null);
       window.location.reload();
     });
@@ -253,6 +257,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
+      history.push("/");
       window.location.reload();
     });
 
@@ -261,6 +266,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
+      history.push("/");
       window.location.reload();
     });
     // });
@@ -277,6 +283,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setCallStarted(false);
     setGettingCall(false);
     socket.current.emit("callEnded", { to: otherPersonID });
+    history.push("/");
     window.location.reload();
   };
 
@@ -289,6 +296,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setCallStarted(false);
     setGettingCall(false);
     socket.current.emit("callRejected", { to: otherPersonID });
+    history.push("/");
     window.location.reload();
   };
 

@@ -1,10 +1,12 @@
-import { Persona, PersonaSize, Stack } from "@fluentui/react";
+import { Persona, PersonaSize, Stack, Image } from "@fluentui/react";
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
 import FirebaseUser from "../../interfaces/user.interface";
 import { RootState } from "../../redux-store";
 import { SocketContext } from "../../SockectContext";
 import { friendVideoStackProps, yourVideoStackProps } from "./Video.styles";
+import personaSVG from "../../assets/persona.svg";
+import { imageStyleProps, personaStyle } from "../Styles";
 
 const Video: React.FunctionComponent = () => {
   const context = useContext(SocketContext);
@@ -15,43 +17,33 @@ const Video: React.FunctionComponent = () => {
   const enteredUserDetails: FirebaseUser = useSelector(
     (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
   );
+  const imageProps = { src: personaSVG.toString() };
 
   return (
-    <Stack verticalFill>
+    <Stack style={{ width: "100%", height: "100%" }}>
       <Stack {...yourVideoStackProps}>
         <video
           width="100%"
           height="100%"
           playsInline
           ref={context.yourVideo}
-          style={{ objectFit: "cover" }}
+          // style={{ objectFit: "cover" }}
+          poster={imageProps.src}
           muted
           autoPlay
         />
       </Stack>
+
       <Stack {...friendVideoStackProps}>
-        {context.callStarted && !context.callAccepted ? (
-          <Stack
-            horizontalAlign="center"
-            verticalAlign="center"
-            style={{ width: "100%", height: "100%" }}
-          >
-            <Persona
-              imageUrl={enteredUserDetails.photoURL}
-              size={PersonaSize.size72}
-              imageAlt="Palak, status is online"
-            />
-          </Stack>
-        ) : (
-          <video
-            width="100%"
-            height="100%"
-            playsInline
-            ref={context.friendVideo}
-            style={{ objectFit: "cover" }}
-            autoPlay
-          />
-        )}
+        <video
+          width="100%"
+          height="100%"
+          playsInline
+          ref={context.friendVideo}
+          // style={{ objectFit: "cover" }}
+          poster={imageProps.src}
+          autoPlay
+        />
       </Stack>
     </Stack>
   );

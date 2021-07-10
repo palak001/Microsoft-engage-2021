@@ -36,6 +36,7 @@ export const headerProps: IStackProps = {
   styles: {
     root: {
       width: "100%",
+      height: "10%",
     },
   },
 };
@@ -87,7 +88,13 @@ export const personaLayoutProps: IStackProps = {
   horizontal: true,
   horizontalAlign: "center",
   verticalAlign: "center",
-  tokens: { padding: "5% 0 0 0" },
+  // tokens: { padding: "5% 0 0 0" },
+  styles: {
+    root: {
+      width: "100%",
+      height: "100%",
+    },
+  },
 };
 
 const videoCallIcon: IIconProps = { iconName: "PresenceChickletVideo" };
@@ -443,7 +450,7 @@ export const videoCallProps: IStackProps = {
   verticalAlign: "center",
   styles: {
     root: {
-      width: "2rem",
+      width: "20px",
       fill: "#0078d4",
     },
   },

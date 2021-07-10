@@ -58,6 +58,8 @@ import MeetingHistory from "../interfaces/meetingHistory.interface";
 import { RootState } from "../redux-store";
 import { CallNotification } from "./CallNotification/CallNotification";
 import "./MediaQueryStyles.css";
+import { fetchMeetingHistory } from "../services/firebase/FetchMeetingHistory";
+import { fetchMeetingHistoryAction } from "../redux-store/Firebase/MeetingHistoryReducer";
 
 const TeamsHeading = "Microsoft Teams Meetings";
 const TeamsDesc = "Try video calling or chat, your call!";
@@ -180,6 +182,11 @@ export const HomeComponent: React.FunctionComponent = () => {
                     uid2: auth.currentUser?.uid,
                   }),
                 });
+
+              // Dispatch the event of adding meeting history
+              fetchMeetingHistory().then((result: Array<MeetingHistory>) => {
+                dispatch(fetchMeetingHistoryAction(result));
+              });
 
               if (flag) {
                 context.getUserMediaFunction();
@@ -317,6 +324,7 @@ export const HomeComponent: React.FunctionComponent = () => {
                 {...meetingNameActionProps}
                 value={meetingName}
                 onChange={handleMeetingNameInput}
+                maxLength={20}
               />
               {meetingNameError !== "" ? (
                 <MessageBar
@@ -387,6 +395,7 @@ export const HomeComponent: React.FunctionComponent = () => {
                 {...meetingNameActionProps}
                 value={meetingName}
                 onChange={handleMeetingNameInput}
+                maxLength={20}
               />
               {meetingNameError !== "" ? (
                 <MessageBar

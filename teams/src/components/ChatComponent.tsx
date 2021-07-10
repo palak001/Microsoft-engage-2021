@@ -8,12 +8,7 @@ import {
   Text,
 } from "@fluentui/react";
 import React, { useEffect, useState } from "react";
-import {
-  IPersonaSharedProps,
-  Persona,
-  PersonaSize,
-  PersonaPresence,
-} from "@fluentui/react/lib/Persona";
+import { Persona, PersonaSize } from "@fluentui/react/lib/Persona";
 import {
   headerProps,
   // personaStyles,
@@ -34,7 +29,6 @@ import qs from "qs";
 import firebase from "firebase";
 import { useContext } from "react";
 import { SocketContext } from "../SockectContext";
-import { enteredUserDetailsReducer } from "../redux-store/Firebase/EnteredUserDetailsReducer";
 import FirebaseUser from "../interfaces/user.interface";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux-store";
@@ -54,16 +48,13 @@ interface Chats {
   message: Chat[];
 }
 
-const getWindowDimensions = () => {
-  console.log("now whatQ");
-  const { innerWidth: width, innerHeight: height } = window;
-  return {
-    width,
-    height,
-  };
-};
+interface ChatsProps {
+  options: string;
+}
 
-export const ChatComponent: React.FunctionComponent = () => {
+export const ChatComponent: React.FunctionComponent<ChatsProps> = (
+  props: ChatsProps
+) => {
   initializeIcons();
   const history = useHistory();
   const [message, setMessage] = useState<string>("");
@@ -77,23 +68,11 @@ export const ChatComponent: React.FunctionComponent = () => {
   const [initChat, setInitChat] = useState<Chats>({ message: [] });
   const [receiverPhotoURL, setReceiverPhotoURL] = useState<string>("");
   const [receiverName, setReceiverName] = useState<string>("");
+  const [disabledSendBtn, setDisabledSendBtn] = useState<boolean>(true);
 
   const enteredUserDetails: FirebaseUser = useSelector(
     (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
   );
-
-  const [windowDimensions, setWindowDimensions] = useState(
-    getWindowDimensions()
-  );
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowDimensions(getWindowDimensions());
-    }
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   useEffect(() => {
     const participantsEmail = {
@@ -163,44 +142,45 @@ export const ChatComponent: React.FunctionComponent = () => {
     });
   }, [context.socket, teamsChat.message]);
 
-  const friendPersona: IPersonaSharedProps = {
-    imageUrl: receiverPhotoURL,
-    text: receiverName,
-    secondaryText: receiverEmailID,
-    // tertiaryText: "In a meeting",
-  };
-
   const handleSendMsg = async () => {
-    if (message === "") {
-      console.log("not allowed");
-    }
-    db.collection("meetings")
-      .doc(`${queryParameter.meetingID}`)
-      .update({
-        meetingHistory: firebase.firestore.FieldValue.arrayUnion({
-          message: message,
-          from: auth.currentUser?.email,
-          time: firebase.firestore.Timestamp.now(),
-        }),
+    let tempMessage = message;
+    tempMessage.trim();
+    if (tempMessage === "") {
+      setMessage("");
+      setDisabledSendBtn(true);
+    } else {
+      db.collection("meetings")
+        .doc(`${queryParameter.meetingID}`)
+        .update({
+          meetingHistory: firebase.firestore.FieldValue.arrayUnion({
+            message: message,
+            from: auth.currentUser?.email,
+            time: firebase.firestore.Timestamp.now(),
+          }),
+        });
+
+      setTeamsChat({
+        message: [
+          ...teamsChat.message,
+          { content: message, time: "1", sender: SenderType.self },
+        ],
       });
 
-    setTeamsChat({
-      message: [
-        ...teamsChat.message,
-        { content: message, time: "1", sender: SenderType.self },
-      ],
-    });
+      // Emit socket event
+      context.sendChatMessage({
+        message: message,
+        receiverEmail: receiverEmailID,
+      });
 
-    // Emit socket event
-    context.sendChatMessage({
-      message: message,
-      receiverEmail: receiverEmailID,
-    });
-
-    setMessage("");
+      setMessage("");
+      setDisabledSendBtn(true);
+    }
   };
 
   const handleMessageInput = (e: any) => {
+    if (e.target.value.trim() !== "") {
+      setDisabledSendBtn(false);
+    } else setDisabledSendBtn(true);
     setMessage(e.target.value);
   };
 
@@ -215,7 +195,7 @@ export const ChatComponent: React.FunctionComponent = () => {
 
   return (
     <Stack {...chatLayoutProps}>
-      <Stack {...headerProps} horizontal>
+      <Stack {...headerProps} horizontal verticalAlign="center">
         <Stack
           horizontal
           horizontalAlign="space-between"
@@ -226,23 +206,33 @@ export const ChatComponent: React.FunctionComponent = () => {
             verticalAlign="center"
             tokens={{ childrenGap: "20px" }}
           >
-            <Icon
-              iconName="Back"
-              style={{ cursor: "pointer" }}
-              onClick={() => history.push("/")}
-            />
+            {props.options === "none" ? (
+              <></>
+            ) : (
+              <Icon
+                iconName="Back"
+                style={{ cursor: "pointer" }}
+                onClick={() => history.push("/")}
+              />
+            )}
+
             <Stack>
               <Text {...chatHeadingProps} className="meetingName">
                 {meetingName}
               </Text>
             </Stack>
           </Stack>
-
-          <CommandButton>
-            <Stack {...videoCallProps} onClick={handleVideoCall}>
-              <CallVideoIcon size="medium" style={{}} />
+          {props.options === "none" ? (
+            <></>
+          ) : (
+            <Stack>
+              <CommandButton>
+                <Stack {...videoCallProps} onClick={handleVideoCall}>
+                  <CallVideoIcon size="medium" />
+                </Stack>
+              </CommandButton>
             </Stack>
-          </CommandButton>
+          )}
         </Stack>
       </Stack>
 
@@ -265,11 +255,15 @@ export const ChatComponent: React.FunctionComponent = () => {
           <Stack horizontal>
             <Persona
               imageUrl={auth.currentUser?.photoURL!}
+              // text={
+              //   auth.currentUser?.photoURL ? "" : auth.currentUser?.displayName!
+              // }
               size={PersonaSize.size24}
             />
             <Text style={{ color: "#646464" }}>You</Text>
           </Stack>
         </Stack>
+
         <Stack
           style={{
             height: "84%",
@@ -294,7 +288,9 @@ export const ChatComponent: React.FunctionComponent = () => {
             {teamsChat?.message?.map((chat: Chat) =>
               chat.sender === SenderType.self ? (
                 <Stack horizontalAlign="end">
-                  <Stack {...duskLight}>{chat.content}</Stack>
+                  <Stack {...duskLight}>
+                    <Text>{chat.content}</Text>
+                  </Stack>
                 </Stack>
               ) : (
                 <Stack
@@ -305,9 +301,12 @@ export const ChatComponent: React.FunctionComponent = () => {
                   <Persona
                     imageUrl={receiverPhotoURL}
                     size={PersonaSize.size24}
+                    text={receiverName}
                     // styles={personaStyles}
                   />
-                  <Stack {...neutralLight}>{chat.content}</Stack>
+                  <Stack {...neutralLight}>
+                    <Text>{chat.content}</Text>
+                  </Stack>
                 </Stack>
               )
             )}
@@ -320,7 +319,11 @@ export const ChatComponent: React.FunctionComponent = () => {
             onChange={handleMessageInput}
             value={message}
           />
-          <IconButton {...sendTextProps} onClick={handleSendMsg} />
+          <IconButton
+            {...sendTextProps}
+            disabled={disabledSendBtn}
+            onClick={handleSendMsg}
+          />
         </Stack>
       </Stack>
     </Stack>
