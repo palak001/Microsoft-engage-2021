@@ -10,13 +10,15 @@ export const signUpStackChildrenProps: IStackProps = {
   // verticalAlign: "space-evenly",
   styles: {
     root: {
-      // height: "0%",
+      height: "60%",
       backgroundColor: "#FFFFFF",
       border: "0.5px solid #E5E5E5",
       boxSizing: "border-box",
       boxShadow:
         "0px 1.6px 3.6px rgba(0, 0, 0, 0.132), 0px 0.3px 0.9px rgba(0, 0, 0, 0.108)",
       borderRadius: "4px",
+      overflow: "scroll",
+      overflowX: "hidden",
     },
   },
 };

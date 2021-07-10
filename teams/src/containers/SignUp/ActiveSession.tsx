@@ -1,10 +1,11 @@
-import { PrimaryButton, Stack, Text } from "@fluentui/react";
+import { Icon, PrimaryButton, Stack, Text } from "@fluentui/react";
 import React from "react";
 import { useContext } from "react";
 import { useHistory } from "react-router";
 import { auth } from "../../config/firebase";
 import { SocketContext } from "../../SockectContext";
 import { signUpStackChildrenProps, signUpStackProps } from "./SignUp.styles";
+import "../../components/MediaQueryStyles.css";
 
 export const ActiveSession: React.FunctionComponent = () => {
   const history = useHistory();
@@ -17,13 +18,22 @@ export const ActiveSession: React.FunctionComponent = () => {
   };
   return (
     <Stack {...signUpStackProps}>
-      <Stack {...signUpStackChildrenProps} style={{ maxWidth: "60%" }}>
+      <Stack
+        {...signUpStackChildrenProps}
+        style={{ maxWidth: "90%" }}
+        className="activeSession-class"
+      >
+        <Icon
+          iconName="AlertSolid"
+          style={{ color: "Red", fontSize: "35px" }}
+        ></Icon>
         <Text
           style={{
-            fontSize: "35px",
+            fontSize: "30px",
             fontStyle: "normal",
             fontWeight: "normal",
           }}
+          className="activeSessionText-class"
         >
           You already have an active session.
         </Text>
@@ -49,8 +59,8 @@ export const ActiveSession: React.FunctionComponent = () => {
               You might be trying to access the Application in multiple
               browsers/devices using same google account. Please make sure to
               use two different accounts to access the application. As per the
-              intended functionality you cannot chat or video call using same
-              accounts at both end.
+              intended functionality each user is restricted to only one active
+              session at a time.
             </Text>
           </li>
 
@@ -77,7 +87,7 @@ export const ActiveSession: React.FunctionComponent = () => {
         </ul>
         {/* <h5>Already have an account? Sign in here</h5> */}
 
-        <PrimaryButton onClick={handleSignOut}>
+        <PrimaryButton onClick={handleSignOut} style={{ padding: "8px" }}>
           Sign Out all sessions from this browser
         </PrimaryButton>
       </Stack>
