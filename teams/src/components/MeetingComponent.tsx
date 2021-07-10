@@ -142,19 +142,19 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
         <Stack style={{ height: "90%" }} {...personaLayoutProps}>
           <Video />
         </Stack>
-        <Stack>
-          <Panel
-            headerText="Chats"
-            // this prop makes the panel non-modal
-            isBlocking={false}
-            isOpen={isOpen}
-            onDismiss={dismissPanel}
-            closeButtonAriaLabel="Close"
-            type={PanelType.medium}
-          >
+        <Panel
+          headerText="Chats"
+          // this prop makes the panel non-modal
+          isBlocking={false}
+          isOpen={isOpen}
+          onDismiss={dismissPanel}
+          closeButtonAriaLabel="Close"
+          type={PanelType.medium}
+        >
+          <Stack verticalFill>
             <ChatComponent options={"none"} />
-          </Panel>
-        </Stack>
+          </Stack>
+        </Panel>
       </Stack>
     </Stack>
   );
