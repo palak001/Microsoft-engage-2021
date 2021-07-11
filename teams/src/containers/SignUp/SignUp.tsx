@@ -25,8 +25,11 @@ export const SignUp: React.FunctionComponent = () => {
   };
 
   return (
-    <Stack {...signUpStackProps}>
-      <Stack {...signUpStackChildrenProps}>
+    <Stack {...signUpStackProps} style={{ height: "50%" }}>
+      <Stack
+        {...signUpStackChildrenProps}
+        tokens={{ childrenGap: "40px", padding: "35px" }}
+      >
         <Stack horizontalAlign="center">
           <Icon
             iconName={"Signin"}

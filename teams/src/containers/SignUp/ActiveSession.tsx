@@ -17,7 +17,10 @@ export const ActiveSession: React.FunctionComponent = () => {
     });
   };
   return (
-    <Stack {...signUpStackProps}>
+    <Stack
+      {...signUpStackProps}
+      style={{ overflow: "scroll", overflowX: "hidden" }}
+    >
       <Stack
         {...signUpStackChildrenProps}
         style={{ maxWidth: "90%" }}

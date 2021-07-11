@@ -17,8 +17,6 @@ export const signUpStackChildrenProps: IStackProps = {
       boxShadow:
         "0px 1.6px 3.6px rgba(0, 0, 0, 0.132), 0px 0.3px 0.9px rgba(0, 0, 0, 0.108)",
       borderRadius: "4px",
-      overflow: "scroll",
-      overflowX: "hidden",
     },
   },
 };
