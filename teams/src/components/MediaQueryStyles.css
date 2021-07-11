@@ -42,3 +42,16 @@
     font-size: 20px;
   }
 }
+
+@media (max-width: 500px) {
+  .callNotification-class {
+    padding: 20px;
+    background: #fafafa;
+    color: #1c1c1c;
+    position: absolute;
+    top: 70%;
+    width: 70%;
+    left: 30%;
+    height: 30%;
+  }
+}

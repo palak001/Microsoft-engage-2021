@@ -586,3 +586,24 @@ export const duskLight: IStackProps = {
     },
   },
 };
+
+export const callWidget: IStackProps = {
+  verticalAlign: "center",
+  horizontalAlign: "center",
+  tokens: {
+    // padding: "70vh 0vh 0vh 0vh",
+  },
+  styles: {
+    root: {
+      background: "#FAFAFA",
+      color: "#1C1C1C",
+      // width: "250px",
+      // height: "300px",
+      position: "absolute",
+      top: "70%",
+      width: "30%",
+      left: "70%",
+      height: "30%",
+    },
+  },
+};

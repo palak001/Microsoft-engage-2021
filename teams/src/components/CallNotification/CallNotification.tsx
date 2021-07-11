@@ -10,6 +10,8 @@ import { Text } from "@fluentui/react/lib/Text";
 import { SocketContext } from "../../SockectContext";
 import { useHistory } from "react-router";
 import { auth } from "../../config/firebase";
+import "../MediaQueryStyles.css";
+import { callWidget } from "../Styles";
 
 const stackTokens: IStackTokens = { childrenGap: 40 };
 
@@ -18,20 +20,7 @@ export const CallNotification: React.FunctionComponent = () => {
   const history = useHistory();
 
   return (
-    <Stack
-      verticalAlign="space-around"
-      horizontalAlign="center"
-      style={{
-        position: "absolute",
-        top: "70%",
-        left: "80%",
-        width: "20%",
-        height: "30%",
-        background: "#FAFAFA",
-        // opacity: "0.75",
-        color: "#1C1C1C",
-      }}
-    >
+    <Stack className="callNotification-class" {...callWidget}>
       <Stack horizontalAlign="center">
         <Persona
           imageUrl={context.callDetails.photoURL}
@@ -41,8 +30,8 @@ export const CallNotification: React.FunctionComponent = () => {
         />
         <Text style={{ color: "#1C1C1C" }} variant={"xLarge"}>
           {context.callDetails.name} is calling...
-          {console.log(context.callDetails)};
         </Text>
+        <br />
       </Stack>
 
       <Stack horizontal tokens={stackTokens}>
