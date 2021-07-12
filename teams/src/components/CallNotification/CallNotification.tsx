@@ -25,7 +25,6 @@ export const CallNotification: React.FunctionComponent = () => {
         <Persona
           imageUrl={context.callDetails.photoURL}
           size={PersonaSize.size56}
-          // presence={PersonaPresence.online}
           imageAlt="Palak, status is online"
         />
         <Text style={{ color: "#1C1C1C" }} variant={"xLarge"}>
@@ -39,6 +38,7 @@ export const CallNotification: React.FunctionComponent = () => {
           style={{ backgroundColor: "#0064BF", color: "white" }}
           text="Accept"
           onClick={() => {
+            // Get user's media and direct them to proper link
             context.getUserMediaFunction();
             context.setAcceptingCallToTrue();
             history.push(

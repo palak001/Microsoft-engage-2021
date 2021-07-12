@@ -13,6 +13,7 @@ export const SignUp: React.FunctionComponent = () => {
   const history = useHistory();
   initializeIcons();
 
+  // Sign in with google
   const signInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
     if (error !== "") setError("");
     SignInWithSocialMedia(provider)

@@ -15,6 +15,8 @@ import {
   ScrollbarVisibility,
 } from "@fluentui/react";
 
+// Contains all major styles
+
 export const mainStack: IStackProps = {
   styles: {
     root: {
@@ -23,10 +25,6 @@ export const mainStack: IStackProps = {
     },
   },
 };
-
-// export const personaStyles: Partial<IPersonaStyles> = {
-//   root: { margin: "0 0 0 0" },
-// };
 
 export const headerProps: IStackProps = {
   verticalAlign: "center",

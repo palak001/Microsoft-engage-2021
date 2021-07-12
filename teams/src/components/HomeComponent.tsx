@@ -79,9 +79,6 @@ export const HomeComponent: React.FunctionComponent = () => {
   const meetingHistory: Array<MeetingHistory> = useSelector(
     (state: RootState) => state.meetingHistoryReducer.meetingHistory
   );
-  // const enteredUserDetails: FirebaseUser = useSelector(
-  //   (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
-  // );
 
   // Local States
   const [email, setEmail] = useState<string>("");
@@ -95,6 +92,8 @@ export const HomeComponent: React.FunctionComponent = () => {
     isAddMeetingModalOpen,
     { setTrue: showAddMeetingModal, setFalse: hideAddMeetingModal },
   ] = useBoolean(false);
+
+  /* persona */
   const examplePersona: IPersonaSharedProps = {
     imageUrl: auth.currentUser?.photoURL!,
     text: auth.currentUser?.displayName!,
@@ -102,6 +101,7 @@ export const HomeComponent: React.FunctionComponent = () => {
   };
   const titleId = useId("title");
 
+  /* handle signOut */
   const handleSignOut = () => {
     auth.signOut().then(() => {
       context.socket.current.emit("signOut");
@@ -137,6 +137,7 @@ export const HomeComponent: React.FunctionComponent = () => {
     }
   };
 
+  /* Handle things to occur on clicking next in modal shown by start new meeting btn */
   const handleNext = async (flag: any) => {
     await checkEmailValidity().then(async () => {
       if (
@@ -160,6 +161,7 @@ export const HomeComponent: React.FunctionComponent = () => {
                 meetingName: meetingName,
               });
 
+              /* Add meeting related information in both users document */
               // user 1
               db.collection("users")
                 .doc(auth.currentUser?.email + "")
@@ -194,10 +196,10 @@ export const HomeComponent: React.FunctionComponent = () => {
                 dispatch(fetchMeetingHistoryAction(result));
               });
 
+              /* Flag is used to differentiate the action to be performed on clicking next on both the modals */
               if (flag) {
                 context.getUserMediaFunction();
                 context.setStartingCallToTrue();
-                // important *****************************************************
                 history.push(
                   `/meeting?uid1=${auth.currentUser?.uid}&uid2=${
                     doc.data()?.uid
@@ -212,6 +214,7 @@ export const HomeComponent: React.FunctionComponent = () => {
     });
   };
 
+  /* For rendering meetings on meeting history section */
   const onRenderCell = (
     item: any | undefined,
     index: number | undefined
@@ -225,7 +228,6 @@ export const HomeComponent: React.FunctionComponent = () => {
         <div
           className={classNames.itemContent}
           onClick={async () => {
-            console.log(item);
             await fetchEnteredUserDetails(item.user2Email).then(
               (result: FirebaseUser) => {
                 dispatch(fetchEnteredUserDetailsAction(result));
@@ -272,13 +274,13 @@ export const HomeComponent: React.FunctionComponent = () => {
   return (
     <>
       <Stack {...mainStack}>
+        {/* Header */}
         <Stack {...headerProps} horizontal>
           <Stack style={{ width: "74%" }}>
             <Persona
               {...examplePersona}
               size={PersonaSize.size72}
               presence={PersonaPresence.offline}
-              // styles={personaStyles}
             />
           </Stack>
           <Stack horizontalAlign="end" style={{ width: "26%" }}>
@@ -290,7 +292,9 @@ export const HomeComponent: React.FunctionComponent = () => {
             />
           </Stack>
         </Stack>
+        {/* Main body  */}
         <Stack {...LayoutProps} className="layout-class">
+          {/* Left section  */}
           <Stack {...sandbox} className="newMeeting-class">
             <Stack {...content}>
               <Stack>
@@ -307,6 +311,7 @@ export const HomeComponent: React.FunctionComponent = () => {
             </Stack>
           </Stack>
           {/* <Stack {...vertical} className="verticalLine-class"></Stack> */}
+          {/* Right section  */}
           <Stack {...sandbox} className="meetingHistory">
             <Stack {...content}>
               <Stack>
@@ -335,6 +340,7 @@ export const HomeComponent: React.FunctionComponent = () => {
         </Stack>
       </Stack>
 
+      {/* To show or not call notification  */}
       {context.gettingCall && !context.callAccepted && context.callDetails ? (
         <Stack style={{ height: "10%", width: "10%" }}>
           <CallNotification />
@@ -343,6 +349,7 @@ export const HomeComponent: React.FunctionComponent = () => {
         <></>
       )}
 
+      {/* Modal that opens on clicking start new meeting btn  */}
       <Modal
         titleAriaId={titleId}
         isOpen={isModalOpen}
@@ -483,7 +490,7 @@ export const HomeComponent: React.FunctionComponent = () => {
                 {...nextActionProps}
                 className="nextAction-class"
                 onClick={() => {
-                  console.log(email);
+                  // console.log(email);
                   handleNext(0);
                 }}
               />

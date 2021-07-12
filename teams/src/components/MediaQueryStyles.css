@@ -1,10 +1,4 @@
-/* .layout-class {
-  background-color: gold;
-}
-
-.newMeeting-class {
-  background-color: blue;
-} */
+/* For adding media queries */
 
 @media (max-width: 950px) {
   .layout-class {
@@ -43,6 +37,7 @@
   }
 }
 
+/* Call Notification  */
 @media (max-width: 500px) {
   .callNotification-class {
     padding: 20px;

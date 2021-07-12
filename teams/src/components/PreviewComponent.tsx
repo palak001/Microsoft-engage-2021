@@ -57,11 +57,14 @@ export const PreviewComponent: React.FunctionComponent = () => {
   const [disableIcons, setDisableIcons] = useState<boolean>(true);
 
   useEffect(() => {
-    console.log();
+    // console.log();
+    // keep btn disabled till we receive users media or get an error for the same
     if (context.stream || mediaStreamError) {
       setDisableIcons(false);
     }
   }, [context.stream, mediaStreamError]);
+
+  // Handle cam/mic toggle
 
   const handleOnCamToggle = () => {
     if (toggleCamStatus === "on") {
@@ -87,8 +90,9 @@ export const PreviewComponent: React.FunctionComponent = () => {
     context.toggleAudioSettings();
   };
 
+  // Handle call join
   const handleJoin = () => {
-    console.log("enteredUserDetails.socketID: ", enteredUserDetails.socketID);
+    // console.log("enteredUserDetails.socketID: ", enteredUserDetails.socketID);
     if (context.acceptingCall) {
       context.answerCall();
     } else context.startCall(enteredUserDetails.socketID);
@@ -113,6 +117,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
         />
       </Stack>
 
+      {/* Main preview screen  */}
       <Stack
         verticalAlign="center"
         horizontalAlign="center"
@@ -122,6 +127,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
           style={{ height: "5%", width: "60%" }}
           tokens={{ padding: "0px 0px 20px 0px" }}
         >
+          {/* Show error in case of mistake  */}
           {mediaStreamError ? (
             <MessageBar messageBarType={MessageBarType.severeWarning}>
               {mediaStreamError}
@@ -131,6 +137,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
           )}
         </Stack>
         <Stack {...previewStackProps} className="previewStack-class">
+          {/* User's video  */}
           <Stack
             horizontalAlign="center"
             verticalAlign="center"
@@ -147,6 +154,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
               autoPlay
             />
           </Stack>
+          {/* Cam controls  */}
           <Stack
             horizontal
             horizontalAlign="center"
@@ -168,6 +176,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
                 disabled={disableIcons}
               />
             </Stack>
+            {/* Mic controls  */}
             <Stack
               horizontal
               verticalAlign="center"
@@ -189,6 +198,7 @@ export const PreviewComponent: React.FunctionComponent = () => {
                 />
               </Stack>
             </Stack>
+            {/* Join btn  */}
             <Stack verticalAlign="center" tokens={{ padding: "10px" }}>
               <PrimaryButton
                 text="Join"
