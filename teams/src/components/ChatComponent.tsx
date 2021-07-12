@@ -29,23 +29,13 @@ import firebase from "firebase";
 import { useContext } from "react";
 import { SocketContext } from "../SockectContext";
 import FirebaseUser from "../interfaces/user.interface";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux-store";
-
-enum SenderType {
-  self = 0,
-  frnd = 1,
-}
-
-interface Chat {
-  content: string;
-  time: string;
-  sender: SenderType;
-}
-
-interface Chats {
-  message: Chat[];
-}
+import { Chat, SenderType } from "../interfaces/chat.interface";
+import {
+  setChatsHistory,
+  updateChatsHistory,
+} from "../redux-store/Chat/ChatReducer";
 
 interface ChatsProps {
   options: string;
@@ -56,15 +46,13 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
 ) => {
   initializeIcons();
   const history = useHistory();
+  const dispatch = useDispatch();
   const [message, setMessage] = useState<string>("");
   const { search }: any = useLocation();
   const queryParameter = qs.parse(search, { ignoreQueryPrefix: true });
   const context = useContext(SocketContext);
   const [receiverEmailID, setReceiverEmailID] = useState<string>("");
   const [meetingName, setMeetingName] = useState<string>("");
-
-  const [teamsChat, setTeamsChat] = useState<Chats>({ message: [] });
-  const [initChat, setInitChat] = useState<Chats>({ message: [] });
   const [receiverPhotoURL, setReceiverPhotoURL] = useState<string>("");
   const [receiverName, setReceiverName] = useState<string>("");
   const [disabledSendBtn, setDisabledSendBtn] = useState<boolean>(true);
@@ -72,6 +60,39 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   const enteredUserDetails: FirebaseUser = useSelector(
     (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
   );
+
+  const teamsChat: Chat[] = useSelector(
+    (state: RootState) => state.chatReducer.message
+  );
+
+  // Fetch Chat History for particular Meeting ID
+  useEffect(() => {
+    const meetingToken: string = `${queryParameter.meetingID}`;
+    db.collection("meetings")
+      .doc(meetingToken)
+      .get()
+      .then((doc) => {
+        let chatHistory: Chat[] = [];
+        if (doc.exists) {
+          if (doc.data()) {
+            if (doc.data()?.meetingHistory) {
+              doc.data()?.meetingHistory.forEach((element: any) => {
+                const senderType =
+                  auth.currentUser?.email === element.from
+                    ? SenderType.self
+                    : SenderType.frnd;
+                chatHistory.push({
+                  content: element.message,
+                  time: "1",
+                  sender: senderType,
+                });
+              });
+            }
+          }
+        }
+        dispatch(setChatsHistory(chatHistory));
+      });
+  }, [dispatch, queryParameter.meetingID]);
 
   useEffect(() => {
     /* Sets meeting id and receivers email id from query parameters */
@@ -116,34 +137,16 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   }, [receiverEmailID]);
 
   useEffect(() => {
-    /* fetch old chats */
-    context.socket.current.emit("sendOldChats", {
-      meetingID: queryParameter.meetingID,
-      user: context.yourID,
-      userEmail: auth.currentUser?.email,
-    });
-    context.socket.current.on("oldChats", (chatHistory: any) => {
-      setInitChat({
-        message: [...chatHistory],
-      });
-    });
-  }, [queryParameter.meetingID, context.socket, context.yourID]);
-
-  useEffect(() => {
-    setTeamsChat(initChat);
-  }, [initChat]);
-
-  useEffect(() => {
     /* Add new chat to the meeting */
     context.socket.current.on("newChat", (data: any) => {
-      setTeamsChat({
-        message: [
-          ...teamsChat.message,
-          { content: data.message, time: "1", sender: SenderType.frnd },
-        ],
-      });
+      const chats = {
+        content: data.message,
+        time: "1",
+        sender: SenderType.frnd,
+      };
+      dispatch(updateChatsHistory(chats));
     });
-  }, [context.socket, teamsChat.message]);
+  }, [context.socket, dispatch]);
 
   /* Handle send message */
   const handleSendMsg = async () => {
@@ -163,12 +166,12 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
           }),
         });
 
-      setTeamsChat({
-        message: [
-          ...teamsChat.message,
-          { content: message, time: "1", sender: SenderType.self },
-        ],
-      });
+      const chats = {
+        content: message,
+        time: "1",
+        sender: SenderType.self,
+      };
+      dispatch(updateChatsHistory(chats));
 
       // Emit socket event
       context.sendChatMessage({
@@ -289,7 +292,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
               overflow: "scroll",
             }}
           >
-            {teamsChat?.message?.map((chat: Chat) =>
+            {teamsChat?.map((chat: Chat) =>
               chat.sender === SenderType.self ? (
                 <Stack horizontalAlign="end">
                   <Stack {...duskLight}>
