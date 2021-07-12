@@ -139,14 +139,17 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   useEffect(() => {
     /* Add new chat to the meeting */
     context.socket.current.on("newChat", (data: any) => {
-      const chats = {
-        content: data.message,
-        time: "1",
-        sender: SenderType.frnd,
-      };
-      dispatch(updateChatsHistory(chats));
+      console.log("received Chat");
+      if (data.meetingID === queryParameter.meetingID) {
+        const chats = {
+          content: data.message,
+          time: "1",
+          sender: SenderType.frnd,
+        };
+        dispatch(updateChatsHistory(chats));
+      }
     });
-  }, [context.socket, dispatch]);
+  }, [context.socket, dispatch, queryParameter.meetingID]);
 
   /* Handle send message */
   const handleSendMsg = async () => {
@@ -177,6 +180,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
       context.sendChatMessage({
         message: message,
         receiverEmail: receiverEmailID,
+        meetingID: queryParameter.meetingID,
       });
 
       setMessage("");
