@@ -2,9 +2,14 @@
 This project is a part of my participation in Microsoft Engage Mentorship Program 2021. I've implemented Microsoft Teams Clone application. 
 You can check out the project using [Website Link](https://palak001-microsoft-engage-2021.netlify.app/).
 
+## Some additional Links
+[Project's desgin document](https://drive.google.com/file/d/1IR-qX6sdtYAYsD-lwCIn_yiRKwc1Jk3g/view?usp=sharing)\
+[Project's timeline](https://docs.google.com/document/d/1UD0M6VAbLMRsoqhzxQocGrSoSdE3kd5aO_xPRrwa6eE/edit?usp=sharing)
+
 ## Features provided
+* Provides user authentication
 * Allows two participants to have a video call
-* Allows two participants to chat with each other(before, during and after 
+* Allows two participants to chat with each other(before, during and after a video call)
 * Allows participants to keep discussion related to different topics seperate by creating meetings
 
 ## Tech Stack used
@@ -48,9 +53,6 @@ There can be many reasons as to why you might be facing such an issue. But gener
 ### Suggestions
 More suggestions and improvements are welcomed.
 
-## Some additional Links
-[Project's desgin document](https://drive.google.com/file/d/1IR-qX6sdtYAYsD-lwCIn_yiRKwc1Jk3g/view?usp=sharing)\
-[Project's timeline](https://docs.google.com/document/d/1UD0M6VAbLMRsoqhzxQocGrSoSdE3kd5aO_xPRrwa6eE/edit?usp=sharing)
 
 
 
