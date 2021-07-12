@@ -4,7 +4,7 @@ You can check out the project using [Website Link](https://palak001-microsoft-en
 
 ## Features provided
 * Allows two participants to have a video call
-* Allows two participants to chat with each other. 
+* Allows two participants to chat with each other(before, during and after 
 * Allows participants to keep discussion related to different topics seperate by creating meetings
 
 ## Tech Stack used
@@ -28,6 +28,9 @@ Why seeing this message?
 Seems like a mistake?
 * Try refreshing the application some times.
 
+### Why am I not allowed to open multiple sessions of same user?
+This is an intended feature. The reason for restricting users to single session is to properly handle video call feature in the application. Every session is assigned a socketID. This socketID is necessary for letting two participants have a video call. Multiple active session implies, multiple socketIDs is associated with that particular user. One way of handling multiple active session is by having some way of keeping a record of active socketID and a way of finding out which socketID is the participant using for establishing peer to peer connection(helps in videocalling). The other way(which I have used) is to restrict the participant with only one active sessions at a moment. Hence my application just allows one active session per user at any point in time.
+
 ### I can't see/hear the other person video/audio
 This could occur for couple of reasons-
 * Your friend hasn't switched on their camera
@@ -35,10 +38,14 @@ This could occur for couple of reasons-
 
 
 ## What to do if the application doesn't seem to work?
-There can be many reasons as to why you are facing such an issue. But before concluding that this application doesn't work at all, Please consider trying it one last time. Generally refreshing the application or trying the application from different devices do the trick. 
+There can be many reasons as to why you might be facing such an issue. But generally refreshing the application or trying the application from different devices do the trick. 
 
 ### Suggestions
 More suggestions and improvements are welcomed.
+
+## Some additional Links
+[Project's desgin document](https://drive.google.com/file/d/1IR-qX6sdtYAYsD-lwCIn_yiRKwc1Jk3g/view?usp=sharing)
+[Project's timeline](https://docs.google.com/document/d/1UD0M6VAbLMRsoqhzxQocGrSoSdE3kd5aO_xPRrwa6eE/edit?usp=sharing)
 
 
 
