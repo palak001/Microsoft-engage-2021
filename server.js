@@ -165,6 +165,7 @@ io.on("connection", (socket) => {
             from: data.from,
             message: data.message,
             senderEmail: data.senderEmail,
+            meetingID: data.meetingID,
           });
         }
       });

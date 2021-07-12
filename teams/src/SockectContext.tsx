@@ -408,6 +408,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // Chatting related
   const sendChatMessage = (chatObject: any) => {
+    console.log("sending message", chatObject.message);
     if (socket.current) {
       db.collection("users")
         .doc(chatObject.receiverEmail)
@@ -419,6 +420,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
               message: chatObject.message,
               from: yourID,
               senderEmail: auth.currentUser?.email,
+              meetingID: chatObject.meetingID,
             });
           }
         });
