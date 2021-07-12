@@ -10,6 +10,8 @@ import "../../components/MediaQueryStyles.css";
 export const ActiveSession: React.FunctionComponent = () => {
   const history = useHistory();
   const context = useContext(SocketContext);
+
+  // Handle sign out
   const handleSignOut = () => {
     auth.signOut().then(() => {
       context.socket.current.emit("signOut");

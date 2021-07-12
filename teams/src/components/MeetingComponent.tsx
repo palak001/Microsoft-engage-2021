@@ -47,6 +47,7 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
   props: MediaControlsProps
 ) => {
   initializeIcons();
+  // Persona
   const examplePersona: IPersonaSharedProps = {
     imageUrl: auth.currentUser?.photoURL!,
     text: auth.currentUser?.displayName!,
@@ -59,6 +60,8 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
   const mediaStreamError: string = useSelector(
     (state: RootState) => state.mediaStreamErrorReducer.mediaStreamError
   );
+
+  // For syncing global cam/mic status on preview and video call screen
 
   const globalCamStatus: string = useSelector(
     (state: RootState) => state.controlsReducer.camera
@@ -86,6 +89,7 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
 
   return (
     <Stack verticalFill>
+      {/* Header  */}
       <Stack {...headerProps} horizontal horizontalAlign="space-between">
         <Persona
           {...examplePersona}
@@ -126,6 +130,7 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
           <PrimaryButton onClick={context.leaveCall} {...declineCallProps} />
         </Stack>
       </Stack>
+      {/* Main window where both participants video is shown  */}
       <Stack style={{ height: "90%" }}>
         <Stack
           style={{ height: "10%" }}
@@ -139,6 +144,7 @@ export const MeetingComponent: React.FunctionComponent<MediaControlsProps> = (
             ""
           )}
         </Stack>
+        {/* Chat panel  */}
         <Stack style={{ height: "90%" }} {...personaLayoutProps}>
           <Video />
         </Stack>

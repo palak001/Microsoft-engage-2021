@@ -42,11 +42,13 @@ let corsOptions = {
 };
 
 /* Redis Adapter */
+/* For deployment purpose */
 const redisAdapter = adapter({
   host: process.env.REDIS_HOST || "localhost",
   port: process.env.REDIS_PORT || "6379",
   password: process.env.REDIS_PASS || "password",
 });
+/* For local testing */
 // const redisAdapter = adapter({
 //   host: "localhost",
 //   port: "6379",
@@ -74,18 +76,16 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-// important
+// Socket.io server main logic
 io.on("connection", (socket) => {
   redis.keys("*", function (err, keys) {
     if (err) return console.log(err);
-    for (var i = 0, len = keys.length; i < len; i++) {
-      console.log("key: ", keys[i]);
-    }
   });
-  console.log(socket.id);
-  socket.on("authentication", async (data) => {
-    // console.log("Here's the data I recieved: ", data);
 
+  /* Making sure the client has only one active session */
+  socket.on("authentication", async (data) => {
+    /* For acquiring lock on user session */
+    /* Sets up key only if it doesn't already exist with an expiration of 30 sec */
     let canConnect = await redis.setAsync(
       `users:${data.uid}`,
       socket.id,
@@ -93,27 +93,22 @@ io.on("connection", (socket) => {
       "EX",
       30
     );
+    /* If key cannot be set then Invalid session */
     if (!canConnect) {
-      console.log("Already Logged In");
-      console.log(socket.id + " disconnected");
       io.to(socket.id).emit("InvalidSession");
       if (socket.user) {
         await redis.delAsync(`users:${socket.user.uid}`);
       }
       socket.disconnect();
     } else {
+      /* User authenticated */
       socket.user = data;
-      console.log(socket.user);
       io.to(socket.id).emit("authenticated");
-      console.log("Welcome");
 
-      // redis renewel
+      // redis key renewel as the key have expiration of 30sec
       socket.conn.on("packet", async (packet) => {
-        console.log("Thinking of renewing the key");
-        console.log("socket.auth: ", socket.auth);
-        console.log("packet type: ", packet.type);
         if (packet.type === "pong") {
-          console.log("received a pong");
+          /*Set the key only if it already exists */
           await redis.setAsync(
             `users:${socket.user.uid}`,
             socket.id,
@@ -164,9 +159,8 @@ io.on("connection", (socket) => {
         io.to(data.to).emit("callRejected");
       });
 
-      // chat related logic
+      // retrieving old chat related logic
       socket.on("sendOldChats", (data) => {
-        console.log("sending");
         if (data.meetingID) {
           db.collection("meetings")
             .doc(data.meetingID)
@@ -185,14 +179,12 @@ io.on("connection", (socket) => {
                   });
                 }
               }
-              // socket.emit("oldChats", chatHistory);
               io.to(data.user).emit("oldChats", chatHistory);
             });
         }
       });
 
       socket.on("chat", (data) => {
-        console.log("chat!");
         if (data.to) {
           io.to(data.to).emit("newChat", {
             from: data.from,

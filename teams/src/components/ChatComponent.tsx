@@ -11,7 +11,6 @@ import React, { useEffect, useState } from "react";
 import { Persona, PersonaSize } from "@fluentui/react/lib/Persona";
 import {
   headerProps,
-  // personaStyles,
   chatHeadingProps,
   videoCallProps,
   textActionProps,
@@ -75,6 +74,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   );
 
   useEffect(() => {
+    /* Sets meeting id and receivers email id from query parameters */
     const participantsEmail = {
       user1: "",
       user2: "",
@@ -101,6 +101,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   }, [queryParameter.meetingID]);
 
   useEffect(() => {
+    /* Fetches receivers info */
     if (receiverEmailID) {
       db.collection("users")
         .doc(receiverEmailID)
@@ -115,6 +116,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   }, [receiverEmailID]);
 
   useEffect(() => {
+    /* fetch old chats */
     context.socket.current.emit("sendOldChats", {
       meetingID: queryParameter.meetingID,
       user: context.yourID,
@@ -132,6 +134,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   }, [initChat]);
 
   useEffect(() => {
+    /* Add new chat to the meeting */
     context.socket.current.on("newChat", (data: any) => {
       setTeamsChat({
         message: [
@@ -142,6 +145,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
     });
   }, [context.socket, teamsChat.message]);
 
+  /* Handle send message */
   const handleSendMsg = async () => {
     let tempMessage = message;
     tempMessage.trim();
@@ -177,6 +181,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
     }
   };
 
+  /* Handle Message input in the text field */
   const handleMessageInput = (e: any) => {
     if (e.target.value.trim() !== "") {
       setDisabledSendBtn(false);
@@ -184,6 +189,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
     setMessage(e.target.value);
   };
 
+  /* Handle video call through the chat screen */
   const handleVideoCall = () => {
     context.getUserMediaFunction();
     context.setStartingCallToTrue();
@@ -206,6 +212,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
             verticalAlign="center"
             tokens={{ childrenGap: "20px" }}
           >
+            {/* Whether to show back icon on chat component or not */}
             {props.options === "none" ? (
               <></>
             ) : (
@@ -222,6 +229,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
               </Text>
             </Stack>
           </Stack>
+          {/* Whether to show video icon or not */}
           {props.options === "none" ? (
             <></>
           ) : (

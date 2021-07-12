@@ -51,11 +51,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   const history = useHistory();
   const { search }: any = useLocation();
   const queryParameter = qs.parse(search, { ignoreQueryPrefix: true });
-
   const dispatch = useDispatch();
 
   // Local States
-
   const [stream, setStream] = useState<any>();
   const [friendStream, setFriendStream] = useState<any>();
   const [yourID, setYourID] = useState<string>("");
@@ -76,30 +74,31 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // useEffects
   useEffect(() => {
+    /* For production */
     socket.current = io("https://microsoft-engage-2021-server.herokuapp.com", {
       autoConnect: false,
     });
+    /* for developement */
     // socket.current = io("http://localhost:8000", {
     //   autoConnect: false,
     // });
 
     socket.current.on("connect", () => {
-      console.log("sending authentication data");
       socket.current.emit("authentication", {
         username: auth.currentUser?.email,
         uid: auth.currentUser?.uid,
       });
 
+      /* When you already have an active session */
       socket.current.on("InvalidSession", () => {
-        console.log("Unauthorized:");
         history.push("/activesession");
       });
       socket.current.on("authenticated", function () {
-        console.log("authenticated");
+        // console.log("authenticated");
       });
 
+      /* Recieve socketID */
       socket.current.on("yourID", (socketID: string) => {
-        console.log("Your ID: ", socketID);
         setYourID(socketID);
         if (auth.currentUser) {
           db.collection("users")
@@ -112,10 +111,10 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
             );
         }
       });
+
+      /* Receiving call */
       socket.current.on("callingYou", (data: ICallDetails) => {
         setGettingCall(true);
-        // console.log("getting call", callDetails);
-        console.log("details: ", data);
         setCallDetails({
           from: data.from,
           name: data.name,
@@ -143,11 +142,12 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // Helper Functions
 
+  /* For starting a call */
   const startCall = (socketId: string) => {
-    console.log("call started so start");
     setCallStarted(true);
     setOtherPersonID(socketId);
-    console.log("stream", stream);
+
+    /* Creating a new peer */
     const peer = new Peer({
       initiator: true,
       offerOptions: {
@@ -181,6 +181,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
     });
 
+    /* fires on receiving friends stream */
     peer.on("stream", (friendStream) => {
       if (friendVideo.current) friendVideo.current.srcObject = friendStream;
       setFriendStream(friendStream);
@@ -191,44 +192,40 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       console.log(err);
     });
 
+    /* Fires when the friend has accepted the call */
     socket.current.on("callAccepted", (signal: any) => {
       setCallAccepted(true);
       peer.signal(JSON.stringify(signal));
     });
 
+    /* Fires when the friend has ended the call */
     socket.current.on("callEnded", () => {
-      // stopMediaTracks(stream);
       stopMediaTracks();
-
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
       history.push("/");
-
       window.location.reload();
     });
 
+    /* Fires when the friend has rejected the call */
     socket.current.on("callRejected", () => {
-      // stopMediaTracks(stream);
       stopMediaTracks();
-
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
       history.push("/");
-
-      // setCallDetails(null);
       window.location.reload();
     });
-    // });
   };
 
+  /* Answer call function */
   const answerCall = () => {
     setCallAccepted(true);
     setGettingCall(false);
+    /* peer object */
     const peer = new Peer({
       initiator: false,
-
       answerOptions: {
         offerToReceiveAudio: false,
         offerToReceiveVideo: false,
@@ -236,9 +233,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       trickle: false,
       stream: stream,
     });
-
     connectionRef.current = peer;
-
+    /* Fires when the peer is ready with signalling data */
     peer.on("signal", (signalData) => {
       socket.current.emit("acceptedCall", {
         signal: signalData,
@@ -246,6 +242,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       });
     });
 
+    /* fires on receiving friends stream */
     peer.on("stream", (friendStream) => {
       setFriendStream(friendStream);
       if (friendVideo.current) friendVideo.current.srcObject = friendStream;
@@ -257,10 +254,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
     peer.signal(JSON.stringify(callDetails.signal));
 
+    /* Fires when the friend has ended the call */
     socket.current.on("callEnded", () => {
-      // stopMediaTracks(stream);
       stopMediaTracks();
-
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
@@ -268,27 +264,22 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
       window.location.reload();
     });
 
+    /* Fires when the friend has rejected the call */
     socket.current.on("callRejected", () => {
-      // stopMediaTracks(stream);
       stopMediaTracks();
-
       setCallEnded(true);
       setCallAccepted(false);
       setCallStarted(false);
       history.push("/");
       window.location.reload();
     });
-    // });
   };
 
   const leaveCall = () => {
-    // To switch your webcam light!
-    // stopMediaTracks(stream);
+    // To switch off your webcam light!
     stopMediaTracks();
-
     setCallEnded(true);
     if (connectionRef.current) connectionRef.current.destroy();
-    console.log("streams: ", stream);
     setCallAccepted(false);
     setCallStarted(false);
     setGettingCall(false);
@@ -298,8 +289,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
   };
 
   const rejectCall = () => {
-    // To switch your webcam light!
-    // stopMediaTracks(stream);
+    // To switch of your webcam light!
     stopMediaTracks();
     setCallRejected(true);
     if (connectionRef.current) connectionRef.current.destroy();
@@ -319,9 +309,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     setAcceptingCall(true);
   };
 
+  /* For getting user media */
   const getUserMediaFunction = () => {
     navigator.mediaDevices.enumerateDevices().then(function (devices) {
-      console.log(devices);
       var cam = devices.find(function (device) {
         return device.kind === "videoinput";
       });
@@ -337,8 +327,9 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
           if (yourVideo.current) yourVideo.current.srcObject = stream;
         })
         .catch(function (err) {
+          /* Sets error in case of failure in getting user media */
           if (cam || mic) {
-            console.log(err);
+            // console.log(err);
             setStream(null);
             if (yourVideo.current) yourVideo.current.srcObject = null;
 
@@ -383,6 +374,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     }
   }
 
+  /* Functions to toggle audio and video settings */
   const toggleAudioSettings = () => {
     if (stream) {
       stream.getTracks().forEach(function (track: any) {
@@ -403,8 +395,8 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     }
   };
 
+  /* Function to stop media tracks in case of leave call or reject call */
   const stopMediaTracks = () => {
-    // currentStream: any
     if (stream) {
       stream.getTracks().forEach(function (track: any) {
         track.stop();
