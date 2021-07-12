@@ -12,6 +12,10 @@ You can check out the project using [Website Link](https://palak001-microsoft-en
 * Node js, simple peer, socket.io, redis for server side 
 * Firebase for authentication and user data storage
 
+## Agile Methodology followed throughtout this project
+This was a month-long project. And for a project like this, planning is a necessary part. The way I managed to keep a check on my progress was by creating regular GitHub issues and pull requests. I configured continuous integration and continuous deployment for my application so whenever a pull request was made to main branch, the automatic deployment is triggered for my react app on netlify and server at heroku. So in this way I was able to build my complete application by integrating small functional components over time.
+
+
 ## Point to note 
 * The application allows only one session per user, so if you try to open multiple sessions for same user, the application will close all your sessions(except the very first one) with an active session error message. 
 
@@ -39,6 +43,7 @@ This could occur for couple of reasons-
 
 ## What to do if the application doesn't seem to work?
 There can be many reasons as to why you might be facing such an issue. But generally refreshing the application or trying the application from different devices do the trick. 
+
 
 ### Suggestions
 More suggestions and improvements are welcomed.
