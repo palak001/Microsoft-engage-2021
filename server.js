@@ -159,31 +159,6 @@ io.on("connection", (socket) => {
         io.to(data.to).emit("callRejected");
       });
 
-      // retrieving old chat related logic
-      socket.on("sendOldChats", (data) => {
-        if (data.meetingID) {
-          db.collection("meetings")
-            .doc(data.meetingID)
-            .get()
-            .then((doc) => {
-              let chatHistory = [];
-              if (doc.exists) {
-                if (doc.data().meetingHistory) {
-                  doc.data().meetingHistory.forEach((element) => {
-                    let senderType = data.userEmail === element.from ? 0 : 1;
-                    chatHistory.push({
-                      content: element.message,
-                      time: "1",
-                      sender: senderType,
-                    });
-                  });
-                }
-              }
-              io.to(data.user).emit("oldChats", chatHistory);
-            });
-        }
-      });
-
       socket.on("chat", (data) => {
         if (data.to) {
           io.to(data.to).emit("newChat", {
