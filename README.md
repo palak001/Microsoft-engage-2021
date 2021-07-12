@@ -44,7 +44,7 @@ There can be many reasons as to why you might be facing such an issue. But gener
 More suggestions and improvements are welcomed.
 
 ## Some additional Links
-[Project's desgin document](https://drive.google.com/file/d/1IR-qX6sdtYAYsD-lwCIn_yiRKwc1Jk3g/view?usp=sharing)
+[Project's desgin document](https://drive.google.com/file/d/1IR-qX6sdtYAYsD-lwCIn_yiRKwc1Jk3g/view?usp=sharing)\
 [Project's timeline](https://docs.google.com/document/d/1UD0M6VAbLMRsoqhzxQocGrSoSdE3kd5aO_xPRrwa6eE/edit?usp=sharing)
 
 
