@@ -6,6 +6,9 @@ import {
   initializeIcons,
   Icon,
   Text,
+  Spinner,
+  SpinnerSize,
+  IStackProps,
 } from "@fluentui/react";
 import React, { useEffect, useState } from "react";
 import { Persona, PersonaSize } from "@fluentui/react/lib/Persona";
@@ -56,6 +59,13 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   const [receiverPhotoURL, setReceiverPhotoURL] = useState<string>("");
   const [receiverName, setReceiverName] = useState<string>("");
   const [disabledSendBtn, setDisabledSendBtn] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
+  const rowProps: IStackProps = {
+    verticalFill: true,
+    horizontal: true,
+    verticalAlign: "center",
+    horizontalAlign: "center",
+  };
 
   const enteredUserDetails: FirebaseUser = useSelector(
     (state: RootState) => state.enteredUserDetailsReducer.enteredUserDetails
@@ -90,6 +100,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
             }
           }
         }
+        setLoading(false);
         dispatch(setChatsHistory(chatHistory));
       });
   }, [dispatch, queryParameter.meetingID]);
@@ -139,7 +150,6 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   useEffect(() => {
     /* Add new chat to the meeting */
     context.socket.current.on("newChat", (data: any) => {
-      console.log("received Chat");
       if (data.meetingID === queryParameter.meetingID) {
         const chats = {
           content: data.message,
@@ -149,6 +159,12 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
         dispatch(updateChatsHistory(chats));
       }
     });
+
+    /* Remove event listener for newChat */
+    return () => {
+      // debugger;
+      context.socket.current.removeListener("newChat");
+    };
   }, [context.socket, dispatch, queryParameter.meetingID]);
 
   /* Handle send message */
@@ -174,6 +190,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
         time: "1",
         sender: SenderType.self,
       };
+
       dispatch(updateChatsHistory(chats));
 
       // Emit socket event
@@ -200,7 +217,7 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
   const handleVideoCall = () => {
     context.getUserMediaFunction();
     context.setStartingCallToTrue();
-    console.log(enteredUserDetails);
+    // console.log(enteredUserDetails);
     history.push(
       `/meeting?uid1=${auth.currentUser?.uid}&uid2=${queryParameter.uid2}&meetingID=${queryParameter.meetingID}`
     );
@@ -251,98 +268,109 @@ export const ChatComponent: React.FunctionComponent<ChatsProps> = (
         </Stack>
       </Stack>
       <Stack style={{ height: "90%" }} verticalAlign="end">
-        <Stack
-          horizontal
-          horizontalAlign="space-between"
-          tokens={{ padding: "10px 40px 10px 40px" }}
-          style={{
-            height: "6%",
-            width: "100%",
-          }}
-        >
-          <Stack horizontal>
-            <Text style={{ color: "#646464", paddingRight: "9px" }}>
-              {receiverName}
-            </Text>
-            <Persona imageUrl={receiverPhotoURL} size={PersonaSize.size24} />
+        {loading ? (
+          <Stack {...rowProps}>
+            <Spinner size={SpinnerSize.large} />
           </Stack>
-          <Stack horizontal>
-            <Persona
-              imageUrl={auth.currentUser?.photoURL!}
-              size={PersonaSize.size24}
-            />
-            <Text style={{ color: "#646464" }}>You</Text>
-          </Stack>
-        </Stack>
+        ) : (
+          <>
+            <Stack
+              horizontal
+              horizontalAlign="space-between"
+              tokens={{ padding: "10px 40px 10px 40px" }}
+              style={{
+                height: "6%",
+                width: "100%",
+              }}
+            >
+              <Stack horizontal>
+                <Text style={{ color: "#646464", paddingRight: "9px" }}>
+                  {receiverName}
+                </Text>
+                <Persona
+                  imageUrl={receiverPhotoURL}
+                  size={PersonaSize.size24}
+                />
+              </Stack>
+              <Stack horizontal>
+                <Persona
+                  imageUrl={auth.currentUser?.photoURL!}
+                  size={PersonaSize.size24}
+                />
+                <Text style={{ color: "#646464" }}>You</Text>
+              </Stack>
+            </Stack>
 
-        <Stack
-          style={{
-            height: "88%",
-            overflowY: "scroll",
-            scrollbarWidth: "none",
-            width: "100%",
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
-          <Stack
-            {...chatScreenProps}
-            style={{
-              position: "absolute",
-              top: "0",
-              left: "0",
-              bottom: "-20px",
-              right: "-20px",
-              overflow: "scroll",
-            }}
-          >
-            {teamsChat?.map((chat: Chat) =>
-              chat.sender === SenderType.self ? (
-                <Stack horizontalAlign="end">
-                  <Stack {...duskLight}>
-                    <Text>{chat.content}</Text>
-                  </Stack>
-                </Stack>
-              ) : (
-                <Stack
-                  horizontal
-                  horizontalAlign="start"
-                  verticalAlign="center"
-                >
-                  <Persona
-                    imageUrl={receiverPhotoURL}
-                    size={PersonaSize.size24}
-                    // text={receiverName}
-                    // styles={personaStyles}
-                  />
-                  <Stack {...neutralLight}>
-                    <Text>{chat.content}</Text>
-                  </Stack>
-                </Stack>
-              )
-            )}
-          </Stack>
-        </Stack>
+            <Stack
+              style={{
+                height: "88%",
+                overflowY: "scroll",
+                scrollbarWidth: "none",
+                width: "100%",
+                overflow: "hidden",
+                position: "relative",
+              }}
+            >
+              <Stack
+                {...chatScreenProps}
+                style={{
+                  position: "absolute",
+                  top: "0",
+                  left: "0",
+                  bottom: "-20px",
+                  right: "-20px",
+                  overflow: "scroll",
+                }}
+              >
+                {teamsChat?.map((chat: Chat) =>
+                  chat.sender === SenderType.self ? (
+                    <Stack horizontalAlign="end">
+                      <Stack {...duskLight}>
+                        <Text>{chat.content}</Text>
+                      </Stack>
+                    </Stack>
+                  ) : (
+                    <Stack
+                      horizontal
+                      horizontalAlign="start"
+                      verticalAlign="center"
+                    >
+                      <Persona
+                        imageUrl={receiverPhotoURL}
+                        size={PersonaSize.size24}
+                        // text={receiverName}
+                        // styles={personaStyles}
+                      />
+                      <Stack {...neutralLight}>
+                        <Text>{chat.content}</Text>
+                      </Stack>
+                    </Stack>
+                  )
+                )}
+              </Stack>
+            </Stack>
 
-        <Stack
-          style={{ height: "6%" }}
-          {...textStackProps}
-          verticalAlign="center"
-          horizontalAlign="center"
-        >
-          <Stack horizontal style={{ width: "100%" }}>
-            <TextField
-              {...textActionProps}
-              onChange={handleMessageInput}
-              value={message}
-            />
-            <IconButton
-              {...sendTextProps}
-              disabled={disabledSendBtn}
-              onClick={handleSendMsg}
-            />
-          </Stack>
-        </Stack>
+            <Stack
+              style={{ height: "6%" }}
+              {...textStackProps}
+              verticalAlign="center"
+              horizontalAlign="center"
+            >
+              <Stack horizontal style={{ width: "100%" }}>
+                <TextField
+                  {...textActionProps}
+                  onChange={handleMessageInput}
+                  value={message}
+                />
+                <IconButton
+                  {...sendTextProps}
+                  disabled={disabledSendBtn}
+                  onClick={handleSendMsg}
+                />
+              </Stack>
+            </Stack>
+          </>
+        )}
       </Stack>
     </Stack>
   );

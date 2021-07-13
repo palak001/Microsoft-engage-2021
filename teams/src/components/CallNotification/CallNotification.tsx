@@ -22,6 +22,8 @@ export const CallNotification: React.FunctionComponent = () => {
   return (
     <Stack className="callNotification-class" {...callWidget}>
       <Stack horizontalAlign="center">
+        <Text variant={"xxLarge"}>{context.callDetails.meetingName}</Text>{" "}
+        <br></br>
         <Persona
           imageUrl={context.callDetails.photoURL}
           size={PersonaSize.size56}
