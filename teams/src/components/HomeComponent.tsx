@@ -98,6 +98,7 @@ export const HomeComponent: React.FunctionComponent = () => {
     imageUrl: auth.currentUser?.photoURL!,
     text: auth.currentUser?.displayName!,
     secondaryText: auth.currentUser?.email!,
+    // presence: PersonaPresence.online,
   };
   const titleId = useId("title");
 
@@ -280,7 +281,7 @@ export const HomeComponent: React.FunctionComponent = () => {
             <Persona
               {...examplePersona}
               size={PersonaSize.size72}
-              presence={PersonaPresence.offline}
+              presence={PersonaPresence.online}
             />
           </Stack>
           <Stack horizontalAlign="end" style={{ width: "26%" }}>

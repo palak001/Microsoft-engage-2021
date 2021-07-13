@@ -57,7 +57,6 @@ export const PreviewComponent: React.FunctionComponent = () => {
   const [disableIcons, setDisableIcons] = useState<boolean>(true);
 
   useEffect(() => {
-    // console.log();
     // keep btn disabled till we receive users media or get an error for the same
     if (context.stream || mediaStreamError) {
       setDisableIcons(false);

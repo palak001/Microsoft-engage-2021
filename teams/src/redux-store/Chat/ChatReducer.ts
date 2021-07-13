@@ -23,7 +23,6 @@ export const updateChatsHistory = createAction<Chat>(
 export const chatReducer = createReducer(initialState, (builder) => {
   builder.addCase(setChatsHistory, (state, action: PayloadAction<Chat[]>) => {
     if (action.payload) state.message = action.payload;
-    console.log("setChatsHistory: ", state);
     return state;
   });
 
@@ -32,9 +31,7 @@ export const chatReducer = createReducer(initialState, (builder) => {
       const chats = state.message;
       chats.push(action.payload);
       state.message = chats;
-      // console.log("updating: ", action.payload);
     }
-    console.log("updateChatHis: ", state);
     return state;
   });
 });

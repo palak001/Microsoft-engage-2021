@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { fetchMediaStreamErrorAction } from "./redux-store/Video/MediaStreamErrorReducer";
 
 interface ICallDetails {
+  meetingName: string;
   from: string;
   photoURL: string;
   name: string;
@@ -122,13 +123,16 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
           uid: data.uid,
           signal: data.signal,
           meetingID: data.meetingID,
+          meetingName: data.meetingName,
           isReceivedCall: data.isReceivedCall,
         });
         setOtherPersonID(data.from);
+        history.push("/");
       });
     });
   }, [history]);
 
+  /* Setting streams if not already set */
   useEffect(() => {
     if (callAccepted || callStarted) {
       if (yourVideo.current && !yourVideo.current.srcObject) {
@@ -170,15 +174,23 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     connectionRef.current = peer;
     // fires when the peer want to send signalling data to other peers
     peer.on("signal", (signalData: any) => {
-      socket.current.emit("callUser", {
-        userToCall: socketId,
-        signalData: signalData,
-        from: yourID,
-        photoURL: auth.currentUser?.photoURL,
-        name: auth.currentUser?.displayName,
-        uid: auth.currentUser?.uid,
-        meetingID: queryParameter.meetingID,
-      });
+      db.collection("meetings")
+        .doc(`${queryParameter.meetingID}`)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            socket.current.emit("callUser", {
+              userToCall: socketId,
+              signalData: signalData,
+              from: yourID,
+              photoURL: auth.currentUser?.photoURL,
+              name: auth.currentUser?.displayName,
+              uid: auth.currentUser?.uid,
+              meetingID: queryParameter.meetingID,
+              meetingName: doc.data()?.meetingName,
+            });
+          }
+        });
     });
 
     /* fires on receiving friends stream */
@@ -345,6 +357,7 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
     });
   };
 
+  /* For handling userMedia related error */
   function handleGetUserMediaError(e: any) {
     switch (e.name) {
       case "NotFoundError":
@@ -408,7 +421,6 @@ const ContextProvider: React.FunctionComponent = ({ children }) => {
 
   // Chatting related
   const sendChatMessage = (chatObject: any) => {
-    console.log("sending message", chatObject.message);
     if (socket.current) {
       db.collection("users")
         .doc(chatObject.receiverEmail)

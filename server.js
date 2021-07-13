@@ -144,6 +144,7 @@ io.on("connection", (socket) => {
           uid: data.uid,
           meetingID: data.meetingID,
           isReceivedCall: true,
+          meetingName: data.meetingName,
         });
       });
 
